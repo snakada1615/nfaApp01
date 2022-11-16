@@ -340,7 +340,7 @@ export const actions = {
     return await fireGetDoc(payload.collectionId, payload.documentId)
   },
 
-  https://firestore.googleapis.com/
+  // https://firestore.googleapis.com/
   // google.firestore.v1.Firestore/Listen/
   // channel?VER=8&database=projects%2Fifnaapp01%2Fdatabases%2F(default)
   // &gsessionid=W1XJe055EbOZr44S1phcXN-M9voWyfw7pmOVJ1NqZaI&SID=3WycrZyj9Yvd1Sv6xXZXMw&RID=52804&TYPE=terminate&zx=rpqrrzq1nnj7
