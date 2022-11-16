@@ -17,11 +17,15 @@ export default {
     link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
   },
 
+  router: {
+    middleware: 'login',
+  },
+
   // Global CSS: https://go.nuxtjs.dev/config-css
   css: ['@/assets/scss/app.scss'],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-  plugins: [],
+  plugins: [{ src: '@/plugins/helper' }, { src: '@/plugins/firebasePlugin' }],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
