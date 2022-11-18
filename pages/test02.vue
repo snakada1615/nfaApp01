@@ -1,16 +1,21 @@
 <template>
   <b-container>
-    halo
     <b-table
       small
-      :items="$store.state.fire.dri"
+      stripped
+      responsive
+      :items="member"
       :fields="fieldTableDri"
-    ></b-table>
+    >
+      <template #cell(number)="data">
+        <div class="d-flex justify-content-around">
+          <b-icon icon="BIconDashCircleFill" class="mx-2"/> {{data.item.number}}<b-icon icon="BIconPlusCircleFill" class="mx-2"/>
+        </div>
+      </template>
+    </b-table>
     <b-card>
-      myApp
-      {{$store.state.fire.dri}}
+      myApp{{member}}
       myFamily
-      {{$store.state.fire.families}}
     </b-card>
   </b-container>
 </template>
@@ -25,7 +30,7 @@ export default {
        */
       fieldDRI: [
         {key: 'id', sortable: true, tdClass: 'd-none', thClass: 'd-none'},
-        {key: 'Name', sortable: false},
+        {key: 'name', sortable: false},
         {key: 'number', sortable: false},
       ],
       /**
@@ -36,8 +41,8 @@ export default {
        * 栄養必要量の合計値を示すテーブルのフィールド定義
        */
       fieldTableDri: [
-        {key: 'Name', sortable: false},
-        {key: 'Value', sortable: false},
+        {key: 'name', sortable: false},
+        {key: 'number', sortable: false},
       ],
       /**
        * 最初のテーブルを埋めるデータ（年齢・性別毎の人数）
@@ -47,6 +52,13 @@ export default {
        * 2番目のテーブルを埋めるデータ（栄養素毎の合計必要量）
        */
       tableDri: [],
+    }
+  },
+  computed: {
+    member:{
+      get(){
+        return this.$store.getters["fire/initialMembers"]
+      }
     }
   },
 };

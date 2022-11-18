@@ -273,12 +273,23 @@ export const state = () => ({
   loadingStatus: false,
 })
 
-export const getters = {}
+export const getters = {
+  initialMembers(state) {
+    return state.dri.map((item) => {
+      return {
+        id: item.id,
+        name: item.Name,
+        number: 0,
+      }
+    })
+  },
+}
 
 export const mutations = {
   /**
    * Familyの新規追加
-   * @param name
+   * @param state
+   * @param payload
    */
   addNewFamily({ state }, payload) {
     // 名前が重複していたらreturn
@@ -347,20 +358,26 @@ export const actions = {
 
   async fireGetDri({ commit }, payload) {
     console.log('get1')
-    const dri = await fireGetDoc(payload.collectionId, payload.documentId)
+    const dri = await fireGetDoc(
+      payload.collectionId,
+      payload.documentId
+    ).catch((err) => {
+      throw err
+    })
     console.log('get2')
     if (dri) {
       const driArray = formatDri(dri)
       console.log('get3')
       commit('updateAppDri', driArray)
+      console.log(driArray)
       console.log('get4')
     } else {
       throw new Error('fetchDri fail: no data')
     }
   },
 
-  loadMyApp({ dispatch }) {
-    dispatch('fireGetDri', {
+  async loadMyApp({ dispatch }) {
+    await dispatch('fireGetDri', {
       collectionId: 'nfaSharedData',
       documentId: 'dri01',
     })
