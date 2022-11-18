@@ -30,8 +30,8 @@
 
 import {initializeApp} from "firebase/app";
 import {CACHE_SIZE_UNLIMITED, collection, doc, getDoc, getDocs, initializeFirestore, setDoc} from "firebase/firestore";
-import {firestoreDb} from "../plugins/firebasePlugin";
-import {makeToast} from "../plugins/helper";
+import {firestoreDb} from "@/plugins/firebasePlugin";
+import {makeToast} from "@/plugins/helper";
 
 
 export default {
@@ -81,8 +81,9 @@ export default {
     this.secondaryFirestore = initializeFirestore(this.secondaryApp, {
       cacheSizeBytes: CACHE_SIZE_UNLIMITED,
     })
+    await this.$store.dispatch('fire/updateLoadingState', true)
     this.dbList = await this.getDocList('dataset')
-    console.log(this.dbList)
+    await this.$store.dispatch('fire/updateLoadingState', false)
   },
   methods:{
     async getDocList (myCollection, returnValue = 1) {
