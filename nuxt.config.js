@@ -75,10 +75,15 @@ export default {
       },
     ],
     'bootstrap-vue/nuxt',
+
     // https://go.nuxtjs.dev/axios
     '@nuxtjs/axios',
+
     // https://go.nuxtjs.dev/pwa
     '@nuxtjs/pwa',
+
+    // https://i18n.nuxtjs.org/
+    '@nuxtjs/i18n',
   ],
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
@@ -92,6 +97,22 @@ export default {
     manifest: {
       lang: 'en',
     },
+  },
+
+  // multi-language, i18n
+  i18n: {
+    locales: [
+      { code: 'ja', iso: 'ja_JP', file: 'ja.json' },
+      { code: 'en', iso: 'en-US', file: 'en.json' },
+      { code: 'fr', iso: 'fr-fr', file: 'fr.json' },
+    ],
+    lazy: true,
+    langDir: 'locales/',
+    defaultLocale: 'en',
+    vueI18n: {
+      fallbackLocale: 'en',
+    },
+    detectBrowserLanguage: { alwaysRedirect: true },
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build

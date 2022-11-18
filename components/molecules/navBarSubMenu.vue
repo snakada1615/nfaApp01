@@ -43,6 +43,20 @@
           </div>
         </b-nav-item-dropdown>
 
+        <!--  ここから言語切り替えの表示  -->
+        <b-nav-item-dropdown right>
+          <template #button-content>
+            <em>{{$i18n.locale}}</em>
+          </template>
+          <b-dropdown-item
+            v-for="locale in availableLocales"
+            :key="locale.code"
+            @click="() => changeLocale(locale.code)"
+          >
+            {{ locale.code }}
+          </b-dropdown-item>
+        </b-nav-item-dropdown>
+
         <!--  ここからuser情報の表示  -->
         <b-nav-item-dropdown v-if="false" right>
           <!-- Using 'button-content' slot -->
@@ -160,6 +174,13 @@ export default {
     }
   },
   computed: {
+    /**
+     * 使用可能な言語の種類
+     * @returns {*}
+     */
+    availableLocales() {
+      return this.$i18n.locales.filter((i) => i.code !== this.$i18n.locale)
+    },
     myMenuList () {
       const menuTemp = JSON.parse(JSON.stringify(this.myMenu.menuItems))
       if (menuTemp.length === 0) {
@@ -312,7 +333,15 @@ export default {
         throw err
       })
       this.$router.push('/')
-    }
+    },
+    /**
+     * リロードなし
+     * クッキーと、$i18n独自ストアのlocaleに言語を設定する
+     * 直接storeを書き換えるためリロードは不要
+     */
+    async changeLocale(locale) {
+      await this.$i18n.setLocale(locale)
+    },
   }
 }
 </script>

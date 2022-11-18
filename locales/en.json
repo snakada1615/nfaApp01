@@ -1,0 +1,14 @@
+{
+  "links": {
+  "home": "Home",
+    "about": "About",
+    "en": "English",
+    "ja": "Japanese"
+  },
+  "home": {
+    "title": {
+      "introduction": "This is an introduction in English."
+      }
+  },
+  "apple": "Apple1"
+}

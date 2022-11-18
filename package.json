@@ -1,5 +1,5 @@
 {
-  "name": "nfaApp",
+  "name": "nfaapp",
   "version": "1.0.0",
   "private": true,
   "scripts": {
@@ -19,6 +19,7 @@
     "@firebase/firestore": "^3.7.3",
     "@firebase/storage": "^0.9.14",
     "@nuxtjs/axios": "^5.13.6",
+    "@nuxtjs/i18n": "^7.3.0",
     "@nuxtjs/pwa": "^3.3.5",
     "bootstrap": "^4.6.1",
     "bootstrap-vue": "^2.21.2",

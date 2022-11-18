@@ -1,5 +1,6 @@
 <template>
   <b-container>
+    {{ $t('hello') }}
     <b-table
       small
       stripped
