@@ -9,7 +9,9 @@
     >
       <template #cell(number)="data">
         <div class="d-flex justify-content-around">
-          <b-icon icon="BIconDashCircleFill" class="mx-2"/> {{data.item.number}}<b-icon icon="BIconPlusCircleFill" class="mx-2"/>
+          <b-icon icon="BIconDashCircleFill" class="mx-2" style="cursor: pointer" @click="test"/>
+          {{data.item.number}}
+          <b-icon icon="BIconPlusCircleFill" class="mx-2" style="cursor: pointer" @click="test"/>
         </div>
       </template>
     </b-table>
@@ -21,6 +23,8 @@
 </template>
 
 <script>
+import { makeToast } from "@/plugins/helper";
+
 export default {
   name: "MyTest02",
   data() {
@@ -61,6 +65,11 @@ export default {
       }
     }
   },
+  methods: {
+    test(){
+      makeToast(this,'this day')
+    }
+  }
 };
 </script>
 
