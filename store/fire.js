@@ -1,6 +1,7 @@
 import { fireGetDoc } from '@/plugins/firebasePlugin'
 import { validateDeepObject } from '@/plugins/helper'
 
+/*
 const Family = class {
   constructor(name, member = []) {
     if (!Array.isArray(member)) {
@@ -110,6 +111,7 @@ const Family = class {
     this._recommendedCrops = value
   }
 }
+*/
 
 // const Ingredient = class {
 //   constructor(args = {}) {
@@ -310,6 +312,17 @@ export const state = () => ({
    * loadingBox表示用のフラグ
    */
   loadingStatus: false,
+  isUpdateElements: {
+    families: false,
+    communities: false,
+    userInfo: false,
+    dri: false,
+    driObject: false,
+    fct: false,
+    fctObject: false,
+    calendar: false,
+    portionSize: false,
+  },
 })
 
 export const getters = {
@@ -322,20 +335,52 @@ export const getters = {
       }
     })
   },
+  familyList(state) {
+    return state.families.map((item) => {
+      return item.name
+    })
+  },
+  isUpdateAny(state) {
+    let res = false
+    Object.values(state.isUpdateElements).forEach((item) => {
+      if (item) {
+        res = true
+      }
+    })
+    return res
+  },
 }
 
 export const mutations = {
+  /**
+   * 要素ごとのupdateの状況を設定
+   * @param state
+   * @param payload
+   */
+  setUpdateFlag(state, payload) {
+    state.isUpdateElements[payload.element] = payload.value
+  },
   /**
    * Familyの新規追加
    * @param state
    * @param payload
    */
-  addNewFamily({ state }, payload) {
+  addNewFamily(state, payload) {
+    // 名前が指定されていなければ何もしない
+    if (!payload.name) {
+      return
+    }
+
     // 名前が重複していたらreturn
+    console.log(state.families)
     if (state.families.find((item) => item.name === payload)) {
       throw new Error('family name duplication')
     }
-    const family = new Family(name)
+    const family = {}
+    family.name = payload.name
+    family.member = JSON.parse(JSON.stringify(payload.member))
+    family.diet = []
+    family.recommendedCrops = []
     state.families.push(family)
   },
 
@@ -387,6 +432,14 @@ export const mutations = {
 }
 
 export const actions = {
+  /**
+   * 要素ごとのupdateの状況を設定
+   * @param state
+   * @param payload
+   */
+  setUpdateFlag({ commit }, payload) {
+    commit('setUpdateFlag', payload)
+  },
   /**
    * loadingStatusの更新
    * @param commit
@@ -442,5 +495,13 @@ export const actions = {
       collectionId: 'nfaSharedData',
       documentId: 'fct_eth0729_rev',
     })
+  },
+  /**
+   * Familyの新規追加
+   * @param state
+   * @param payload
+   */
+  addNewFamily({ commit }, payload) {
+    commit('addNewFamily', payload)
   },
 }

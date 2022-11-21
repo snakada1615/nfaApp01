@@ -95,6 +95,11 @@ export default {
         console.log(val)
       }
     },
+    familySizes:{
+      get(){
+        return this.familyMember
+      }
+    },
     familyDri:{
       get(){
         return this.formatDriTable(

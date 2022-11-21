@@ -12,13 +12,8 @@
       <b-navbar-nav class="ml-auto" :small="true">
         <!--ここから回想メニューの表示-->
         <b-nav-item-dropdown ref="rootMenu" text="Menu" right>
-          <div
-            v-for="(item, index) in myMenuList"
-            :key="index"
-          >
-            <b-dropdown-item
-              v-if="item.menuCategory !== 'subMenuTitle'"
-            >
+          <div v-for="(item, index) in myMenuList" :key="index">
+            <b-dropdown-item v-if="item.menuCategory !== 'subMenuTitle'">
               {{ item.menuText }}
             </b-dropdown-item>
             <b-dropdown
@@ -33,9 +28,7 @@
                 v-for="(subItem, index2) in item.subMenu"
                 :key="index2"
               >
-                <b-dropdown-item
-                  :to="subItem.menuTo"
-                >
+                <b-dropdown-item :to="subItem.menuTo">
                   {{ subItem.menuText }}
                 </b-dropdown-item>
               </b-dropdown-item>
@@ -46,7 +39,7 @@
         <!--  ここから言語切り替えの表示  -->
         <b-nav-item-dropdown right>
           <template #button-content>
-            <em>{{$i18n.locale}}</em>
+            <em>{{ $i18n.locale }}</em>
           </template>
           <b-dropdown-item
             v-for="locale in availableLocales"
@@ -70,9 +63,7 @@
             class="small"
           >
             <div class="d-flex justify-content-around">
-              <div class="text-info">
-                {{ Object.keys(item)[0] }}:
-              </div>
+              <div class="text-info">{{ Object.keys(item)[0] }}:</div>
               <div>{{ Object.values(item)[0] }}</div>
             </div>
           </b-dropdown-item>
@@ -82,7 +73,12 @@
       <!-- saveボタンの表示 -->
       <b-button
         :disabled="!hasDocumentChanged"
-        :class="{'border-white':true, 'btn-primary': !hasDocumentChanged, 'btn-warning': hasDocumentChanged, 'mx-2':true}"
+        :class="{
+          'border-white': true,
+          'btn-primary': !hasDocumentChanged,
+          'btn-warning': hasDocumentChanged,
+          'mx-2': true,
+        }"
         pill
         size="sm"
         style="font-size: 13px"
@@ -98,9 +94,7 @@
         <b-icon icon="reception0" />
       </div>
     </b-navbar>
-    <loading-box
-      :open-flag="$store.state.fire.loadingStatus"
-    />
+    <loading-box :open-flag="$store.state.fire.loadingStatus" />
   </b-container>
 </template>
 <script>
@@ -108,9 +102,9 @@ import loadingBox from '@/components/atoms/loadingBox'
 
 export default {
   components: {
-    loadingBox
+    loadingBox,
   },
-  data () {
+  data() {
     return {
       /**
        * ドロップダウンメニューの開閉動作を抑制するためのフラグ
@@ -118,59 +112,63 @@ export default {
       isSubMenuVisible: false,
       myMenu: {
         subMenuCategory: [
-          'root', 'subMenu1', 'subMenu2', 'subMenu3', 'subMenu4'
+          'root',
+          'subMenu1',
+          'subMenu2',
+          'subMenu3',
+          'subMenu4',
         ],
         menuItems: [
           {
             menuCategory: 'root',
             menuText: '1st item',
             menuTo: '/',
-            menuDisabled: false
+            menuDisabled: false,
           },
           {
             menuCategory: 'subMenu1',
             menuText: 'firestore edit',
             menuTo: '/importData/',
-            menuDisabled: false
+            menuDisabled: false,
           },
           {
             menuCategory: 'subMenu3',
             menuText: 'menu3-1',
             menuTo: '/',
-            menuDisabled: false
+            menuDisabled: false,
           },
           {
             menuCategory: 'subMenu1',
             menuText: 'menu1-2',
             menuTo: '/',
-            menuDisabled: false
+            menuDisabled: false,
           },
           {
             menuCategory: 'root',
             menuText: 'menu0-2',
             menuTo: '/',
-            menuDisabled: false
+            menuDisabled: false,
           },
           {
             menuCategory: 'subMenu1',
             menuText: 'menu1-3',
             menuTo: '/',
-            menuDisabled: false
+            menuDisabled: false,
           },
           {
             menuCategory: 'subMenu2',
             menuText: 'menu2-1',
             menuTo: '/',
-            menuDisabled: false
+            menuDisabled: false,
           },
           {
             menuCategory: 'subMenu1',
             menuText: 'menu1-4',
             menuTo: '/',
-            menuDisabled: false
-          }
-        ]
-      }
+            menuDisabled: false,
+          },
+        ],
+      },
     }
   },
   computed: {
@@ -181,7 +179,7 @@ export default {
     availableLocales() {
       return this.$i18n.locales.filter((i) => i.code !== this.$i18n.locale)
     },
-    myMenuList () {
+    myMenuList() {
       const menuTemp = JSON.parse(JSON.stringify(this.myMenu.menuItems))
       if (menuTemp.length === 0) {
         return []
@@ -192,12 +190,12 @@ export default {
       let prevGroup = 'root'
       const resArray = menuTemp.sort((a, b) => {
         let res
-        if ((a.menuCategory === 'root') && (b.menuCategory !== 'root')) {
+        if (a.menuCategory === 'root' && b.menuCategory !== 'root') {
           res = -1
-        } else if ((a.menuCategory !== 'root') && (b.menuCategory === 'root')) {
+        } else if (a.menuCategory !== 'root' && b.menuCategory === 'root') {
           res = 1
         } else {
-          res = (a.menuCategory < b.menuCategory) ? -1 : 1
+          res = a.menuCategory < b.menuCategory ? -1 : 1
         }
         return res
       })
@@ -220,14 +218,12 @@ export default {
           res3[groupIndex].menuCategory = 'subMenuTitle'
           res3[groupIndex].menuText = currentGroup
           res3[groupIndex].subMenu = []
-          res3[groupIndex].subMenu.push(
-            {
-              menuCategory: currentGroup,
-              menuText: currentMenuText,
-              menuTo: currentMenuTo,
-              menuDisabled: currentMenuStatus
-            }
-          )
+          res3[groupIndex].subMenu.push({
+            menuCategory: currentGroup,
+            menuText: currentMenuText,
+            menuTo: currentMenuTo,
+            menuDisabled: currentMenuStatus,
+          })
         }
       })
       if (res3[groupIndex].subMenu.length > 0) {
@@ -239,61 +235,73 @@ export default {
      * データ更新の有無($store.state.fire.hasDocumentChanged)を確認
      * @returns {boolean}
      */
-    hasDocumentChanged () {
-      return this.$store.state.fire.hasDocumentChanged
+    hasDocumentChanged() {
+      return this.$store.getters['fire/isUpdateAny']
     },
     /**
      * ログイン状態のフラグ
      * @returns {boolean}
      */
-    isLoggedIn () {
+    isLoggedIn() {
       return this.$store.state.fire.isLoggedIn
     },
-    userInfo () {
-      return Object.entries(this.$store.state.fire.myApp.user).filter(([key]) => {
-        return (
-          ['displayName', 'country',
-            'subnational1', 'subnational2',
+    userInfo() {
+      return Object.entries(this.$store.state.fire.myApp.user)
+        .filter(([key]) => {
+          return [
+            'displayName',
+            'country',
+            'subnational1',
+            'subnational2',
             'subnational3',
-            'organization', 'title'].includes(key)
-        )
-      }).map(([key, value]) => {
-        const res = {}
-        let myKey = key
-        if (key === 'displayName') {
-          myKey = 'ID'
-        }
-        res[myKey] = value
-        return res
-      }).filter((item) => {
-        return item.displayName !== ''
-      })
-    }
+            'organization',
+            'title',
+          ].includes(key)
+        })
+        .map(([key, value]) => {
+          const res = {}
+          let myKey = key
+          if (key === 'displayName') {
+            myKey = 'ID'
+          }
+          res[myKey] = value
+          return res
+        })
+        .filter((item) => {
+          return item.displayName !== ''
+        })
+    },
   },
   watch: {
     /**
      * データが更新された場合（hasDocumentChanged）のみ、beforeunloadを追加
      * @param {boolean} value
      */
-    hasDocumentChanged (value) {
+    hasDocumentChanged(value) {
       // eslint-disable-next-line no-console
       console.log(value)
       if (value) {
-        addEventListener('beforeunload', this.beforeUnloadListener, { capture: true })
+        addEventListener('beforeunload', this.beforeUnloadListener, {
+          capture: true,
+        })
       } else {
-        removeEventListener('beforeunload', this.beforeUnloadListener, { capture: true })
+        removeEventListener('beforeunload', this.beforeUnloadListener, {
+          capture: true,
+        })
       }
     },
-    $route () {
+    $route() {
       // ページ移動前にメニューを折りたたむ
       this.$refs.rootMenu.hide()
-    }
+    },
   },
-  beforeDestroy () {
+  beforeDestroy() {
     // 破棄される前にイベントリスナーから削除
-    removeEventListener('beforeunload', this.beforeUnloadListener, { capture: true })
+    removeEventListener('beforeunload', this.beforeUnloadListener, {
+      capture: true,
+    })
   },
-  mounted () {
+  mounted() {
     // メニューアイテムをクリックした際、idに'subMenu-'が含まれていればサブメニューを開く
     this.$root.$on('bv::dropdown::show', (bvEvent) => {
       if (bvEvent.componentId.includes('subMenu-')) {
@@ -315,19 +323,20 @@ export default {
      * @param event
      * @returns {string}
      */
-    beforeUnloadListener (event) {
+    beforeUnloadListener(event) {
       // eslint-disable-next-line no-console
       console.log('trigger')
       event.preventDefault()
-      event.returnValue = 'Are you sure you want to exit before saving your data?'
+      event.returnValue =
+        'Are you sure you want to exit before saving your data?'
     },
     /**
      * myAppをfireStoreに保存
      */
-    fireSaveAppdata () {
+    fireSaveAppdata() {
       this.$store.dispatch('fire/fireSaveAppdata')
     },
-    async resetData () {
+    async resetData() {
       const user = JSON.parse(JSON.stringify(this.$store.state.fire.myApp.user))
       await this.$store.dispatch('fire/fireResetAppdata', user).catch((err) => {
         throw err
@@ -342,6 +351,6 @@ export default {
     async changeLocale(locale) {
       await this.$i18n.setLocale(locale)
     },
-  }
+  },
 }
 </script>
