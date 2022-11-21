@@ -236,23 +236,60 @@ const FamilySchema = {
 
 /**
  * JSON -→ array of objectに変換
- * @param dri dri(JSON形式)
- * @returns {{}[]}
+ * @param fct fct(JSON形式)
+ * @param returnType
+ * @returns {{}|*[]}
  */
-function formatDri(dri) {
-  const res = []
-  for (const key of Object.keys(dri)) {
-    const resObj = {}
-    resObj.En = dri[key].energy
-    resObj.Fe = dri[key].fe
-    resObj.Pr = dri[key].protein
-    resObj.Va = dri[key].vita
-    resObj.Name = dri[key].nut_group
-    resObj.id = dri[key].id
-    resObj.max_vol = dri[key].max_vol
-    res.push(resObj)
+function formatFct(fct, returnType = 1) {
+  const resArray = []
+  const resObject = {}
+  for (const key of Object.keys(fct)) {
+    const tempObj = {}
+    tempObj.Carbohydrate = fct[key].Carbohydrate
+    tempObj.En = fct[key].Energy
+    tempObj.Fe = fct[key].FE
+    tempObj.Fat = fct[key].Fat
+    tempObj.Name = fct[key].Food_name
+    tempObj.Pr = fct[key].Protein
+    tempObj.Va = fct[key].VITA_RAE
+    tempObj.Group = fct[key].food_group_unicef
+    tempObj.food_grp_id = fct[key].food_grp_id
+    tempObj.id = fct[key].FCT_id
+    resArray.push(tempObj)
+    resObject[key] = tempObj
   }
-  return res
+  if (returnType === 1) {
+    return resArray
+  } else {
+    return resObject
+  }
+}
+/**
+ * JSON -→ array of objectに変換
+ * @param dri
+ * @param returnType
+ * @returns {{}|*[]}
+ */
+function formatDri(dri, returnType = 1) {
+  const resArray = []
+  const resObject = {}
+  for (const key of Object.keys(dri)) {
+    const tempObj = {}
+    tempObj.En = dri[key].energy
+    tempObj.Fe = dri[key].fe
+    tempObj.Pr = dri[key].protein
+    tempObj.Va = dri[key].vita
+    tempObj.Name = dri[key].nut_group
+    tempObj.id = dri[key].id
+    tempObj.max_vol = dri[key].max_vol
+    resArray.push(tempObj)
+    resObject[key] = tempObj
+  }
+  if (returnType === 1) {
+    return resArray
+  } else {
+    return resObject
+  }
 }
 
 // /////////////////////////////////////////////////////////////
@@ -264,7 +301,9 @@ export const state = () => ({
   communities: [],
   userInfo: {},
   dri: [],
+  driObject: {},
   fct: [],
+  fctObject: {},
   calendar: [],
   portionSize: [],
   /**
@@ -333,8 +372,17 @@ export const mutations = {
   updateAppFamily(state, payload) {
     state.family = payload
   },
-  updateAppDri(state, payload) {
+  updateDri(state, payload) {
     state.dri = payload
+  },
+  updateDriObject(state, payload) {
+    state.driObject = payload
+  },
+  updateFct(state, payload) {
+    state.fct = payload
+  },
+  updateFctObject(state, payload) {
+    state.fctObject = payload
   },
 }
 
@@ -351,26 +399,35 @@ export const actions = {
     return await fireGetDoc(payload.collectionId, payload.documentId)
   },
 
-  // https://firestore.googleapis.com/
-  // google.firestore.v1.Firestore/Listen/
-  // channel?VER=8&database=projects%2Fifnaapp01%2Fdatabases%2F(default)
-  // &gsessionid=W1XJe055EbOZr44S1phcXN-M9voWyfw7pmOVJ1NqZaI&SID=3WycrZyj9Yvd1Sv6xXZXMw&RID=52804&TYPE=terminate&zx=rpqrrzq1nnj7
-
   async fireGetDri({ commit }, payload) {
-    console.log('get1')
     const dri = await fireGetDoc(
       payload.collectionId,
       payload.documentId
     ).catch((err) => {
       throw err
     })
-    console.log('get2')
     if (dri) {
-      const driArray = formatDri(dri)
-      console.log('get3')
-      commit('updateAppDri', driArray)
-      console.log(driArray)
-      console.log('get4')
+      const driArray = formatDri(dri, 1)
+      const driObject = formatDri(dri, 2)
+      commit('updateDri', driArray)
+      commit('updateDriObject', driObject)
+    } else {
+      throw new Error('fetchDri fail: no data')
+    }
+  },
+
+  async fireGetFct({ commit }, payload) {
+    const fct = await fireGetDoc(
+      payload.collectionId,
+      payload.documentId
+    ).catch((err) => {
+      throw err
+    })
+    if (fct) {
+      const fctArray = formatFct(fct, 1)
+      const fctObject = formatFct(fct, 2)
+      commit('updateFct', fctArray)
+      commit('updateFctObject', fctObject)
     } else {
       throw new Error('fetchDri fail: no data')
     }
@@ -380,6 +437,10 @@ export const actions = {
     await dispatch('fireGetDri', {
       collectionId: 'nfaSharedData',
       documentId: 'dri01',
+    })
+    await dispatch('fireGetFct', {
+      collectionId: 'nfaSharedData',
+      documentId: 'fct_eth0729_rev',
     })
   },
 }

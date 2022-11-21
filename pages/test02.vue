@@ -1,33 +1,22 @@
 <template>
   <b-container>
-    {{ $t('hello') }}
-    <b-table
-      small
-      stripped
-      responsive
-      :items="member"
-      :fields="fieldTableDri"
-    >
-      <template #cell(number)="data">
-        <div class="d-flex justify-content-around">
-          <b-icon icon="BIconDashCircleFill" class="mx-2" style="cursor: pointer" @click="test"/>
-          {{data.item.number}}
-          <b-icon icon="BIconPlusCircleFill" class="mx-2" style="cursor: pointer" @click="test"/>
-        </div>
-      </template>
-    </b-table>
-    <b-card>
-      myApp{{member}}
-      myFamily
-    </b-card>
+
+    <update-family
+      :member.sync="tablePop"
+      :dri="$store.state.fire.driObject"
+    />
   </b-container>
 </template>
 
 <script>
 import { makeToast } from "@/plugins/helper";
+import updateFamily from "@/components/molecules/updateFamily";
 
 export default {
   name: "MyTest02",
+  components: {
+    updateFamily
+  },
   data() {
     return {
       /**
@@ -57,23 +46,22 @@ export default {
        * 2番目のテーブルを埋めるデータ（栄養素毎の合計必要量）
        */
       tableDri: [],
-    }
-  },
-  computed: {
-    member:{
-      get(){
-        return this.$store.getters["fire/initialMembers"]
+      temp: 2,
+      temp2 : {
+        jingle: 'bell'
       }
     }
   },
+  computed: {
+  },
+  created() {
+    this.tablePop = JSON.parse(JSON.stringify(this.$store.getters['fire/initialMembers']))
+  },
   methods: {
-    test(){
+    test(val){
       makeToast(this,'this day')
+      console.log(val)
     }
   }
 };
 </script>
-
-<style scoped>
-
-</style>

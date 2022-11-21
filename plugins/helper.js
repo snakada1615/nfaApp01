@@ -166,3 +166,37 @@ export function makeToast(vm, message = 'test', options = {}) {
     solid: true,
   })
 }
+
+export function nutritionDemands(
+  driObject,
+  member,
+  keys = ['En', 'Pr', 'Va', 'Fe'],
+  returnType = 1 // 1: return Object（参照が容易）, 2: return Array of Object (table表示に適当)
+) {
+  let returnObject = {}
+  const returnArray = []
+  returnObject = member.reduce((accum, current) => {
+    keys.forEach((nutrientKey) => {
+      // accum[nutrientKey] += current.number * driObject[current.id][nutrientKey]
+      // Objectの値をレスポンシブにするためにObject.assignを使う
+      const temp = {}
+      temp[nutrientKey] =
+        accum[nutrientKey] + current.number * driObject[current.id][nutrientKey]
+      accum = Object.assign(accum, JSON.parse(JSON.stringify(temp)))
+    })
+    return accum
+  }, {})
+
+  // 利用目的に応じてObjectまたはArrayを返す
+  if (returnType === 2) {
+    Object.keys(returnObject).forEach((key) => {
+      returnArray.push({
+        name: key,
+        value: returnObject[key],
+      })
+    })
+    return returnArray
+  } else {
+    return returnObject
+  }
+}

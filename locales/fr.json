@@ -10,5 +10,6 @@
       "introduction": "This is an introduction in French."
       }
   },
-  "apple": "Apple1Fr"
+  "apple": "Apple1Fr",
+  "hello": "bonjour"
 }
