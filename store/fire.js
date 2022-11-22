@@ -1,4 +1,4 @@
-import { fireGetDoc } from '@/plugins/firebasePlugin'
+import { fireGetDoc, fireSaveDoc, firestoreDb } from '@/plugins/firebasePlugin'
 import { validateDeepObject } from '@/plugins/helper'
 
 /*
@@ -496,6 +496,22 @@ export const actions = {
       documentId: 'fct_eth0729_rev',
     })
   },
+
+  async fireSaveMyApp({ dispatch, commit }, payload) {
+    const targetDoc = Object.entries(this.isUpdateElements)
+      .filter(([key, value]) => value === true)
+      .map((item) => {
+        return item
+      })
+    targetDoc.forEach(async (item) => {
+      await fireSaveDoc(payload.collectionId, payload.docId, item).catch(
+        (err) => {
+          console.log(err)
+        }
+      )
+    })
+  },
+
   /**
    * Familyの新規追加
    * @param state

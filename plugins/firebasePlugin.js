@@ -9,6 +9,7 @@ import {
   getDocFromServer,
   getDocs,
   getDoc,
+  setDoc,
   collection,
   query,
   where,
@@ -198,4 +199,11 @@ export async function removeUserByName(displayName) {
   } else {
     return false
   }
+}
+
+export async function fireSaveDoc(collectionId, docId, myDoc) {
+  const ref = doc(firestoreDb, collectionId, docId)
+  await setDoc(ref, myDoc).catch((err) => {
+    throw new Error('Error in fireSaveQuestions:' + err)
+  })
 }
