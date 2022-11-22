@@ -10,6 +10,9 @@
       "introduction": "This is an introduction in English."
       }
   },
+  "fire": {
+    "update": "data successfully updated"
+  },
   "apple": "Apple1",
   "hello": "hello"
 }

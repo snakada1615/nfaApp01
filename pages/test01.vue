@@ -1,123 +1,26 @@
 <template>
   <b-container>
-    from: {{sourceDocName}}
-    <b-select
-      v-model="sourceCollectionId"
-      :options="['dataset', 'user']"
-    />
-    <b-select
-      v-model="sourceDocName"
-      :options="dbList"
-      @change="destDocName = sourceDocName"
-    />
-    <hr>
-    to:
-    <b-select
-      v-model="destCollectionId"
-      :options="['nfaSharedData', 'nfaUserData']"
-    />
-    <b-form-input
-      v-model="destDocName"
-    />
-    <b-button @click="uploadDoc(destCollectionId, destDocName, sourceDocName)">copy</b-button>
-
+    <fct-box :items="myFct" />
   </b-container>
 </template>
 
 <script>
-
-// import firebase from "firebase/compat";
-
-import {initializeApp} from "firebase/app";
-import {CACHE_SIZE_UNLIMITED, collection, doc, getDoc, getDocs, initializeFirestore, setDoc} from "firebase/firestore";
-import {firestoreDb} from "../plugins/firebasePlugin";
-import {makeToast} from "../plugins/helper";
-
+import fctBox from '../components/molecules/fctBox'
 
 export default {
-  name: "MyTest01",
-  components:{
+  name: 'MyTest01',
+  components: {
+    fctBox,
   },
-  data(){
+  data() {
     return {
-      /**
-       * The following fields are REQUIRED:
-       * - Project ID
-       * - App ID
-       * - API Key
-       */
-      secondaryAppConfig: {
-        projectId: 'ifnaapp01',
-        appId: '1:419104702670:web:94dc61759415cd134a909f',
-        apiKey: 'AIzaSyDH_RkqtAD6I-MQIcSVFVWDeeGzZUPI2pw',
-        // databaseURL: "...",
-        // storageBucket: "...",
-      },
-
-      secondaryApp : null,
-      secondaryFirestore : null,
-      dbList: [],
-      destCollectionId: '',
-      destDocName: '',
-      sourceCollectionId: '',
-      sourceDocName: ''
+      myFct: [],
     }
   },
-  computed:{
-    docList:{
-      get(){
-        return this.dbList.map((item)=>{
-          return item
-        })
-      }
-    }
+  computed: {},
+  created() {
+    this.myFct = JSON.parse(JSON.stringify(this.$store.state.fire.fct))
   },
-  async created() {
-    this.secondaryApp = initializeApp(this.secondaryAppConfig, "secondary");
-    /**
-     * キャッシュサイズを最大化
-     * @type {Firestore}
-     */
-    this.secondaryFirestore = initializeFirestore(this.secondaryApp, {
-      cacheSizeBytes: CACHE_SIZE_UNLIMITED,
-    })
-    this.dbList = await this.getDocList('dataset')
-    console.log(this.dbList)
-  },
-  methods:{
-    async getDocList (myCollection, returnValue = 1) {
-      const res = []
-      const querySnapshot = await getDocs(collection(this.secondaryFirestore, myCollection))
-      querySnapshot.forEach((item) => {
-        if (returnValue === 2) {
-          res.push({
-            id: item.id,
-            name: item.data().user.displayName
-          })
-        } else {
-          res.push(item.id)
-        }
-      })
-      return res
-    },
-    async uploadDoc(collectionId, docId, myDoc){
-      let res = null
-      const ref = await doc(this.secondaryFirestore, 'dataset', myDoc)
-      const docSnap = await getDoc(ref).catch((err) => {
-        console.error(err)
-      })
-      if (docSnap.exists()) {
-        res = docSnap.data()
-      } else {
-        console.log('getData fail: no data in Cache or Server')
-        return ''
-      }
-      await setDoc(doc(firestoreDb, collectionId, docId), res).catch((err)=> {
-        throw err
-      })
-      makeToast(this, 'copy done!')
-    }
-  }
-};
+  methods: {},
+}
 </script>
-

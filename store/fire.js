@@ -1,4 +1,5 @@
-import { fireGetDoc, fireSaveDoc, firestoreDb } from '@/plugins/firebasePlugin'
+import { fireSaveDoc } from '../plugins/firebasePlugin'
+import { fireGetDoc } from '@/plugins/firebasePlugin'
 import { validateDeepObject } from '@/plugins/helper'
 
 /*
@@ -248,15 +249,15 @@ function formatFct(fct, returnType = 1) {
   for (const key of Object.keys(fct)) {
     const tempObj = {}
     tempObj.Carbohydrate = fct[key].Carbohydrate
-    tempObj.En = fct[key].Energy
-    tempObj.Fe = fct[key].FE
+    tempObj.En = fct[key].En
+    tempObj.Fe = fct[key].Fe
     tempObj.Fat = fct[key].Fat
-    tempObj.Name = fct[key].Food_name
-    tempObj.Pr = fct[key].Protein
-    tempObj.Va = fct[key].VITA_RAE
-    tempObj.Group = fct[key].food_group_unicef
+    tempObj.Name = fct[key].Name
+    tempObj.Pr = fct[key].Pr
+    tempObj.Va = fct[key].Va
+    tempObj.Group = fct[key].Group
     tempObj.food_grp_id = fct[key].food_grp_id
-    tempObj.id = fct[key].FCT_id
+    tempObj.id = fct[key].id
     resArray.push(tempObj)
     resObject[key] = tempObj
   }
@@ -349,6 +350,26 @@ export const getters = {
     })
     return res
   },
+  /**
+   * FCTに含まれるFood Groupの一覧
+   * @returns {*[]}
+   * @constructor
+   */
+  FoodGrp(state) {
+    const uniqueGroup = []
+    const result = []
+    if (state.fct) {
+      state.fct.forEach(function (elem) {
+        if (!uniqueGroup.includes(elem.Group)) {
+          uniqueGroup.push(elem.Group)
+          result.push({
+            name: elem.Group,
+          })
+        }
+      })
+    }
+    return result
+  },
 }
 
 export const mutations = {
@@ -389,13 +410,14 @@ export const mutations = {
    * @param state
    * @param payload
    */
-  updateFamilies({ state }, payload) {
+  updateFamilies(state, payload) {
     if (!Array.isArray(payload)) {
       throw new TypeError(
         'wrong parameter:' + typeof payload + 'expected Array'
       )
     }
     payload.forEach((item) => {
+      console.log(item)
       validateDeepObject(item, FamilySchema)
     })
 
@@ -403,7 +425,7 @@ export const mutations = {
     const newArray = JSON.parse(JSON.stringify(payload))
 
     // reactivityを担保するためspliceを使用
-    state.families.splice(0, this.families.length, ...newArray)
+    state.families.splice(0, state.families.length, ...newArray)
   },
 
   /**
@@ -413,9 +435,6 @@ export const mutations = {
    */
   updateLoadingState(state, payload) {
     state.loadingStatus = payload
-  },
-  updateAppFamily(state, payload) {
-    state.family = payload
   },
   updateDri(state, payload) {
     state.dri = payload
@@ -477,8 +496,12 @@ export const actions = {
       throw err
     })
     if (fct) {
+      console.log('fct=')
+      console.log(fct)
       const fctArray = formatFct(fct, 1)
       const fctObject = formatFct(fct, 2)
+      console.log('fctArray=')
+      console.log(fctArray)
       commit('updateFct', fctArray)
       commit('updateFctObject', fctObject)
     } else {
@@ -487,6 +510,7 @@ export const actions = {
   },
 
   async loadMyApp({ dispatch }) {
+    dispatch('updateLoadingState', true)
     await dispatch('fireGetDri', {
       collectionId: 'nfaSharedData',
       documentId: 'dri01',
@@ -495,21 +519,28 @@ export const actions = {
       collectionId: 'nfaSharedData',
       documentId: 'fct_eth0729_rev',
     })
+    dispatch('updateLoadingState', false)
   },
 
-  async fireSaveMyApp({ dispatch, commit }, payload) {
-    const targetDoc = Object.entries(this.isUpdateElements)
+  async fireSaveMyApp({ dispatch, commit, state }) {
+    const targetDoc = Object.entries(state.isUpdateElements)
       .filter(([key, value]) => value === true)
       .map((item) => {
-        return item
+        return item[0]
       })
-    targetDoc.forEach(async (item) => {
-      await fireSaveDoc(payload.collectionId, payload.docId, item).catch(
-        (err) => {
-          console.log(err)
-        }
-      )
-    })
+    dispatch('updateLoadingState', true)
+    for (const item of targetDoc) {
+      const myDoc = {}
+      myDoc[item] = state[item]
+      await fireSaveDoc('nfaUserData', 'userTest01', myDoc).catch((err) => {
+        console.log(err)
+      })
+      dispatch('setUpdateFlag', {
+        element: item,
+        value: false,
+      })
+    }
+    dispatch('updateLoadingState', false)
   },
 
   /**
@@ -519,5 +550,11 @@ export const actions = {
    */
   addNewFamily({ commit }, payload) {
     commit('addNewFamily', payload)
+  },
+  removeFamily({ state, commit }, payload) {
+    const res = JSON.parse(JSON.stringify(state.families)).filter(
+      (item) => item.name !== payload
+    )
+    commit('updateFamilies', res)
   },
 }

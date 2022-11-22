@@ -334,7 +334,7 @@ export default {
      * myAppをfireStoreに保存
      */
     fireSaveAppdata() {
-      this.$store.dispatch('fire/fireSaveAppdata')
+      this.$store.dispatch('fire/fireSaveMyApp')
     },
     async resetData() {
       const user = JSON.parse(JSON.stringify(this.$store.state.fire.myApp.user))

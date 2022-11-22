@@ -28,12 +28,27 @@
       </b-input-group>
 
       <!-- 既存のFamily選択 -->
-      <b-select
+      <b-input-group
         v-if="modeNewFamily === 'Select' && familyList.length > 0"
-        v-model="selectedFamilyName"
-        :options="$store.getters['fire/familyList']"
-        @change="selectFamily"
-      ></b-select>
+        prepend="select"
+        size="sm"
+      >
+        <b-select
+          v-model="selectedFamilyName"
+          :options="$store.getters['fire/familyList']"
+          @change="selectFamily"
+        ></b-select>
+        <!-- 削除用ボタン -->
+        <template #append>
+          <b-input-group-text>
+            <b-icon
+              icon="BIconTrash"
+              style="cursor: pointer"
+              @click="removeFamily(selectedFamilyName)"
+            />
+          </b-input-group-text>
+        </template>
+      </b-input-group>
 
       <!-- 選択するFamilyがない場合 -->
       <div
@@ -58,7 +73,7 @@ import { makeToast } from '@/plugins/helper'
 import updateFamily from '@/components/molecules/updateFamily'
 
 export default {
-  name: 'MyTest02',
+  name: 'SetFamily',
   components: {
     updateFamily,
   },
@@ -104,9 +119,15 @@ export default {
   },
   methods: {
     test(val) {
-      makeToast(this, 'this day')
+      makeToast(this, val)
       console.log(val)
     },
+
+    /**
+     * 新規家族の追加
+     * @param name
+     * @param member
+     */
     addNewFamily(name, member) {
       this.$store.dispatch('fire/addNewFamily', {
         name,
@@ -117,7 +138,12 @@ export default {
         element: 'families',
         value: true,
       })
+      makeToast(this, 'upload complete')
     },
+
+    /**
+     * ドキュメント更新フラグを立てる
+     */
     updateFlagForFamily() {
       // 新規追加の場合はSaveボタンを押すまでは無視。既存家族を編集している場合は常時更新フラグを立てる位
       if (this.modeNewFamily === 'Add') {
@@ -128,17 +154,32 @@ export default {
         value: true,
       })
     },
+
+    /**
+     * tab切替時に変数初期化
+     */
     initMember() {
       this.tablePop.splice(0, this.tablePop.length, ...this.initPop)
       this.newFamilyName = ''
       this.selectedFamilyName = ''
     },
+
+    /**
+     * 家族選択時に変数を割り当てる
+     * @param val
+     */
     selectFamily(val) {
-      console.log(val)
       const resPop = this.$store.state.fire.families.find(
         (item) => item.name === val
       ).member
       this.tablePop.splice(0, this.tablePop.length, ...resPop)
+    },
+
+    removeFamily(val) {
+      if (!window.confirm('do you really want to remove family record?')) {
+        return
+      }
+      this.$store.dispatch('fire/removeFamily', val)
     },
   },
 }
