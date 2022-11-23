@@ -311,7 +311,7 @@ export const state = () => ({
   fct: [],
   fctObject: {},
   calendar: [],
-  portionSize: [],
+  portionUnit: [],
   /**
    * loadingBox表示用のフラグ
    */
@@ -325,7 +325,7 @@ export const state = () => ({
     fct: false,
     fctObject: false,
     calendar: false,
-    portionSize: false,
+    portionUnit: false,
   },
 })
 
@@ -451,6 +451,9 @@ export const mutations = {
   updateFctObject(state, payload) {
     state.fctObject = payload
   },
+  updatePortionUnit(state, payload) {
+    state.portionUnit = payload
+  },
 }
 
 export const actions = {
@@ -493,11 +496,9 @@ export const actions = {
 
     // portionUnitをstoreに保存
     if (portionUnit) {
-      // const portionUnitArray = formatPortionUnit(portionUnit)
-      const portionUnitArray = []
-      commit('updatePortionUnit', portionUnitArray)
+      commit('updatePortionUnit', Object.values(portionUnit))
     } else {
-      throw new Error('fetchPortionUnitFromFire fail: no data')
+      throw new Error('fetchPortion fail: no data')
     }
   },
   /**
@@ -580,7 +581,7 @@ export const actions = {
       commit('updateFct', Object.values(fct))
       commit('updateFctObject', fct)
     } else {
-      throw new Error('fetchDri fail: no data')
+      throw new Error('fetchFct fail: no data')
     }
   },
 
@@ -593,6 +594,10 @@ export const actions = {
     await dispatch('fireGetFct', {
       collectionId: 'nfaSharedData',
       documentId: 'fctNew',
+    })
+    await dispatch('fireGetPortionUnit', {
+      collectionId: 'nfaSharedData',
+      documentId: 'portion_nakada01',
     })
     dispatch('updateLoadingState', false)
   },
