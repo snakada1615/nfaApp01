@@ -56,7 +56,7 @@ export function validateObject(data, types) {
  * @returns {boolean}
  */
 export function validateDeepObject(obj, schema, path = '') {
-  let ok = true
+  let ok
 
   if (!obj) ok = obj === schema
   else if (typeof schema === 'function') ok = obj.constructor === schema
@@ -175,6 +175,13 @@ export function nutritionDemands(
 ) {
   let returnObject = {}
   const returnArray = []
+
+  // 初期値の設定
+  const initValue = {}
+  keys.forEach((nutrientKey) => {
+    initValue[nutrientKey] = 0
+  })
+
   returnObject = member.reduce((accum, current) => {
     keys.forEach((nutrientKey) => {
       // accum[nutrientKey] += current.number * driObject[current.id][nutrientKey]
@@ -185,7 +192,7 @@ export function nutritionDemands(
       accum = Object.assign(accum, JSON.parse(JSON.stringify(temp)))
     })
     return accum
-  }, {})
+  }, initValue)
 
   // 利用目的に応じてObjectまたはArrayを返す
   if (returnType === 2) {

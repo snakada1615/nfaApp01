@@ -127,8 +127,8 @@ export default {
           },
           {
             menuCategory: 'subMenu1',
-            menuText: 'firestore edit',
-            menuTo: '/importData/',
+            menuText: 'firestore copy',
+            menuTo: '/tool/copyDoc',
             menuDisabled: false,
           },
           {

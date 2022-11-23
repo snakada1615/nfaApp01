@@ -1,7 +1,7 @@
 <template>
   <b-container class="my-0">
     <!--  フィルター用のリストボックス  -->
-    <b-input-group>
+    <b-input-group size="sm">
       <b-form-input
         id="filterInput"
         v-model="filter"
@@ -10,7 +10,7 @@
       ></b-form-input>
 
       <template #append>
-        <b-dropdown text="Group" variant="primary">
+        <b-dropdown text="Group" variant="primary" size="sm">
           <b-dropdown-item
             v-for="grpName in foodGroup"
             :key="grpName.name"
@@ -108,10 +108,6 @@ export default {
         { key: 'Va', sortable: true, thStyle: { width: '50px' } },
         { key: 'Fe', sortable: true, thStyle: { width: '50px' } },
       ],
-      /**
-       * 各列の表示幅の設定
-       */
-      colWidth: [0, 0, 120, 30, 30, 30, 30],
       /**
        * FCTの全ての行数
        */

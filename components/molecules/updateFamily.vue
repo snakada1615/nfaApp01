@@ -1,6 +1,6 @@
 <template>
   <b-container>
-<!-- メンバー登録用table -->
+    <!-- メンバー登録用table -->
     <b-table
       small
       stripped
@@ -12,8 +12,11 @@
         <div class="d-flex justify-content-around align-items-center">
           <b-icon
             icon="BIconPlusCircleFill"
-            class="mx-2" style="cursor: pointer"
-            scale="1.5" @click="updateMemberPlusOne(data.item.id)"/>
+            class="mx-2"
+            style="cursor: pointer"
+            scale="1.5"
+            @click="updateMemberPlusOne(data.item.id)"
+          />
           <b-form-input
             :value="data.item.number"
             type="number"
@@ -22,8 +25,12 @@
             @input="updateMember(data.item.id, $event)"
           />
           <b-icon
-            icon="BIconDashCircleFill" class="mx-2" style="cursor: pointer"
-            scale="1.5" @click="updateMemberMinusOne(data.item.id)"/>
+            icon="BIconDashCircleFill"
+            class="mx-2"
+            style="cursor: pointer"
+            scale="1.5"
+            @click="updateMemberMinusOne(data.item.id)"
+          />
         </div>
       </template>
     </b-table>
@@ -35,7 +42,7 @@
       striped
       bordered
       small
-      :fixed=true
+      :fixed="true"
       head-row-variant="success"
       table-variant="light"
       :items="familyDri"
@@ -44,24 +51,26 @@
       <template #cell(Value)="data">
         <span class="text-info">{{ data }}</span>
       </template>
+      <template #table-caption>
+        KC: KiloCalorie, MC: MegaCalorie, GC: GigaCalorie
+      </template>
     </b-table>
-    KC: KiloCalorie, MC: MegaCalorie, GC: GigaCalorie
   </b-container>
 </template>
 
 <script>
-import { makeToast, nutritionDemands, setDigit } from "@/plugins/helper";
+import { makeToast, nutritionDemands, setDigit } from '@/plugins/helper'
 
 export default {
-  name: "MyTest02",
+  name: 'MyTest02',
   props: {
-    dri:{
+    dri: {
       type: Object,
-      required: true
+      required: true,
     },
-    member:{
+    member: {
       type: Array,
-      required: true
+      required: true,
     },
   },
   data() {
@@ -70,8 +79,8 @@ export default {
        * 表示用のフィールド定義
        */
       fieldDRI: [
-        {key: 'name', sortable: false},
-        {key: 'value', sortable: false},
+        { key: 'name', sortable: false },
+        { key: 'value', sortable: false },
       ],
       /**
        * sortのためのkey列を定義
@@ -81,94 +90,91 @@ export default {
        * 栄養必要量の合計値を示すテーブルのフィールド定義
        */
       fieldMember: [
-        {key: 'name', sortable: false},
-        {key: 'number', sortable: false},
+        { key: 'name', sortable: false },
+        { key: 'number', sortable: false },
       ],
     }
   },
   computed: {
-    familyMember:{
-      get(){
+    familyMember: {
+      get() {
         return this.member
       },
-      set (val) {
+      set(val) {
         console.log(val)
-      }
+      },
     },
-    familySizes:{
-      get(){
+    familySizes: {
+      get() {
         return this.familyMember
-      }
+      },
     },
-    familyDri:{
-      get(){
+    familyDri: {
+      get() {
         return this.formatDriTable(
-          nutritionDemands(this.dri, this.member,undefined,2)
+          nutritionDemands(this.dri, this.member, undefined, 2)
         )
-      }
-    }
+      },
+    },
   },
   created() {
     this.driTemp = this.dri
   },
   methods: {
-    updateMember(id, number){
-      const tmpResult = JSON.parse(JSON.stringify(this.member)).map((item)=>{
-        if (item.id === id){
+    updateMember(id, number) {
+      const tmpResult = JSON.parse(JSON.stringify(this.member)).map((item) => {
+        if (item.id === id) {
           item.number = number
         }
         return item
       })
-      this.$emit('update:member',tmpResult)
-      makeToast(this, "happy")
+      this.$emit('update:member', tmpResult)
+      makeToast(this, 'happy')
     },
-    updateMemberPlusOne(id){
-      const tmpResult = JSON.parse(JSON.stringify(this.member)).map((item)=>{
-        if (item.id === id){
+    updateMemberPlusOne(id) {
+      const tmpResult = JSON.parse(JSON.stringify(this.member)).map((item) => {
+        if (item.id === id) {
           item.number += 1
         }
         return item
       })
-      this.$emit('update:member',tmpResult)
+      this.$emit('update:member', tmpResult)
     },
-    updateMemberMinusOne(id){
-      const tmpResult = JSON.parse(JSON.stringify(this.member)).map((item)=>{
-        if (item.id === id && item.number > 0){
+    updateMemberMinusOne(id) {
+      const tmpResult = JSON.parse(JSON.stringify(this.member)).map((item) => {
+        if (item.id === id && item.number > 0) {
           item.number -= 1
         }
         return item
       })
-      this.$emit('update:member',tmpResult)
+      this.$emit('update:member', tmpResult)
     },
     /**
      * 栄養必要量のテーブル表示用フォーマット
      * @param arr
      */
     formatDriTable(arr) {
-      return arr.map((item)=>{
+      return arr.map((item) => {
         let index = 1
         const myKey = item.name
-        let myValue = 0
-        if (['En'].includes(myKey)){
+        if (['En'].includes(myKey)) {
           index = 1
-        } else if (['Pr'].includes(myKey)){
+        } else if (['Pr'].includes(myKey)) {
           index = 2
-        } else if (['Va'].includes(myKey)){
+        } else if (['Va'].includes(myKey)) {
           index = 3
-        } else if (['Fe'].includes(myKey)){
+        } else if (['Fe'].includes(myKey)) {
           index = 4
         }
-        myValue = setDigit(item.value, index)
+        const myValue = setDigit(item.value, index)
         return {
           name: myKey,
-          value: myValue
+          value: myValue,
         }
       })
     },
-  }
-};
+  },
+}
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

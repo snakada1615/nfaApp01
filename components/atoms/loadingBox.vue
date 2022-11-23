@@ -11,22 +11,48 @@
     @ok="handleOk"
   >
     <b-overlay :show="showSpinner" rounded="sm">
-      <form ref="form" @submit.stop.prevent="handleSubmit">
-        <b-form-group
-          :label="label"
-          label-for="text-input"
-          invalid-feedback="please fill the text. no space at the beginning or end"
-          :state="stateInput"
-        >
-          <b-form-input
-            id="text-input"
-            v-model="userText"
-            :state="stateInput"
-            required
-            pattern="\w.*\w$"
-          />
-        </b-form-group>
-      </form>
+      <b-card>
+        <div></div>
+        <div></div>
+        <div></div>
+      </b-card>
+      <template #overlay>
+        <div class="text-center">
+          <div>
+            <b-icon
+              icon="arrow-counterclockwise"
+              animation="spin-reverse"
+              font-scale="1"
+            />
+            <b-icon
+              icon="arrow-counterclockwise"
+              animation="spin-reverse"
+              font-scale="1"
+            />
+            <b-icon
+              icon="arrow-counterclockwise"
+              animation="spin-reverse"
+              font-scale="1"
+            />
+            <b-icon
+              icon="arrow-counterclockwise"
+              animation="spin-reverse"
+              font-scale="1"
+            />
+            <b-icon
+              icon="arrow-counterclockwise"
+              animation="spin-reverse"
+              font-scale="1"
+            />
+            <b-icon
+              icon="arrow-counterclockwise"
+              animation="spin-reverse"
+              font-scale="1"
+            />
+          </div>
+          <p id="cancel-label">Please wait...</p>
+        </div>
+      </template>
     </b-overlay>
   </b-modal>
 </template>
@@ -37,66 +63,66 @@ export default {
   props: {
     modalName: {
       type: String,
-      default: 'loadingBox'
+      default: 'loadingBox',
     },
     textInput: {
       type: String,
-      default: ''
+      default: '',
     },
     title: {
       type: String,
-      default: 'date loading...'
+      default: 'date loading...',
     },
     label: {
       type: String,
-      default: ''
+      default: '',
     },
     showSpinner: {
       type: Boolean,
-      default: true
+      default: true,
     },
     hideFooter: {
       type: Boolean,
-      default: true
+      default: true,
     },
     openFlag: {
       type: Boolean,
-      required: true
-    }
+      required: true,
+    },
   },
-  data () {
+  data() {
     return {
       userText: '',
-      stateInput: null
+      stateInput: null,
     }
   },
   computed: {
     isModalOpen: {
-      get () {
+      get() {
         return this.openFlag
       },
-      set (val) {
+      set(val) {
         this.$emit('update:openFlag', val)
-      }
-    }
+      },
+    },
   },
   methods: {
-    checkFormValidity () {
+    checkFormValidity() {
       const valid = this.$refs.form.checkValidity()
       this.stateInput = valid
       return valid
     },
-    resetModal () {
+    resetModal() {
       this.userText = this.textInput
       this.stateInput = null
     },
-    handleOk (bvModalEvent) {
+    handleOk(bvModalEvent) {
       // Prevent modal from closing
       bvModalEvent.preventDefault()
       // Trigger submit handler
       this.handleSubmit()
     },
-    handleSubmit () {
+    handleSubmit() {
       // Exit when the form isn't valid
       if (!this.checkFormValidity()) {
         return
@@ -108,7 +134,7 @@ export default {
       this.$nextTick(() => {
         this.$bvModal.hide(this.modalName)
       })
-    }
-  }
+    },
+  },
 }
 </script>

@@ -1,5 +1,4 @@
-import { fireSaveDoc } from '../plugins/firebasePlugin'
-import { fireGetDoc } from '@/plugins/firebasePlugin'
+import { fireSaveDoc, fireGetDoc } from '@/plugins/firebasePlugin'
 import { validateDeepObject } from '@/plugins/helper'
 
 /*
@@ -237,12 +236,13 @@ const FamilySchema = {
 // ////////////////// ここからfunction定義 ///////////////////////////
 // ///////////////////////////////////////////////////////////////
 
-/**
+/*
+/!**
  * JSON -→ array of objectに変換
  * @param fct fct(JSON形式)
  * @param returnType
  * @returns {{}|*[]}
- */
+ *!/
 function formatFct(fct, returnType = 1) {
   const resArray = []
   const resObject = {}
@@ -267,12 +267,14 @@ function formatFct(fct, returnType = 1) {
     return resObject
   }
 }
-/**
+*/
+/*
+/!**
  * JSON -→ array of objectに変換
  * @param dri
  * @param returnType
  * @returns {{}|*[]}
- */
+ *!/
 function formatDri(dri, returnType = 1) {
   const resArray = []
   const resObject = {}
@@ -294,6 +296,7 @@ function formatDri(dri, returnType = 1) {
     return resObject
   }
 }
+*/
 
 // /////////////////////////////////////////////////////////////
 // ////////////////// ここからstore定義 ///////////////////////////
@@ -471,6 +474,86 @@ export const actions = {
     return await fireGetDoc(payload.collectionId, payload.documentId)
   },
 
+  async fireGetPortion({ commit }, payload) {},
+  /**
+   * PortionUnitのデータをfireStoreから取得して返す
+   * @param state
+   * @param commit
+   * @param dispatch
+   * @param payload
+   * @returns {Promise<void>}
+   */
+  async fireGetPortionUnit({ state, commit, dispatch }, payload) {
+    const portionUnit = await fireGetDoc(
+      payload.collectionId,
+      payload.documentId
+    ).catch((err) => {
+      throw err
+    })
+
+    // portionUnitをstoreに保存
+    if (portionUnit) {
+      // const portionUnitArray = formatPortionUnit(portionUnit)
+      const portionUnitArray = []
+      commit('updatePortionUnit', portionUnitArray)
+    } else {
+      throw new Error('fetchPortionUnitFromFire fail: no data')
+    }
+  },
+  /**
+   * cropCalendarのデータをfireStoreから取得して返す
+   * @param state
+   * @param commit
+   * @param dispatch
+   * @param payload 初期値（db名）の指定があれば、これを元に初期化
+   * @returns {Promise<void>}
+   */
+  async fireGetCropCalendar({ state, commit, dispatch }, payload) {
+    if (payload) {
+      await commit('updateCropCalendarId', payload)
+    }
+    // cropCalendarをfireStoreからfetch (cropCalendarIdを使う)
+    const cropCalendar = await fireGetDoc(
+      'dataset',
+      state.myApp.dataSet.cropCalendarId
+    ).catch((err) => {
+      throw new Error(err)
+    })
+
+    // cropCalendarをstoreに保存
+    if (cropCalendar) {
+      const cropCalendarArray = Object.values(cropCalendar)
+      console.log(cropCalendarArray)
+      commit('updateCropCalendar', cropCalendarArray)
+    } else {
+      throw new Error('fetchCropCalendarFromFire fail: no data')
+    }
+  },
+  /**
+   * questionsのデータをfireStoreから取得して返す
+   * @param state
+   * @param commit
+   * @param dispatch
+   * @returns {Promise<void>}
+   */
+  async fetchQuestionsFromFire({ state, commit, dispatch }) {
+    // questionsをfireStoreからfetch (questionsIdを使う)
+    const questions = await fireGetDoc(
+      'dataset',
+      state.myApp.dataSet.questionsId
+    ).catch((err) => {
+      throw new Error(err)
+    })
+
+    // questionsをstoreに保存
+    if (questions) {
+      // const questionsArray = formatQuestions(questions)
+      const questionsArray = []
+      commit('updateQuestions', questionsArray)
+    } else {
+      throw new Error('fetchQuestionsFromFire fail: no data')
+    }
+  },
   async fireGetDri({ commit }, payload) {
     const dri = await fireGetDoc(
       payload.collectionId,
@@ -479,10 +562,8 @@ export const actions = {
       throw err
     })
     if (dri) {
-      const driArray = formatDri(dri, 1)
-      const driObject = formatDri(dri, 2)
-      commit('updateDri', driArray)
-      commit('updateDriObject', driObject)
+      commit('updateDri', Object.values(dri))
+      commit('updateDriObject', dri)
     } else {
       throw new Error('fetchDri fail: no data')
     }
@@ -496,14 +577,8 @@ export const actions = {
       throw err
     })
     if (fct) {
-      console.log('fct=')
-      console.log(fct)
-      const fctArray = formatFct(fct, 1)
-      const fctObject = formatFct(fct, 2)
-      console.log('fctArray=')
-      console.log(fctArray)
-      commit('updateFct', fctArray)
-      commit('updateFctObject', fctObject)
+      commit('updateFct', Object.values(fct))
+      commit('updateFctObject', fct)
     } else {
       throw new Error('fetchDri fail: no data')
     }
@@ -513,16 +588,16 @@ export const actions = {
     dispatch('updateLoadingState', true)
     await dispatch('fireGetDri', {
       collectionId: 'nfaSharedData',
-      documentId: 'dri01',
+      documentId: 'driNew',
     })
     await dispatch('fireGetFct', {
       collectionId: 'nfaSharedData',
-      documentId: 'fct_eth0729_rev',
+      documentId: 'fctNew',
     })
     dispatch('updateLoadingState', false)
   },
 
-  async fireSaveMyApp({ dispatch, commit, state }) {
+  async fireSaveMyApp({ dispatch, state }) {
     const targetDoc = Object.entries(state.isUpdateElements)
       .filter(([key, value]) => value === true)
       .map((item) => {
@@ -556,5 +631,12 @@ export const actions = {
       (item) => item.name !== payload
     )
     commit('updateFamilies', res)
+  },
+  async saveDri({ state }) {
+    const driBack = {}
+    state.dri.forEach((item) => {
+      driBack[item.id] = JSON.parse(JSON.stringify(item))
+    })
+    await fireSaveDoc('nfaSharedData', 'driNew', driBack)
   },
 }
