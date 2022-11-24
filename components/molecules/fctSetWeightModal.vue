@@ -6,6 +6,7 @@
       v-model="showModalComputed"
       hide-header
       hide-footer
+      no-close-on-esc
     >
       <!--   タイトル   -->
       <b-row class="px-0 mx-0 my-1">
@@ -43,6 +44,7 @@
         bg-variant="light"
         class="my-2"
       >
+        <!-- 食事名の設定 -->
         <span class="font-weight-bold text-success">set diet name</span>
         <b-input-group size="sm" class="mx-0">
           <template #prepend>
@@ -58,6 +60,8 @@
             <small>Enter at least 4 letters, or select from below</small>
           </b-form-invalid-feedback>
         </b-input-group>
+
+        <!-- 典型的な食事名の一覧 -->
         <b-row>
           <b-col>
             <b-button
@@ -75,6 +79,7 @@
         </b-row>
       </b-card>
 
+      <!-- portion数の設定 -->
       <b-card
         header-bg-variant="success"
         border-variant="success"
@@ -93,6 +98,8 @@
             :state="stateFoodVolume"
           />
         </b-input-group>
+
+        <!-- 合計重量の表示 -->
         <b-row class="mt-2">
           <b-col>
             total weight:
@@ -100,6 +107,8 @@
               {{ foodVolume }}
             </span>
             gram
+
+            <!-- portionの選択 -->
             <b-table
               bordered
               small
@@ -113,6 +122,8 @@
           </b-col>
         </b-row>
       </b-card>
+
+      <!-- 食材の写真表示 -->
       <b-card
         header-bg-variant="success"
         border-variant="success"
@@ -336,37 +347,15 @@ export default {
       )
       return res
     },
-    portionSelected() {
-      const vm = this
-      return vm.portionList.filter((dat) => {
-        return dat.count_method === vm.selected
-      })
-    },
-    inputName() {
-      return this.myName + '_input'
-    },
+    /**
+     * modal表示設定
+     */
     showModalComputed: {
       get() {
         return this.showModal
       },
       set(val) {
         this.$emit('update:showModal', val)
-      },
-    },
-    portionValue: {
-      get() {
-        if (this.portionSelected.length === 0) {
-          return this.weight
-        }
-        return (
-          Math.round((this.weight * 10) / this.portionSelected[0].unit_weight) /
-          10
-        )
-      },
-      set(val) {
-        const res =
-          Math.round(val * this.portionSelected[0].unit_weight * 10) / 10
-        this.$emit('update:weight', Number(res))
       },
     },
   },
@@ -378,6 +367,11 @@ export default {
           this.portionList[this.portionList.length - 1].count_method
       }
     },
+  },
+  created() {
+    this.foodName = this.menuName
+    this.portionCount = this.weight
+    this.portionSize = 1
   },
   methods: {
     onPortionSelected(item) {
@@ -418,10 +412,14 @@ export default {
      * テーブル内の要素（items）と入力されたWtを一つのObjectに合成して返す
      */
     clickOk() {
-      let result = {}
-      result = this.selectedItem
-      result.Wt = this.weight
-      result.menuName = this.menuName
+      const result = {}
+      result.item = this.selectedItem
+      result.Wt = this.foodVolume
+      result.foodName = this.foodName
+      this.$emit('update:menuName', this.foodName)
+      this.$emit('update:weight', this.foodVolume)
+      this.$emit('update:showModal', false)
+
       this.$emit('modalOk', result)
     },
     clickCancel() {
@@ -432,6 +430,7 @@ export default {
       this.portionCount = 0
       this.portionSize = 0
 
+      this.$emit('update:showModal', false)
       this.$emit('modalCancel')
     },
   },

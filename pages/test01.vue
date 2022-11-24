@@ -1,14 +1,15 @@
 <template>
   <b-container>
     <b-button size="sm" @click="showModal = true">click</b-button>
+    <b-form-input v-model="fctId" type="number" />
+    menuName: {{ menuName }}, menuWeight: {{ menuWeight }}
     <fct-set-weight-modal
-      :show-modal="showModal"
-      :selected-item="myFct[0]"
+      :v-if="targetCrop"
+      :selected-item="targetCrop"
       :portion-units="$store.state.fire.portionUnit"
-      :menu-name="menuName"
-      :weight="menuWeight"
-      @modalOk="modalOk"
-      @modalCancel="modalCancel"
+      :show-modal.sync="showModal"
+      :menu-name.sync="menuName"
+      :weight.sync="menuWeight"
     />
   </b-container>
 </template>
@@ -26,23 +27,28 @@ export default {
     return {
       myFct: [],
       showModal: false,
-      menuName: '',
-      menuWeight: 0,
+      menuName: 'hage',
+      menuWeight: 231,
       field01: [{}],
+      fctId: 0,
     }
   },
-  computed: {},
+  computed: {
+    targetCrop: {
+      get() {
+        return this.myFct.find((item) => item.id === this.fctId) || {}
+      },
+    },
+  },
   created() {
     this.myFct = JSON.parse(JSON.stringify(this.$store.state.fire.fct))
   },
   methods: {
     modalOk(val) {
       console.log(val)
-      this.showModal = false
     },
     modalCancel() {
       console.log('cancel')
-      this.showModal = false
     },
     showClick(val) {
       console.log(val)
