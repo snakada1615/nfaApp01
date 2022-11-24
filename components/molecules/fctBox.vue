@@ -11,12 +11,13 @@
 
       <template #append>
         <b-dropdown text="Group" variant="primary" size="sm">
+          <b-select v-model="filter" items="foodGroup" />
           <b-dropdown-item
             v-for="grpName in foodGroup"
-            :key="grpName.name"
-            :value="grpName.name"
-            @click="filter = grpName.name"
-            >{{ grpName.name }}
+            :key="grpName"
+            :value="grpName"
+            @click="filter = grpName"
+            >{{ grpName }}
           </b-dropdown-item>
         </b-dropdown>
         <b-button variant="info" :disabled="!filter" @click="filter = ''"
@@ -51,26 +52,26 @@
         @row-dblclicked="rowDblClick"
         @input="onInput"
       >
+        <template #cell(Name)="data">
+          <b-icon
+            icon="BIconPlusCircle"
+            variant="danger"
+            @click="clickPlus(data.item)"
+          />
+          {{ data.item.Name }}
+        </template>
       </b-table>
 
       <!--   ページ毎の表示件数を選択   -->
-      <b-form-group
-        label="Per page"
-        label-cols-sm="10"
-        label-cols-md="10"
-        label-cols-lg="10"
-        label-align-sm="right"
-        label-size="sm"
-        label-for="perPageSelect"
-        class="mb-1"
-      >
+      <b-input-group size="sm" prepend="Item per Page" class="mb-2">
         <b-form-select
           id="perPageSelect"
           v-model="perPage"
           size="sm"
           :options="pageOptions"
         ></b-form-select>
-      </b-form-group>
+      </b-input-group>
+
       <b-pagination
         v-model="currentPage"
         :total-rows="totalRows"
@@ -143,10 +144,21 @@ export default {
     }
   },
   computed: {
-    foodGroup: {
-      get() {
-        return this.$store.getters['fire/foodGroup']
-      },
+    /**
+     * FCTに含まれるFood Groupの一覧
+     * @returns {*[]}
+     * @constructor
+     */
+    foodGroup() {
+      const uniqueGroup = []
+      if (this.items) {
+        this.items.forEach(function (elem) {
+          if (!uniqueGroup.includes(elem.Group)) {
+            uniqueGroup.push(elem.Group)
+          }
+        })
+      }
+      return uniqueGroup
     },
   },
   methods: {
@@ -173,6 +185,9 @@ export default {
      */
     rowClick(record) {
       this.$emit('fctClick', record)
+    },
+    clickPlus(val) {
+      this.$emit('fctClickPlus', val)
     },
     /**
      * テーブルの行をダブルクリックした際にその行の情報をemit

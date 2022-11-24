@@ -358,20 +358,16 @@ export const getters = {
    * @returns {*[]}
    * @constructor
    */
-  FoodGrp(state) {
+  foodGroup(state) {
     const uniqueGroup = []
-    const result = []
     if (state.fct) {
       state.fct.forEach(function (elem) {
         if (!uniqueGroup.includes(elem.Group)) {
           uniqueGroup.push(elem.Group)
-          result.push({
-            name: elem.Group,
-          })
         }
       })
     }
-    return result
+    return uniqueGroup
   },
 }
 
