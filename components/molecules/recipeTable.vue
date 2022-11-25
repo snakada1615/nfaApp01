@@ -280,12 +280,7 @@ export default {
      * @param id
      */
     delClick(id) {
-      const res = []
-      this.items.forEach(function (val, index) {
-        if (index !== id) {
-          res.push(val)
-        }
-      })
+      const res = this.items.filter((item, index) => index !== id)
       this.$emit('itemDeleted', res)
     },
   },

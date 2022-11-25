@@ -8,9 +8,9 @@
       :show-modal.sync="showModal"
       :menu-name.sync="menuName"
       :weight.sync="menuWeight"
-      @modalOk="setRecipe"
+      @modalOk="addRecipe"
     />
-    <recipe-table :items="recipeTableItems" />
+    <recipe-table :items="recipeTableItems" @itemDeleted="updateRecipes" />
   </b-container>
 </template>
 
@@ -52,7 +52,18 @@ export default {
       this.targetCrop = Object.assign({}, val)
       this.showModal = true
     },
-    setRecipe(val) {
+    /**
+     * recipeTableItems全体を入れ替え
+     * @param val
+     */
+    updateRecipes(val) {
+      this.recipeTableItems.splice(0, this.recipeTableItems.length, ...val)
+    },
+    /**
+     * recipeTableItemsに1項目を追加または修正
+     * @param val
+     */
+    addRecipe(val) {
       let isNew = true
       const res = this.recipeTableItems.map((item) => {
         if (
