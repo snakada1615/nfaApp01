@@ -1,6 +1,6 @@
 <template>
   <b-container>
-    <div>hi</div>
+    <div>{{ $t('hello') }}</div>
   </b-container>
 </template>
 
@@ -9,6 +9,6 @@ export default {
   name: 'IndexPage',
   created() {
     console.log(this.$store.state.fire.families)
-  }
+  },
 }
 </script>

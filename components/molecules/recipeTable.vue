@@ -1,0 +1,300 @@
+<template>
+  <b-container class="my-0 px-0">
+    <div>
+      <b-table
+        ref="table"
+        striped
+        bordered
+        small
+        sticky-header
+        :items="itemWeighted"
+        :fields="fields"
+        foot-clone
+        no-footer-sorting
+        v-bind="$attrs"
+        @input="onInput"
+        @row-clicked="rowClick"
+      >
+        <!-- A custom formatted footer cell for field 'name' -->
+        <template #head(menuName)>
+          <span>Menu</span>
+        </template>
+        <template #foot(menuName)>
+          <span>Menu</span>
+        </template>
+        <!-- A custom formatted footer cell for field 'name' -->
+        <template #head(Name)>
+          <span>ingredients</span>
+        </template>
+        <template #foot(Name)>
+          <span>total</span>
+        </template>
+        <!-- A custom formatted footer cell for field 'En' -->
+        <template #foot(En)>
+          <span class="text-info" style="font-size: small">{{
+            formatNumber(nutritionSum.En, 3)
+          }}</span>
+        </template>
+        <!-- A custom formatted footer cell for field 'Pr' -->
+        <template #foot(Pr)>
+          <span class="text-info" style="font-size: small">{{
+            formatNumber(nutritionSum.Pr, 0)
+          }}</span>
+        </template>
+        <!-- A custom formatted footer cell for field 'Va' -->
+        <template #foot(Va)>
+          <span class="text-info" style="font-size: small">{{
+            formatNumber(nutritionSum.Va, 1)
+          }}</span>
+        </template>
+        <!-- A custom formatted footer cell for field 'Fe' -->
+        <template #foot(Fe)>
+          <span class="text-info" style="font-size: small">{{
+            formatNumber(nutritionSum.Fe, 2)
+          }}</span>
+        </template>
+        <!-- A custom formatted footer cell for field 'Wt' -->
+        <template #foot(Wt)>
+          <span class="text-info" style="font-size: small">{{
+            formatNumber(nutritionSum.Wt, 0)
+          }}</span>
+        </template>
+
+        <!-- A custom formatted cell for field 'name' -->
+        <template #cell(Name)="data">
+          <span class="text-info pointer" style="font-size: small">{{
+            data.value
+          }}</span>
+          <b-button
+            class="px-0 py-0 mx-0 my-0"
+            variant="light"
+            @click="delClick(data.index)"
+          >
+            <b-badge variant="gray-400" class="px-0 py-0">
+              <b-icon icon="X" />
+            </b-badge>
+          </b-button>
+        </template>
+        <!-- A custom formatted cell for field 'menuName' -->
+        <template #cell(menuName)="data">
+          <span class="text-info" style="font-size: small">
+            <!-- 'new'と表記されている場合に「!」マークを表示-->
+            <b-icon
+              v-if="addExclamation(data.value)"
+              icon="exclamation-circle"
+              aria-hidden="true"
+              class="text-danger"
+            />
+            {{ data.value }}
+          </span>
+        </template>
+        <!-- A custom formatted cell for field 'En' -->
+        <template #cell(En)="data">
+          <span class="text-info" style="font-size: small">{{
+            formatNumber(data.value, 3)
+          }}</span>
+        </template>
+        <!-- A custom formatted cell for field 'Pr' -->
+        <template #cell(Pr)="data">
+          <span class="text-info" style="font-size: small">{{
+            formatNumber(data.value, 0)
+          }}</span>
+        </template>
+        <!-- A custom formatted cell for field 'Va' -->
+        <template #cell(Va)="data">
+          <span class="text-info" style="font-size: small">{{
+            formatNumber(data.value, 1)
+          }}</span>
+        </template>
+        <!-- A custom formatted cell for field 'Fe' -->
+        <template #cell(Fe)="data">
+          <span class="text-info" style="font-size: small">{{
+            formatNumber(data.value, 2)
+          }}</span>
+        </template>
+        <!-- A custom formatted cell for field 'Wt' -->
+        <template #cell(Wt)="data">
+          <span class="text-info" style="font-size: small">{{
+            formatNumber(data.value, 0)
+          }}</span>
+        </template>
+      </b-table>
+      KC: KiloCalorie, MC: MegaCalorie, GC: GigaCalorie
+    </div>
+  </b-container>
+</template>
+
+<script>
+/**
+ * @desc 選択された品目一覧を表示するテーブル
+ * 横幅がタブレット以上の場合には料理名を表示、スマホの場合は材料名のみ表示
+ */
+import { setDigit } from '@/plugins/helper'
+
+export default {
+  props: {
+    /**
+     * 食品名及び栄養成分の一覧を含む配列
+     */
+    items: {
+      type: Array,
+      required: true,
+    },
+    dummyDrawFlag: {
+      type: Number,
+      default: 0,
+    },
+  },
+  data() {
+    return {
+      /**
+       * itemに含まれる全ての作物の栄養成分の合計値
+       */
+      nutritionSum: {},
+      /**
+       * itemの各要素にweightを掛け合わせたもの
+       */
+      itemWeighted: [],
+      /**
+       * テーブルのフィールド毎の書式設定
+       */
+      fields: [
+        { key: 'id', sortable: false, tdClass: 'd-none', thClass: 'd-none' },
+        { key: 'Group', sortable: true, tdClass: 'd-none', thClass: 'd-none' },
+        {
+          key: 'menuName',
+          sortable: true,
+          tdClass: 'text-center',
+          thClass: 'text-center',
+        },
+        { key: 'Name', sortable: true },
+        {
+          key: 'En',
+          sortable: true,
+          tdClass: 'text-center',
+          thClass: 'text-center',
+        },
+        {
+          key: 'Pr',
+          sortable: true,
+          tdClass: 'text-center',
+          thClass: 'text-center',
+        },
+        {
+          key: 'Va',
+          sortable: true,
+          tdClass: 'text-center',
+          thClass: 'text-center',
+        },
+        {
+          key: 'Fe',
+          sortable: true,
+          tdClass: 'text-center',
+          thClass: 'text-center',
+        },
+        {
+          key: 'Wt',
+          sortable: true,
+          tdClass: 'text-center',
+          thClass: 'text-center',
+        },
+      ],
+    }
+  },
+  watch: {
+    items: {
+      immediate: true,
+      deep: true,
+      handler(value) {
+        if (value.length === 0) {
+          this.nutritionSum = {
+            En: 0,
+            Pr: 0,
+            Va: 0,
+            Fe: 0,
+            Wt: 0,
+          }
+          this.itemWeighted.splice(0, this.itemWeighted.length)
+        } else {
+          this.itemWeighted = this.updateItemWeight(value)
+          this.nutritionSum = { ...this.updateSum(this.itemWeighted) }
+        }
+      },
+    },
+  },
+  methods: {
+    formatNumber(val, index) {
+      return setDigit(Number(val), index)
+    },
+    addExclamation(val) {
+      return val === 'new'
+    },
+    /**
+     * itemの各要素の値から合計値を計算
+     * @param val
+     * @returns {*}
+     */
+    updateSum(val) {
+      return val.reduce((accumulator, item) => {
+        accumulator.En = (accumulator.En || 0) + Number(item.En ? item.En : 0)
+        accumulator.Pr = (accumulator.Pr || 0) + Number(item.Pr ? item.Pr : 0)
+        accumulator.Va = (accumulator.Va || 0) + Number(item.Va ? item.Va : 0)
+        accumulator.Fe = (accumulator.Fe || 0) + Number(item.Fe ? item.Fe : 0)
+        accumulator.Wt = (accumulator.Wt || 0) + Number(item.Wt ? item.Wt : 0)
+        return accumulator
+      }, {})
+    },
+    /**
+     * itemの各要素の値に重量を掛け合わせる
+     * @param array
+     */
+    updateItemWeight(item) {
+      return item.map((val) => {
+        return {
+          id: val.id,
+          Group: val.Group,
+          menuName: val.menuName,
+          Name: val.Name,
+          En: (val.En * val.Wt) / 100,
+          Pr: (val.Pr * val.Wt) / 100,
+          Va: (val.Va * val.Wt) / 100,
+          Fe: (val.Fe * val.Wt) / 100,
+          Wt: val.Wt,
+        }
+      })
+    },
+    /**
+     * itemの構成が変わるたびに、合計値をemit
+     */
+    onInput() {
+      this.$emit('totalChanged', this.nutritionSum)
+    },
+    /**
+     * テーブルの特定行がクリックされた場合、当該行の内容をemit
+     * @param record
+     */
+    rowClick(record) {
+      this.$emit('rowClick', record)
+    },
+    /**
+     * 特定行の×ボタンをクリックした場合に、当該行を削除
+     * @param id
+     */
+    delClick(id) {
+      const res = []
+      this.items.forEach(function (val, index) {
+        if (index !== id) {
+          res.push(val)
+        }
+      })
+      this.$emit('itemDeleted', res)
+    },
+  },
+}
+</script>
+
+<style>
+.pointer {
+  cursor: pointer;
+}
+</style>

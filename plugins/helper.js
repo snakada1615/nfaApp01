@@ -134,13 +134,13 @@ export function setDigit(val, unitKey) {
   const item = Number(val || 0)
   switch (true) {
     case item < 1000:
-      res = String(Math.round(item)) + units[unitKey - 1]['1']
+      res = String(Math.round(item)) + units[unitKey]['1']
       break
     case item >= 1000 && item < 1000000:
-      res = String(Math.round(item / 1000)) + units[unitKey - 1]['2']
+      res = String(Math.round(item / 1000)) + units[unitKey]['2']
       break
     case item >= 1000000:
-      res = String(Math.round(item / 1000000)) + units[unitKey - 1]['3']
+      res = String(Math.round(item / 1000000)) + units[unitKey]['3']
       break
     default:
       console.log('parameter not valid:setDigit')
@@ -206,4 +206,21 @@ export function nutritionDemands(
   } else {
     return returnObject
   }
+}
+
+/**
+ * FCTに含まれるFood Groupの一覧
+ * @returns {*[]}
+ * @constructor
+ */
+export function foodGroup(fct) {
+  const uniqueGroup = []
+  if (fct) {
+    fct.forEach(function (elem) {
+      if (!uniqueGroup.includes(elem.Group)) {
+        uniqueGroup.push(elem.Group)
+      }
+    })
+  }
+  return uniqueGroup
 }

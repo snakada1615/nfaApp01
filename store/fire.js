@@ -1,5 +1,5 @@
 import { fireSaveDoc, fireGetDoc } from '@/plugins/firebasePlugin'
-import { validateDeepObject } from '@/plugins/helper'
+import { foodGroup, validateDeepObject } from '@/plugins/helper'
 
 /*
 const Family = class {
@@ -359,15 +359,7 @@ export const getters = {
    * @constructor
    */
   foodGroup(state) {
-    const uniqueGroup = []
-    if (state.fct) {
-      state.fct.forEach(function (elem) {
-        if (!uniqueGroup.includes(elem.Group)) {
-          uniqueGroup.push(elem.Group)
-        }
-      })
-    }
-    return uniqueGroup
+    return foodGroup(state.fct)
   },
 }
 

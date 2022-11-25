@@ -84,6 +84,8 @@
 </template>
 
 <script>
+import { foodGroup } from '@/plugins/helper'
+
 export default {
   name: 'FctBox',
   props: {
@@ -150,15 +152,7 @@ export default {
      * @constructor
      */
     foodGroup() {
-      const uniqueGroup = []
-      if (this.items) {
-        this.items.forEach(function (elem) {
-          if (!uniqueGroup.includes(elem.Group)) {
-            uniqueGroup.push(elem.Group)
-          }
-        })
-      }
-      return uniqueGroup
+      return foodGroup(this.items)
     },
   },
   methods: {
