@@ -6,21 +6,23 @@
         striped
         bordered
         small
-        sticky-header
+        :sticky-header="true"
+        :no-border-collapse="true"
         :items="itemWeighted"
         :fields="fields"
         foot-clone
         no-footer-sorting
         v-bind="$attrs"
+        head-row-variant="success"
         @input="onInput"
         @row-clicked="rowClick"
       >
         <!-- A custom formatted footer cell for field 'name' -->
-        <template #head(menuName)>
+        <template #head(foodName)>
           <span>Menu</span>
         </template>
-        <template #foot(menuName)>
-          <span>Menu</span>
+        <template #foot(foodName)>
+          <span />
         </template>
         <!-- A custom formatted footer cell for field 'name' -->
         <template #head(Name)>
@@ -75,8 +77,8 @@
             </b-badge>
           </b-button>
         </template>
-        <!-- A custom formatted cell for field 'menuName' -->
-        <template #cell(menuName)="data">
+        <!-- A custom formatted cell for field 'foodName' -->
+        <template #cell(foodName)="data">
           <span class="text-info" style="font-size: small">
             <!-- 'new'と表記されている場合に「!」マークを表示-->
             <b-icon
@@ -118,8 +120,10 @@
             formatNumber(data.value, 0)
           }}</span>
         </template>
+        <template #table-caption>
+          <small>KC: KiloCalorie, MC: MegaCalorie, GC: GigaCalorie</small>
+        </template>
       </b-table>
-      KC: KiloCalorie, MC: MegaCalorie, GC: GigaCalorie
     </div>
   </b-container>
 </template>
@@ -162,12 +166,18 @@ export default {
         { key: 'id', sortable: false, tdClass: 'd-none', thClass: 'd-none' },
         { key: 'Group', sortable: true, tdClass: 'd-none', thClass: 'd-none' },
         {
-          key: 'menuName',
+          key: 'foodName',
           sortable: true,
           tdClass: 'text-center',
           thClass: 'text-center',
         },
         { key: 'Name', sortable: true },
+        {
+          key: 'Wt',
+          sortable: true,
+          tdClass: 'text-center',
+          thClass: 'text-center',
+        },
         {
           key: 'En',
           sortable: true,
@@ -188,12 +198,6 @@ export default {
         },
         {
           key: 'Fe',
-          sortable: true,
-          tdClass: 'text-center',
-          thClass: 'text-center',
-        },
-        {
-          key: 'Wt',
           sortable: true,
           tdClass: 'text-center',
           thClass: 'text-center',
@@ -253,7 +257,7 @@ export default {
         return {
           id: val.id,
           Group: val.Group,
-          menuName: val.menuName,
+          foodName: val.foodName,
           Name: val.Name,
           En: (val.En * val.Wt) / 100,
           Pr: (val.Pr * val.Wt) / 100,

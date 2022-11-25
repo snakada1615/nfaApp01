@@ -154,18 +154,23 @@ export default {
      * @param arr
      */
     formatDriTable(arr) {
+      console.log(arr)
+      if (!arr) {
+        return []
+      }
       return arr.map((item) => {
-        let index = 1
+        let index = 0
         const myKey = item.name
         if (['En'].includes(myKey)) {
-          index = 1
+          index = 0
         } else if (['Pr'].includes(myKey)) {
-          index = 2
+          index = 1
         } else if (['Va'].includes(myKey)) {
-          index = 3
+          index = 2
         } else if (['Fe'].includes(myKey)) {
-          index = 4
+          index = 3
         }
+        console.log(index)
         const myValue = setDigit(item.value, index)
         return {
           name: myKey,

@@ -46,6 +46,7 @@
         :sort-desc="sortDesc"
         :filter="filter"
         :filter-included-fields="filterOn"
+        head-row-variant="success"
         v-bind="$attrs"
         @filtered="onFiltered"
         @row-clicked="rowClick"
