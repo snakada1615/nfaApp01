@@ -8,7 +8,7 @@
         small
         :sticky-header="true"
         :no-border-collapse="true"
-        :items="itemWeighted"
+        :items="itemWeightedCompute"
         :fields="fields"
         foot-clone
         no-footer-sorting
@@ -34,31 +34,31 @@
         <!-- A custom formatted footer cell for field 'En' -->
         <template #foot(En)>
           <span class="text-info" style="font-size: small">{{
-            formatNumber(nutritionSum.En, 0)
+            formatNumber(nutritionSumCompute.En, 0)
           }}</span>
         </template>
         <!-- A custom formatted footer cell for field 'Pr' -->
         <template #foot(Pr)>
           <span class="text-info" style="font-size: small">{{
-            formatNumber(nutritionSum.Pr, 1)
+            formatNumber(nutritionSumCompute.Pr, 1)
           }}</span>
         </template>
         <!-- A custom formatted footer cell for field 'Va' -->
         <template #foot(Va)>
           <span class="text-info" style="font-size: small">{{
-            formatNumber(nutritionSum.Va, 2)
+            formatNumber(nutritionSumCompute.Va, 2)
           }}</span>
         </template>
         <!-- A custom formatted footer cell for field 'Fe' -->
         <template #foot(Fe)>
           <span class="text-info" style="font-size: small">{{
-            formatNumber(nutritionSum.Fe, 3)
+            formatNumber(nutritionSumCompute.Fe, 3)
           }}</span>
         </template>
         <!-- A custom formatted footer cell for field 'Wt' -->
         <template #foot(Wt)>
           <span class="text-info" style="font-size: small">{{
-            formatNumber(nutritionSum.Wt, 1)
+            formatNumber(nutritionSumCompute.Wt, 1)
           }}</span>
         </template>
 
@@ -152,14 +152,6 @@ export default {
   data() {
     return {
       /**
-       * itemに含まれる全ての作物の栄養成分の合計値
-       */
-      nutritionSum: {},
-      /**
-       * itemの各要素にweightを掛け合わせたもの
-       */
-      itemWeighted: [],
-      /**
        * テーブルのフィールド毎の書式設定
        */
       fields: [
@@ -205,24 +197,27 @@ export default {
       ],
     }
   },
-  watch: {
-    items: {
-      immediate: true,
-      deep: true,
-      handler(value) {
-        if (value.length === 0) {
-          this.nutritionSum = {
-            En: 0,
-            Pr: 0,
-            Va: 0,
-            Fe: 0,
-            Wt: 0,
-          }
-          this.itemWeighted.splice(0, this.itemWeighted.length)
-        } else {
-          this.itemWeighted = this.updateItemWeight(value)
-          this.nutritionSum = { ...this.updateSum(this.itemWeighted) }
+  computed: {
+    /**
+     * itemの各要素にweightを掛け合わせたもの
+     */
+    itemWeightedCompute: {
+      get() {
+        if (this.items.length === 0) {
+          return []
         }
+        return this.updateItemWeight(this.items)
+      },
+    },
+    /**
+     * itemに含まれる全ての作物の栄養成分の合計値
+     */
+    nutritionSumCompute: {
+      get() {
+        if (this.itemWeightedCompute.length === 0) {
+          return { En: 0, Pr: 0, Va: 0, Fe: 0, Wt: 0 }
+        }
+        return { ...this.updateSum(this.itemWeightedCompute) }
       },
     },
   },
@@ -254,7 +249,6 @@ export default {
      */
     updateItemWeight(item) {
       return item.map((val) => {
-        console.log(val)
         return {
           foodName: val.foodName,
           Wt: val.Wt,
