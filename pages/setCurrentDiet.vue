@@ -54,9 +54,11 @@ export default {
     },
     setRecipe(val) {
       let isNew = true
-      console.log(val)
       const res = this.recipeTableItems.map((item) => {
-        if (item.Name === val.Name && item.id === val.id) {
+        if (
+          item.cropInfo.Name === val.cropInfo.Name &&
+          item.cropInfo.id === val.cropInfo.id
+        ) {
           isNew = false
           return val
         } else {
@@ -67,9 +69,7 @@ export default {
       if (isNew) {
         res.push(val)
       }
-      console.log(res)
       this.recipeTableItems.splice(0, this.recipeTableItems.length, ...res)
-      console.log(this.recipeTableItems)
     },
     async saveMe() {
       await this.$store.dispatch('fire/updateLoadingState', true)

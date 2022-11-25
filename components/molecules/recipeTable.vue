@@ -34,31 +34,31 @@
         <!-- A custom formatted footer cell for field 'En' -->
         <template #foot(En)>
           <span class="text-info" style="font-size: small">{{
-            formatNumber(nutritionSum.En, 3)
+            formatNumber(nutritionSum.En, 0)
           }}</span>
         </template>
         <!-- A custom formatted footer cell for field 'Pr' -->
         <template #foot(Pr)>
           <span class="text-info" style="font-size: small">{{
-            formatNumber(nutritionSum.Pr, 0)
+            formatNumber(nutritionSum.Pr, 1)
           }}</span>
         </template>
         <!-- A custom formatted footer cell for field 'Va' -->
         <template #foot(Va)>
           <span class="text-info" style="font-size: small">{{
-            formatNumber(nutritionSum.Va, 1)
+            formatNumber(nutritionSum.Va, 2)
           }}</span>
         </template>
         <!-- A custom formatted footer cell for field 'Fe' -->
         <template #foot(Fe)>
           <span class="text-info" style="font-size: small">{{
-            formatNumber(nutritionSum.Fe, 2)
+            formatNumber(nutritionSum.Fe, 3)
           }}</span>
         </template>
         <!-- A custom formatted footer cell for field 'Wt' -->
         <template #foot(Wt)>
           <span class="text-info" style="font-size: small">{{
-            formatNumber(nutritionSum.Wt, 0)
+            formatNumber(nutritionSum.Wt, 1)
           }}</span>
         </template>
 
@@ -93,31 +93,31 @@
         <!-- A custom formatted cell for field 'En' -->
         <template #cell(En)="data">
           <span class="text-info" style="font-size: small">{{
-            formatNumber(data.value, 3)
+            formatNumber(data.value, 0)
           }}</span>
         </template>
         <!-- A custom formatted cell for field 'Pr' -->
         <template #cell(Pr)="data">
           <span class="text-info" style="font-size: small">{{
-            formatNumber(data.value, 0)
+            formatNumber(data.value, 1)
           }}</span>
         </template>
         <!-- A custom formatted cell for field 'Va' -->
         <template #cell(Va)="data">
           <span class="text-info" style="font-size: small">{{
-            formatNumber(data.value, 1)
+            formatNumber(data.value, 2)
           }}</span>
         </template>
         <!-- A custom formatted cell for field 'Fe' -->
         <template #cell(Fe)="data">
           <span class="text-info" style="font-size: small">{{
-            formatNumber(data.value, 2)
+            formatNumber(data.value, 3)
           }}</span>
         </template>
         <!-- A custom formatted cell for field 'Wt' -->
         <template #cell(Wt)="data">
           <span class="text-info" style="font-size: small">{{
-            formatNumber(data.value, 0)
+            formatNumber(data.value, 1)
           }}</span>
         </template>
         <template #table-caption>
@@ -250,20 +250,21 @@ export default {
     },
     /**
      * itemの各要素の値に重量を掛け合わせる
-     * @param array
+     * @param item
      */
     updateItemWeight(item) {
       return item.map((val) => {
+        console.log(val)
         return {
-          id: val.id,
-          Group: val.Group,
           foodName: val.foodName,
-          Name: val.Name,
-          En: (val.En * val.Wt) / 100,
-          Pr: (val.Pr * val.Wt) / 100,
-          Va: (val.Va * val.Wt) / 100,
-          Fe: (val.Fe * val.Wt) / 100,
           Wt: val.Wt,
+          id: val.cropInfo.id,
+          Group: val.cropInfo.Group,
+          Name: val.cropInfo.Name,
+          En: (val.cropInfo.En * val.Wt) / 100,
+          Pr: (val.cropInfo.Pr * val.Wt) / 100,
+          Va: (val.cropInfo.Va * val.Wt) / 100,
+          Fe: (val.cropInfo.Fe * val.Wt) / 100,
         }
       })
     },

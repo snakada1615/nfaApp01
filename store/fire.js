@@ -16,8 +16,8 @@ const FamilySchema = {
   diet: [
     {
       date: Date,
-      menuName: String,
-      weight: Number,
+      foodName: String,
+      Wt: Number,
       cropInfo: {
         Group: String,
         Name: String,

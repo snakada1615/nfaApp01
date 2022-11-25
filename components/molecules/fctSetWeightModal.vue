@@ -412,12 +412,19 @@ export default {
      * テーブル内の要素（items）と入力されたWtを一つのObjectに合成して返す
      */
     clickOk() {
-      const result = this.selectedItem
+      const result = {}
+      result.cropInfo = this.selectedItem
       result.Wt = this.foodVolume
       result.foodName = this.foodName
       this.$emit('update:menuName', this.foodName)
       this.$emit('update:weight', this.foodVolume)
       this.$emit('update:showModal', false)
+
+      this.portionImg = ''
+      this.selected = ''
+      this.foodName = ''
+      this.portionCount = 0
+      this.portionSize = 0
 
       this.$emit('modalOk', result)
     },
