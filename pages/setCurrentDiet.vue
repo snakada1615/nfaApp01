@@ -11,6 +11,7 @@
       @modalOk="setRecipe"
     />
     <recipe-table :items="recipeTableItems" />
+    {{ recipeTableItems }}
   </b-container>
 </template>
 
@@ -53,19 +54,25 @@ export default {
       this.showModal = true
     },
     setRecipe(val) {
+      let isNew = true
       const res = this.recipeTableItems.map((item) => {
         if (item.foodName === val.foodName && item.id === val.id) {
+          isNew = false
           return val
         } else {
           return item
         }
       })
       //
+      if (isNew) {
+        res.push(val)
+      }
       this.recipeTableItems = this.recipeTableItems.splice(
         0,
         this.recipeTableItems.length,
         ...res
       )
+      console.log(this.recipeTableItems)
     },
     async saveMe() {
       await this.$store.dispatch('fire/updateLoadingState', true)
