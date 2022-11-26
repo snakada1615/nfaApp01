@@ -14,7 +14,7 @@
         no-footer-sorting
         v-bind="$attrs"
         head-row-variant="success"
-        @input="onInput"
+        @input="onItemChanged"
         @row-clicked="rowClick"
       >
         <!-- A custom formatted footer cell for field 'name' -->
@@ -64,22 +64,22 @@
 
         <!-- A custom formatted cell for field 'name' -->
         <template #cell(Name)="data">
-          <span class="text-info pointer" style="font-size: small">{{
-            data.value
-          }}</span>
-          <b-button
-            class="px-0 py-0 mx-0 my-0"
-            variant="light"
-            @click="delClick(data.index)"
+          <span
+            class="text-info pointer"
+            style="font-size: small"
+            @click="editItem(data.item)"
+            ><u>{{ data.value }}</u></span
           >
-            <b-badge variant="gray-400" class="px-0 py-0">
-              <b-icon icon="X" />
-            </b-badge>
-          </b-button>
+          <b-icon
+            icon="trash"
+            variant="dark"
+            font-scale="0.8"
+            @click="delItem(data.index)"
+          />
         </template>
         <!-- A custom formatted cell for field 'foodName' -->
         <template #cell(foodName)="data">
-          <span class="text-info" style="font-size: small">
+          <span style="font-size: small">
             <!-- 'new'と表記されている場合に「!」マークを表示-->
             <b-icon
               v-if="addExclamation(data.value)"
@@ -92,31 +92,31 @@
         </template>
         <!-- A custom formatted cell for field 'En' -->
         <template #cell(En)="data">
-          <span class="text-info" style="font-size: small">{{
+          <span style="font-size: small">{{
             formatNumber(data.value, 0)
           }}</span>
         </template>
         <!-- A custom formatted cell for field 'Pr' -->
         <template #cell(Pr)="data">
-          <span class="text-info" style="font-size: small">{{
+          <span style="font-size: small">{{
             formatNumber(data.value, 1)
           }}</span>
         </template>
         <!-- A custom formatted cell for field 'Va' -->
         <template #cell(Va)="data">
-          <span class="text-info" style="font-size: small">{{
+          <span style="font-size: small">{{
             formatNumber(data.value, 2)
           }}</span>
         </template>
         <!-- A custom formatted cell for field 'Fe' -->
         <template #cell(Fe)="data">
-          <span class="text-info" style="font-size: small">{{
+          <span style="font-size: small">{{
             formatNumber(data.value, 3)
           }}</span>
         </template>
         <!-- A custom formatted cell for field 'Wt' -->
         <template #cell(Wt)="data">
-          <span class="text-info" style="font-size: small">{{
+          <span style="font-size: small">{{
             formatNumber(data.value, 1)
           }}</span>
         </template>
@@ -265,11 +265,11 @@ export default {
     /**
      * itemの構成が変わるたびに、合計値をemit
      */
-    onInput() {
-      this.$emit('totalChanged', this.nutritionSum)
+    onItemChanged() {
+      this.$emit('totalChanged', this.nutritionSumCompute)
     },
     /**
-     * テーブルの特定行がクリックされた場合、当該行の内容をemit
+     * fctテーブルの特定行がクリックされた場合、当該行の内容をemit
      * @param record
      */
     rowClick(record) {
@@ -279,9 +279,12 @@ export default {
      * 特定行の×ボタンをクリックした場合に、当該行を削除
      * @param id
      */
-    delClick(id) {
+    delItem(id) {
       const res = this.items.filter((item, index) => index !== id)
       this.$emit('itemDeleted', res)
+    },
+    editItem(val) {
+      this.$emit('itemEdit', val)
     },
   },
 }

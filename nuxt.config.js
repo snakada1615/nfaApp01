@@ -71,6 +71,7 @@ export default {
           'ImagePlugin',
           'ProgressPlugin',
           'OverlayPlugin',
+          'FormDatepickerPlugin',
         ],
       },
     ],

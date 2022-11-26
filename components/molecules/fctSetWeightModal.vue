@@ -366,12 +366,10 @@ export default {
         this.selected =
           this.portionList[this.portionList.length - 1].count_method
       }
+      this.foodName = this.menuName
+      this.portionCount = this.weight
+      this.portionSize = 1
     },
-  },
-  created() {
-    this.foodName = this.menuName
-    this.portionCount = this.weight
-    this.portionSize = 1
   },
   methods: {
     onPortionSelected(item) {
@@ -382,7 +380,6 @@ export default {
         this.portionSize = item[0].unit_weight
       }
     },
-    // ...
     setDigit(item, unitKey) {
       let res = ''
       const units = [
