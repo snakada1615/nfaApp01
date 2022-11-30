@@ -1,5 +1,42 @@
 <template>
   <b-container>
+    <div>current family: {{ $store.state.fire.current.familyName }}</div>
+
+    <!--   Add/Editの選択   -->
+    <b-form-radio-group
+      v-model="modeDiet"
+      :options="['Add', 'Edit', 'Delete']"
+      button-variant="outline-primary"
+      buttons
+      size="sm"
+      class="mb-2"
+      @change="test"
+    />
+
+    <b-button
+      v-if="modeDiet === 'Add'"
+      size="sm"
+      block
+      class="mb-2"
+      variant="primary"
+      :state="stateNewDiet"
+      :disabled="!stateNewDiet"
+      >add new
+    </b-button>
+
+    <b-select v-if="modeDiet === 'Edit'" size="sm" block class="mb-2"
+      >select
+    </b-select>
+
+    <b-button
+      v-if="modeDiet === 'Delete'"
+      size="sm"
+      block
+      class="mb-2"
+      variant="primary"
+      >delete selected record
+    </b-button>
+
     <b-form-datepicker
       id="datepicker01"
       v-model="surveyDate"
@@ -7,7 +44,9 @@
       class="mb-2"
       :state="surveyDate !== ''"
       aria-describedby="datepicker01-feedback"
+      :date-info-fn="dateClass"
     />
+
     <!-- This will only be shown if the preceding input has an invalid state -->
     <b-form-invalid-feedback id="datepicker01-feedback">
       set survey date first
@@ -55,13 +94,45 @@ export default {
       targetCrop: {},
       recipeTableItems: [],
       surveyDate: '',
+      modeDiet: 'Add',
     }
   },
-  computed: {},
+  computed: {
+    stateNewDiet: {
+      get() {
+        return this.surveyDate && this.recipeTableItems.length > 0
+      },
+    },
+  },
   created() {
     this.myFct = JSON.parse(JSON.stringify(this.$store.state.fire.fct))
   },
   methods: {
+    test() {
+      console.log('test')
+    },
+    dateClass(ymd, date) {
+      const myDateObject = this.$store.getters['fire/surveyDateList']
+      let myDate
+      if (Object.keys(myDateObject).length) {
+        myDate = Object.values(myDateObject)[0]
+      } else {
+        myDate = ['2022-11-05']
+      }
+
+      // const myDate = '2022-11-05'
+      const day =
+        date.getFullYear() +
+        '-' +
+        ('0' + (date.getMonth() + 1)).slice(-2) +
+        '-' +
+        ('0' + date.getDate()).slice(-2)
+      if (myDate.includes(day)) {
+        return 'table-info'
+      } else {
+        return ''
+      }
+    },
     modalOk(val) {
       console.log(val)
     },
@@ -109,6 +180,7 @@ export default {
      */
     addRecipe(val) {
       let isNew = true
+      val.date = this.surveyDate
       const res = this.recipeTableItems.map((item) => {
         if (
           item.cropInfo.Name === val.cropInfo.Name &&
@@ -124,7 +196,28 @@ export default {
       if (isNew) {
         res.push(val)
       }
+      // reactiveを維持しながらrecipeTableを更新
+      console.log(this.$store.state.fire.families)
       this.recipeTableItems.splice(0, this.recipeTableItems.length, ...res)
+
+      // reactiveの値を用いてstare.familiesを更新
+      this.$store.dispatch('fire/updateDiet', {
+        name: this.$store.state.fire.current.familyName,
+        diet: this.recipeTableItems,
+      })
+      console.log(this.$store.state.fire.families)
+
+      // 更新フラグを立てる
+      this.$store.dispatch('fire/setUpdateFlag', {
+        element: 'families',
+        value: true,
+      })
+    },
+    storeUpdateRecipes() {
+      this.$store.dispatch('fire/updateRecipes', {
+        name: this.$store.state.fire.current.familyName,
+        diet: this.recipeTableItems,
+      })
     },
     async saveMe() {
       await this.$store.dispatch('fire/updateLoadingState', true)

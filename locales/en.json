@@ -5,10 +5,20 @@
     "en": "English",
     "ja": "Japanese"
   },
-  "home": {
+  "error": {
+    "typeError": "parameter is not valid"
+  },
+  "index": {
     "title": {
       "introduction": "This is an introduction in English."
-      }
+      },
+    "link": {
+      "setFamily": "add select family",
+      "setCurrentDiet": "assess current diet"
+    }
+  },
+  "setFamily": {
+    "title": "add select famiy"
   },
   "fire": {
     "update": "data successfully updated"

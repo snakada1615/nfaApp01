@@ -1,6 +1,6 @@
 <template>
   <b-container>
-    <b-form-group label="Add/Edit Family Member">
+    <b-form-group>
       <!--   Add/Editの選択   -->
       <b-form-radio-group
         v-model="modeNewFamily"
@@ -11,6 +11,10 @@
         class="mb-2"
         @change="initMember"
       />
+
+      <div class="my-2 font-weight-bold" variant="primary">
+        Add/Edit Family Member
+      </div>
 
       <!-- 新規入力用の名前設定 -->
       <b-input-group v-if="modeNewFamily === 'Add'" prepend="name" size="sm">

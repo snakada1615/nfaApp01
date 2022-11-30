@@ -5,55 +5,85 @@ import { foodGroup, validateDeepObject } from '@/plugins/helper'
 // ////////////////// ここからschema定義 ///////////////////////////
 // ///////////////////////////////////////////////////////////////
 
-const FamilySchema = {
-  name: String,
-  member: [
-    {
-      id: Number,
-      count: Number,
-    },
-  ],
-  diet: [
-    {
-      date: Date,
-      foodName: String,
-      Wt: Number,
-      cropInfo: {
-        Group: String,
-        Name: String,
-        food_grp_id: String,
-        id: String,
-        En: Number,
-        Pr: Number,
-        Fe: Number,
-        Va: Number,
-        Carbohydrate: Number,
-        Fat: Number,
+const FamilySchema = [
+  {
+    name: String,
+    member: [
+      {
+        id: Number,
+        count: Number,
       },
-    },
-  ],
-  recommendedCrops: [
-    {
-      month: String,
-      keyNutrient: String,
-      weight: Number,
-      share: Number,
-      cropInfo: {
-        Group: String,
-        Name: String,
-        food_grp_id: String,
-        id: String,
-        En: Number,
-        Pr: Number,
-        Fe: Number,
-        Va: Number,
-        Carbohydrate: Number,
-        Fat: Number,
+    ],
+    diet: [
+      {
+        date: Date,
+        foodName: String,
+        Wt: Number,
+        cropInfo: {
+          Group: String,
+          Name: String,
+          food_grp_id: String,
+          id: String,
+          En: Number,
+          Pr: Number,
+          Fe: Number,
+          Va: Number,
+          Carbohydrate: Number,
+          Fat: Number,
+        },
       },
-      feasibilityScore: [Number],
+    ],
+    recommendedCrops: [
+      {
+        month: String,
+        keyNutrient: String,
+        weight: Number,
+        share: Number,
+        cropInfo: {
+          Group: String,
+          Name: String,
+          food_grp_id: String,
+          id: String,
+          En: Number,
+          Pr: Number,
+          Fe: Number,
+          Va: Number,
+          Carbohydrate: Number,
+          Fat: Number,
+        },
+        feasibilityScore: [Number],
+      },
+    ],
+  },
+]
+
+const DietSchema = [
+  {
+    date: String,
+    foodName: String,
+    Wt: Number,
+    cropInfo: {
+      Group: String,
+      Name: String,
+      food_grp_id: String,
+      id: String,
+      En: Number,
+      Pr: Number,
+      Fe: Number,
+      Va: Number,
+      Carbohydrate: Number,
+      Fat: Number,
     },
-  ],
-}
+  },
+]
+
+const familyMemberSchema = [
+  {
+    id: String,
+    name: String,
+    member: Number,
+  },
+]
 
 // /////////////////////////////////////////////////////////////
 // ////////////////// ここからstore定義 ///////////////////////////
@@ -73,6 +103,13 @@ export const state = () => ({
    * loadingBox表示用のフラグ
    */
   loadingStatus: false,
+  /**
+   * 現在選択されているfamily, dietDateを記録
+   */
+  current: {
+    familyName: 'userTest1',
+    dietDate: '',
+  },
   isUpdateElements: {
     families: false,
     communities: false,
@@ -100,6 +137,19 @@ export const getters = {
     return state.families.map((item) => {
       return item.name
     })
+  },
+  surveyDateList(state) {
+    // let errPath
+    // validateDeepObject(state.families, FamilySchema, errPath)
+    const resObject = {}
+    state.families.forEach((item) => {
+      const res = []
+      for (const item2 in item.diet) {
+        res.push(item2.date)
+      }
+      resObject[item.name] = res
+    })
+    return resObject
   },
   isUpdateAny(state) {
     let res = false
@@ -141,16 +191,47 @@ export const mutations = {
     }
 
     // 名前が重複していたらreturn
-    console.log(state.families)
     if (state.families.find((item) => item.name === payload)) {
       throw new Error('family name duplication')
     }
+    // 型チェック:失敗したらerror
+    let errPath
+    console.log(payload.member)
+    validateDeepObject(payload.member, familyMemberSchema, errPath)
+
     const family = {}
     family.name = payload.name
     family.member = JSON.parse(JSON.stringify(payload.member))
     family.diet = []
     family.recommendedCrops = []
     state.families.push(family)
+  },
+
+  /**
+   * families[].dietを更新
+   * @param state
+   * @param payload
+   */
+  updateDiet(state, payload) {
+    // 名前が指定されていなければ何もしない
+    if (!payload.name) {
+      throw new TypeError('error.typeError')
+    }
+
+    // 型チェック:失敗したらerror
+    let errPath
+    console.log(payload.diet)
+    validateDeepObject(payload.diet, DietSchema, errPath)
+    // payload.diet.forEach((item) => {
+    //   console.log(item)
+    //   validateDeepObject(item, DietSchema, errPath)
+    // })
+
+    state.families[payload.name].diet = Object.assign(
+      {},
+      state.families[payload.name].diet,
+      payload.diet
+    )
   },
 
   /**
@@ -166,7 +247,8 @@ export const mutations = {
     }
     payload.forEach((item) => {
       console.log(item)
-      validateDeepObject(item, FamilySchema)
+      let errPath
+      validateDeepObject(item, FamilySchema, errPath)
     })
 
     // objectのためdeep copyを実行
@@ -202,6 +284,15 @@ export const mutations = {
 }
 
 export const actions = {
+  /**
+   * families[].dietを更新
+   * @param state
+   * @param payload
+   */
+  updateDiet({ commit }, payload) {
+    commit('updateDiet', payload)
+  },
+
   /**
    * 要素ごとのupdateの状況を設定
    * @param state

@@ -154,7 +154,6 @@ export default {
      * @param arr
      */
     formatDriTable(arr) {
-      console.log(arr)
       if (!arr) {
         return []
       }
@@ -170,7 +169,6 @@ export default {
         } else if (['Fe'].includes(myKey)) {
           index = 3
         }
-        console.log(index)
         const myValue = setDigit(item.value, index)
         return {
           name: myKey,
