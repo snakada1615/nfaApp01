@@ -118,40 +118,27 @@ validate(obj, OBJECT_SCHEMA)
 */
 
 export function updateDeepObject(sourceObj, destObj, schema) {
-  console.log('start')
-  console.log(destObj)
-  console.log('lets go')
-
   // if no-data
   if (!sourceObj) {
-    console.log('no1')
-    console.log(schema)
+    console.log(sourceObj)
+    console.log('updateDeepObject: no input')
+    return
   }
 
   // function case 最後にここで値確定する
   else if (typeof schema === 'function') {
-    console.log('no2:function')
-    console.log(schema)
-    console.log(schema(sourceObj))
     // ここがキモ。スキーマに応じた型変換の実施
-    if (!sourceObj) {
-      // sourceObjがnullの場合は型変換のみ
-      destObj = schema(destObj)
-    } else {
-      // sourceObjがnullでない場合は置換＆型変換
-      destObj = schema(sourceObj)
-    }
-    console.log(destObj)
+    destObj = schema(sourceObj)
   }
 
   // non-Object case
   else if (typeof sourceObj !== 'object') {
-    console.log('no3:!object')
+    console.log('updateDeepObject: not an object')
+    return
   }
 
   // Array case
   else if (Array.isArray(schema)) {
-    console.log('no4:Array')
     destObj = Array(sourceObj.length)
     sourceObj.forEach((x, k) => {
       destObj[k] = x
@@ -162,16 +149,8 @@ export function updateDeepObject(sourceObj, destObj, schema) {
   // Object case
   else {
     const ks = Object.keys(schema)
-    console.log('no5:object')
-    console.log(sourceObj)
-    console.log(destObj)
-
     ks.forEach((k) => {
-      console.log('no5:loop-' + k)
       destObj[k] = sourceObj[k]
-      console.log(sourceObj[k])
-      console.log(destObj[k])
-      console.log(schema[k])
       updateDeepObject(sourceObj[k], destObj[k], schema[k])
     })
   }
