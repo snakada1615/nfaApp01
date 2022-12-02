@@ -118,27 +118,32 @@ validate(obj, OBJECT_SCHEMA)
 */
 
 export function updateDeepObject(sourceObj, destObj, schema) {
+  console.log(sourceObj)
+
   // if no-data
   if (!sourceObj) {
-    console.log(sourceObj)
+    console.log(1)
     console.log('updateDeepObject: no input')
     return
   }
 
   // function case 最後にここで値確定する
   else if (typeof schema === 'function') {
+    console.log(2)
     // ここがキモ。スキーマに応じた型変換の実施
     destObj = schema(sourceObj)
   }
 
   // non-Object case
   else if (typeof sourceObj !== 'object') {
+    console.log(3)
     console.log('updateDeepObject: not an object')
     return
   }
 
   // Array case
   else if (Array.isArray(schema)) {
+    console.log(4)
     destObj = Array(sourceObj.length)
     sourceObj.forEach((x, k) => {
       destObj[k] = x
@@ -148,10 +153,55 @@ export function updateDeepObject(sourceObj, destObj, schema) {
 
   // Object case
   else {
+    console.log(5)
     const ks = Object.keys(schema)
     ks.forEach((k) => {
-      destObj[k] = sourceObj[k]
+      destObj[k] = sourceObj[k] || null
       updateDeepObject(sourceObj[k], destObj[k], schema[k])
+    })
+  }
+  return true
+}
+
+export function initDeepObject(sourceObj, schema) {
+  console.log(sourceObj)
+
+  // if no-data
+  if (!sourceObj) {
+    console.log(1)
+    console.log('updateDeepObject: no input')
+    sourceObj = schema()
+    return
+  }
+
+  // function case 最後にここで値確定する
+  else if (typeof schema === 'function') {
+    console.log(2)
+    // ここがキモ。スキーマに応じた型変換の実施
+    sourceObj = schema('')
+    return
+  }
+
+  // non-Object case
+  else if (typeof schema !== 'object') {
+    console.log(3)
+    console.log('updateDeepObject: not an object')
+    return
+  }
+
+  // Array case
+  else if (Array.isArray(schema)) {
+    console.log(4)
+    sourceObj = []
+    return
+  }
+
+  // Object case
+  else {
+    console.log(5)
+    const ks = Object.keys(schema)
+    ks.forEach((k) => {
+      initDeepObject(sourceObj[k], schema[k])
     })
   }
   return true
