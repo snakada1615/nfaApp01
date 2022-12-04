@@ -24,7 +24,7 @@ describe('updateDeepObject', () => {
     data: [
       {
         isSelected: true,
-        mId: 'bar',
+        mId: 'pong',
         omnReplaceDict: {
           //      id: "foo",
           text: {
@@ -38,6 +38,7 @@ describe('updateDeepObject', () => {
   }
 
   const obj3 = {
+    name: 'test',
     data: {
       isSelected: true,
       mId: 'bar',
@@ -57,8 +58,14 @@ describe('updateDeepObject', () => {
   }
 
   it('replace obj2 with obj1 with type specified in schema (OBJECT_SCHEMA),', () => {
-    console.log(obj1)
     updateDeepObject(obj1, obj2, OBJECT_SCHEMA)
+    console.log('done1')
+    console.log(obj2)
+    //    expect(obj2).toBe(obj1)
+
+    updateDeepObject(obj3, obj2, OBJECT_SCHEMA)
+    console.log('done2')
+    console.log(obj2)
     //    expect(obj2).toBe(obj1)
   })
 })
