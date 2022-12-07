@@ -58,9 +58,10 @@ export function validateObject(data, types) {
 export function validateDeepObject(obj, schema, path = '') {
   let ok
 
-  if (!obj) ok = obj === schema
-  else if (typeof schema === 'function') ok = obj.constructor === schema
-  else if (typeof obj !== 'object') ok = obj === schema
+  if (obj == null) ok = obj === schema
+  else if (typeof schema === 'function') {
+    ok = obj.constructor === schema
+  } else if (typeof obj !== 'object') ok = obj === schema
   else if (Array.isArray(schema))
     ok =
       Array.isArray(obj) &&
@@ -74,7 +75,7 @@ export function validateDeepObject(obj, schema, path = '') {
       ko.length === ks.length &&
       ks.every((k) => validateDeepObject(obj[k], schema[k], path + '.' + k))
   }
-  if (!ok) throw new TypeError('Wrong parameter in' + path)
+  if (!ok) throw new TypeError('Wrong parameter in ' + path)
   return true
 }
 
@@ -117,16 +118,20 @@ const obj = {
 validate(obj, OBJECT_SCHEMA)
 */
 
+/**
+ * 型付きのObjectをsourceObjからdestObjに代入
+ * @param sourceObj
+ * @param destObj
+ * @param schema
+ * @returns {boolean}
+ */
 export function updateDeepObject(sourceObj, destObj, schema) {
-  console.log(sourceObj)
-
   // function case 最後にここで値確定する
   if (typeof schema === 'function') {
-    console.log(2)
-
     // sourceObjがnullの場合、型に応じて0または''を代入
     if (!sourceObj) {
       if (destObj) {
+        console.log('hit destObj!!!' + destObj)
         sourceObj = destObj
       } else if (typeof schema(123) === 'number') {
         sourceObj = 0
@@ -140,22 +145,20 @@ export function updateDeepObject(sourceObj, destObj, schema) {
   }
 
   // non-Object case
+  // 何も行わずにreturn
   else if (typeof sourceObj !== 'object') {
-    console.log(3)
-    console.log('updateDeepObject: not an object')
-    return
+    return true
   }
 
   // Array case
   else if (Array.isArray(schema)) {
-    console.log(4)
-    console.log(sourceObj)
-
+    // sourceObjが空白の場合はdestObjに[]を代入してreturn
     if (!sourceObj.length) {
       destObj = []
-      return
+      return true
     }
 
+    // それ以外の場合はarrayの要素ごとに再帰的代入
     destObj = Array(sourceObj.length)
     sourceObj.forEach((x, k) => {
       destObj[k] = x
@@ -165,73 +168,14 @@ export function updateDeepObject(sourceObj, destObj, schema) {
 
   // Object case
   else {
-    console.log(5)
+    // Objectの場合は全要素について再帰的に代入
     const ks = Object.keys(schema)
     ks.forEach((k) => {
-      if (sourceObj[k]) {
+      if (sourceObj[k] && !destObj[k]) {
         destObj[k] = sourceObj[k]
       }
       updateDeepObject(sourceObj[k], destObj[k], schema[k])
-    })
-  }
-  return true
-}
-
-export function updateDeepObject2(sourceObj, destObj, schema) {
-  console.log(sourceObj)
-
-  // function case 最後にここで値確定する
-  if (typeof schema === 'function') {
-    console.log(2)
-
-    // sourceObjがnullの場合、型に応じてdestObj, 0または''を代入
-    if (!sourceObj) {
-      if (typeof schema(123) === 'number') {
-        sourceObj = 0
-      } else {
-        sourceObj = ''
-      }
-    }
-
-    // ここがキモ。スキーマに応じた型変換の実施
-    destObj = schema(sourceObj)
-  }
-
-  // non-Object case
-  else if (typeof sourceObj !== 'object') {
-    console.log(3)
-    console.log('updateDeepObject: not an object')
-    return
-  }
-
-  // Array case
-  else if (Array.isArray(schema)) {
-    console.log(4)
-    destObj = Array(sourceObj.length)
-    sourceObj.forEach((x, k) => {
-      destObj[k] = x
-      updateDeepObject(x, destObj[k], schema[0])
-    })
-  }
-
-  // Object case
-  else {
-    console.log(5)
-    const ks = Object.keys(schema)
-    ks.forEach((k) => {
-      console.log(schema[k])
-      if (!sourceObj[k]) {
-        if (destObj[k]) {
-          sourceObj[k] = destObj[k]
-        } else if (Array.isArray(schema[k])) {
-          sourceObj[k] = []
-        } else if (typeof schema[k] === 'object') {
-          sourceObj[k] = {}
-        } else {
-          sourceObj[k] = null
-        }
-      }
-      updateDeepObject(sourceObj[k], destObj[k], schema[k])
+      // updateDeepObject(source, dest, schema[k])
     })
   }
   return true
@@ -306,10 +250,14 @@ export function nutritionDemands(
     keys.forEach((nutrientKey) => {
       // accum[nutrientKey] += current.number * driObject[current.id][nutrientKey]
       // Objectの値をレスポンシブにするためにObject.assignを使う
-      const temp = {}
-      temp[nutrientKey] =
-        accum[nutrientKey] + current.number * driObject[current.id][nutrientKey]
-      accum = Object.assign(accum, JSON.parse(JSON.stringify(temp)))
+      // const temp = {}
+      // temp[nutrientKey] =
+      //   accum[nutrientKey] + current.number * driObject[current.id][nutrientKey]
+      accum = Object.assign(accum, {
+        nutrientKey:
+          accum[nutrientKey] +
+          current.number * driObject[current.id][nutrientKey],
+      })
     })
     return accum
   }, initValue)

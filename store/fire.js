@@ -81,7 +81,7 @@ const familyMemberSchema = [
   {
     id: String,
     name: String,
-    member: Number,
+    number: Number,
   },
 ]
 
@@ -190,7 +190,7 @@ export const mutations = {
       return
     }
 
-    // 名前が重複していたらreturn
+    // 名前が重複していたらerror
     if (state.families.find((item) => item.name === payload)) {
       throw new Error('family name duplication')
     }
@@ -201,10 +201,8 @@ export const mutations = {
 
     const family = {}
     family.name = payload.name
-    family.member = JSON.parse(JSON.stringify(payload.member))
-    family.diet = []
-    family.recommendedCrops = []
-    state.families.push(family)
+    family.member = payload.member.map((item) => ({ ...item }))
+    state.families.splice(state.families.length, 0, family)
   },
 
   /**
@@ -220,18 +218,9 @@ export const mutations = {
 
     // 型チェック:失敗したらerror
     let errPath
-    console.log(payload.diet)
     validateDeepObject(payload.diet, DietSchema, errPath)
-    // payload.diet.forEach((item) => {
-    //   console.log(item)
-    //   validateDeepObject(item, DietSchema, errPath)
-    // })
 
-    state.families[payload.name].diet = Object.assign(
-      {},
-      state.families[payload.name].diet,
-      payload.diet
-    )
+    state.families[payload.name].diet = Object.assign({}, payload.diet)
   },
 
   /**
@@ -252,7 +241,7 @@ export const mutations = {
     })
 
     // objectのためdeep copyを実行
-    const newArray = JSON.parse(JSON.stringify(payload))
+    const newArray = payload.map((item) => ({ ...item }))
 
     // reactivityを担保するためspliceを使用
     state.families.splice(0, state.families.length, ...newArray)
@@ -270,13 +259,13 @@ export const mutations = {
     state.dri = payload
   },
   updateDriObject(state, payload) {
-    state.driObject = payload
+    state.driObject = Object.assign({}, payload)
   },
   updateFct(state, payload) {
     state.fct = payload
   },
   updateFctObject(state, payload) {
-    state.fctObject = payload
+    state.fctObject = Object.assign({}, payload)
   },
   updatePortionUnit(state, payload) {
     state.portionUnit = payload
@@ -468,15 +457,13 @@ export const actions = {
     commit('addNewFamily', payload)
   },
   removeFamily({ state, commit }, payload) {
-    const res = JSON.parse(JSON.stringify(state.families)).filter(
-      (item) => item.name !== payload
-    )
+    const res = state.families.filter((item) => item.name !== payload)
     commit('updateFamilies', res)
   },
   async saveDri({ state }) {
     const driBack = {}
     state.dri.forEach((item) => {
-      driBack[item.id] = JSON.parse(JSON.stringify(item))
+      driBack[item.id] = item
     })
     await fireSaveDoc('nfaSharedData', 'driNew', driBack)
   },

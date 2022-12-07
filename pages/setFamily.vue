@@ -90,7 +90,7 @@ export default {
       initPop: [],
       newFamilyName: '',
       selectedFamilyName: '',
-      modeNewFamily: true,
+      modeNewFamily: 'Add',
     }
   },
   computed: {

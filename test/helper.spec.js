@@ -20,7 +20,25 @@ describe('updateDeepObject', () => {
     ],
   }
 
-  const obj1 = {
+  const src1 = {
+    name: 'source1',
+    data: [
+      {
+        isSelected: true,
+        mId: 'pong',
+        omnReplaceDict: {
+          id: 'foo',
+          text: {
+            deepObj: {
+              deepProp: [1, 2, '???', 3],
+            },
+          },
+        },
+      },
+    ],
+  }
+
+  const src2noName = {
     data: [
       {
         isSelected: true,
@@ -37,35 +55,103 @@ describe('updateDeepObject', () => {
     ],
   }
 
-  const obj3 = {
-    name: 'test',
-    data: {
-      isSelected: true,
-      mId: 'bar',
-      omnReplaceDict: {
-        //      id: "foo",
-        text: {
-          deepObj: {
-            deepProp: [1, 2, '???', 3],
+  const src3noArray = {
+    name: 'source1',
+    data: [
+      {
+        isSelected: true,
+        mId: 'pong',
+        omnReplaceDict: {
+          id: 'pengo',
+          text: {
+            deepObj: {},
           },
         },
       },
-    },
+    ],
   }
 
-  const obj2 = {
-    name: 'bar',
+  const dest1 = {
+    name: 'dest1Name',
+    data: [
+      {
+        omnReplaceDict: {
+          id: 'dest3',
+        },
+      },
+    ],
   }
 
-  it('replace obj2 with obj1 with type specified in schema (OBJECT_SCHEMA),', () => {
-    updateDeepObject(obj1, obj2, OBJECT_SCHEMA)
-    console.log('done1')
-    console.log(obj2)
-    //    expect(obj2).toBe(obj1)
+  const dest2 = {
+    data: [
+      {
+        isSelected: true,
+        mId: 'pong',
+        omnReplaceDict: {
+          //      id: "foo",
+          text: {
+            deepObj: {
+              deepProp: [1, 2, '???', 3],
+            },
+          },
+        },
+      },
+    ],
+  }
 
-    updateDeepObject(obj3, obj2, OBJECT_SCHEMA)
-    console.log('done2')
-    console.log(obj2)
-    //    expect(obj2).toBe(obj1)
+  const dest3 = {
+    name: 'dest1Name',
+    data: [
+      {
+        omnReplaceDict: {
+          id: 'dest1',
+        },
+      },
+    ],
+  }
+
+  const dest4 = {}
+
+  it('sourceの構造が完全である場合', () => {
+    updateDeepObject(src1, dest1, OBJECT_SCHEMA)
+    expect(dest1).toEqual({
+      name: 'source1',
+      data: [
+        {
+          isSelected: true,
+          mId: 'pong',
+          omnReplaceDict: {
+            id: 'foo',
+            text: {
+              deepObj: {
+                deepProp: [1, 2, '???', 3],
+              },
+            },
+          },
+        },
+      ],
+    })
+  })
+
+  it('sourceの一部がかけている場合', () => {
+    updateDeepObject(src2noName, dest4, OBJECT_SCHEMA)
+    console.log(dest3)
+    expect(dest3).toEqual({
+      name: 'dest1Name',
+      data: [
+        {
+          isSelected: true,
+          mId: 'pong',
+          omnReplaceDict: {
+            id: 'dest1',
+            text: {
+              deepObj: {
+                deepProp: [1, 2, '???', 3],
+              },
+            },
+          },
+        },
+      ],
+    })
   })
 })
