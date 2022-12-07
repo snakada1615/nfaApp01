@@ -1,3 +1,41 @@
+// **************************************************************************
+// ***** こちらは共通変数の定義 *************************************************
+// **************************************************************************
+
+export const fctSchema = [
+  {
+    Group: String,
+    Name: String,
+    food_grp_id: String,
+    id: String,
+    En: Number,
+    Pr: Number,
+    Fe: Number,
+    Va: Number,
+    Carbohydrate: Number,
+    Fat: Number,
+  },
+]
+
+export const driSchema = [
+  {
+    Name: String,
+    id: String,
+    En: Number,
+    Pr: Number,
+    Fe: Number,
+    Va: Number,
+    max_vol: Number,
+  },
+]
+
+// **************************************************************************
+// **************************************************************************
+
+// **************************************************************************
+// ***** こちらは共通関数の定義 *************************************************
+// **************************************************************************
+
 /**
  * Object validation
  *     Objectであるかどうかチェック
@@ -6,46 +44,6 @@
  */
 export function isObject(item) {
   return typeof item === 'object' && item !== null && !Array.isArray(item)
-}
-
-/**
- * Validator for complex object
- * ネストしたObjectに必要なKeyが含まれているかを検証
- * @param data 検査対象のObject
- *     （例：
- *         const obj = {
- *             "type":"typeName","firstName":"Steven",
- *             "lastName":"Smith","address":{"primary":{"city":"abc",
- *             "street":{"name":{"subName":"someName"}}}}
- *                 };）
- * @param types validaterを指定（必要なkeyを配列で指定する
- *     例：const typeName = ['firstName', 'lastName', 'address', '
- *     address.primary', 'address.primary.city',
- *     'address.primary.street'];
- *     ）
- * @returns {*[]} dataに存在しないkeyを抽出
- */
-export function validateObject(data, types) {
-  const errors = []
-  types.forEach((type) => {
-    const keys = type.split('.')
-    let datum = {
-      ...data,
-    }
-    // Loop through the keys
-    for (const [index, key] of keys.entries()) {
-      // Check if the key is not available in the data
-      // then push the corresponding key to the errors array
-      // and break the loop
-      // 以下の行を、if (!datum[key]) { とすればkeyの存在＋値の有無をチェックする
-      if (datum[key] === undefined) {
-        errors.push(keys.slice(0, index + 1).join('.'))
-        break
-      }
-      datum = datum[key]
-    }
-  })
-  return errors
 }
 
 /**
@@ -119,6 +117,41 @@ validate(obj, OBJECT_SCHEMA)
 */
 
 /**
+ * CSVなどの生データに変数の型を付与する（予め定義されたschemaに沿って）
+ * @param obj 生データ
+ * @param schema 各変数の型情報
+ * @returns {{}|null|*}
+ */
+export function setTypeOfDeepObject(obj, schema) {
+  if (obj == null) {
+    // objがnullの際にスキップ
+    return null
+  } else if (typeof schema === 'function') {
+    return schema(obj) || null
+  } else if (typeof obj !== 'object') {
+    // objがfunctionでもObjectでもない場合にスキップ
+    return null
+  } else if (Array.isArray(schema)) {
+    return obj.map((item) => {
+      return setTypeOfDeepObject(item, schema[0])
+    })
+  } else {
+    const keySchema = Object.keys(schema)
+    const res = {}
+    keySchema.forEach((item) => {
+      const itemKeyObject = obj[item]
+
+      if (itemKeyObject) {
+        res[item] = setTypeOfDeepObject(itemKeyObject, schema[item])
+      } else {
+        res[item] = null
+      }
+    })
+    return res
+  }
+}
+
+/**
  * 型付きのObjectをsourceObjからdestObjに代入
  * @param sourceObj
  * @param destObj
@@ -141,7 +174,10 @@ export function updateDeepObject(sourceObj, destObj, schema) {
     }
 
     // ここがキモ。スキーマに応じた型変換の実施
+    console.log('sourceObj= ' + sourceObj)
+    console.log('destObj1= ' + destObj)
     destObj = schema(sourceObj)
+    console.log('destObj2= ' + destObj)
   }
 
   // non-Object case
@@ -171,11 +207,14 @@ export function updateDeepObject(sourceObj, destObj, schema) {
     // Objectの場合は全要素について再帰的に代入
     const ks = Object.keys(schema)
     ks.forEach((k) => {
-      if (sourceObj[k] && !destObj[k]) {
-        destObj[k] = sourceObj[k]
-      }
-      updateDeepObject(sourceObj[k], destObj[k], schema[k])
-      // updateDeepObject(source, dest, schema[k])
+      // if (sourceObj[k] && !destObj[k]) {
+      //   destObj[k] = sourceObj[k]
+      // }
+      // propertyが存在しない場合、nullを代入（undefinedを回避）
+      const source = sourceObj[k] || null
+      const dest = destObj[k] || null
+      // updateDeepObject(sourceObj[k], destObj[k], schema[k])
+      updateDeepObject(source, dest, schema[k])
     })
   }
   return true

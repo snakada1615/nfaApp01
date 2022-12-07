@@ -19,7 +19,7 @@
     <b-form-input v-model="destDocName" />
     <b-button
       v-if="Object.values(sourceDoc).length > 0"
-      @click="uploadDoc(destCollectionId, destDocName, sourceDoc)"
+      @click="uploadDoc(destCollectionId, destDocName, myDocArray, mySchema)"
       >copy</b-button
     >
   </b-container>
@@ -39,6 +39,7 @@ import {
   setDoc,
 } from 'firebase/firestore'
 import JsonView from 'vue-json-viewer'
+import { driSchema, fctSchema, setTypeOfDeepObject } from '../../plugins/helper'
 import { firestoreDb } from '@/plugins/firebasePlugin'
 import { makeToast } from '@/plugins/helper'
 
@@ -79,6 +80,52 @@ export default {
         return this.dbList.map((item) => {
           return item
         })
+      },
+    },
+    /**
+     * csv等から読み込んだ生データを型付きObjectに代入
+     */
+    myDocArray: {
+      get() {
+        return Object.values(this.sourceDoc).map((item) => {
+          if (this.sourceDocName.includes('fct')) {
+            return {
+              Group: item.food_group_unicef2,
+              Name: item.Food_name,
+              food_grp_id: item.food_grp_id,
+              id: item.food_item_id,
+              En: item.Energy,
+              Pr: item.Protein,
+              Fe: item.FE,
+              Va: item.VITA_RAE,
+              Carbohydrate: item.Carbohydrate,
+              Fat: item.Fat,
+            }
+          } else if (this.sourceDocName.includes('dri')) {
+            return {
+              Name: item.nut_group,
+              id: item.id,
+              En: item.energy,
+              Pr: item.protein,
+              Fe: item.fe,
+              Va: item.vita,
+              max_vol: item.max_vol,
+            }
+          } else {
+            return {}
+          }
+        })
+      },
+    },
+    mySchema: {
+      get() {
+        if (this.sourceDocName.includes('fct')) {
+          return fctSchema
+        } else if (this.sourceDocName.includes('dri')) {
+          return driSchema
+        } else {
+          return {}
+        }
       },
     },
   },
@@ -132,13 +179,27 @@ export default {
       })
       return res
     },
-    async uploadDoc(collectionId, docId, myDoc) {
+    async uploadDoc(collectionId, docId, myDoc, mySchema) {
+      // loadingをセット
       await this.$store.dispatch('fire/updateLoadingState', true)
-      await setDoc(doc(firestoreDb, collectionId, docId), myDoc).catch(
+
+      // 生データに型を付与
+      const myDocWithType = setTypeOfDeepObject(myDoc, mySchema).reduce(
+        (accum, current) => {
+          accum[current.id] = current
+          return accum
+        },
+        {}
+      )
+
+      // 型付きデータをfirebaseにアップロード
+      await setDoc(doc(firestoreDb, collectionId, docId), myDocWithType).catch(
         (err) => {
           throw err
         }
       )
+
+      // データ更新フラグをおろす（必要か？）
       await this.$store.dispatch('fire/updateLoadingState', false)
       makeToast(this, 'copy done!')
     },

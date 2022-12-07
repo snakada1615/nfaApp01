@@ -1,4 +1,5 @@
 import { describe, expect, it } from '@jest/globals'
+import { setTypeOfDeepObject } from '../plugins/helper'
 import { updateDeepObject } from '@/plugins/helper'
 
 describe('updateDeepObject', () => {
@@ -135,8 +136,8 @@ describe('updateDeepObject', () => {
 
   it('sourceの一部がかけている場合', () => {
     updateDeepObject(src2noName, dest4, OBJECT_SCHEMA)
-    console.log(dest3)
-    expect(dest3).toEqual({
+    console.log(dest4)
+    expect(dest4).toEqual({
       name: 'dest1Name',
       data: [
         {
@@ -147,6 +148,28 @@ describe('updateDeepObject', () => {
             text: {
               deepObj: {
                 deepProp: [1, 2, '???', 3],
+              },
+            },
+          },
+        },
+      ],
+    })
+  })
+
+  it('sourceの型変換機能', () => {
+    const res = setTypeOfDeepObject(src1, OBJECT_SCHEMA)
+    console.log(res)
+    expect(res).toEqual({
+      name: 'source1',
+      data: [
+        {
+          isSelected: true,
+          mId: 'pong',
+          omnReplaceDict: {
+            id: 'foo',
+            text: {
+              deepObj: {
+                deepProp: [1, 2, null, 3],
               },
             },
           },
