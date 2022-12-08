@@ -153,71 +153,16 @@ export function setTypeOfDeepObject(obj, schema) {
 
 /**
  * 型付きのObjectをsourceObjからdestObjに代入
- * @param sourceObj
- * @param destObj
+ * @param newObj
+ * @param currentObj
  * @param schema
  * @returns {boolean}
  */
-export function updateDeepObject(sourceObj, destObj, schema) {
-  // function case 最後にここで値確定する
-  if (typeof schema === 'function') {
-    // sourceObjがnullの場合、型に応じて0または''を代入
-    if (!sourceObj) {
-      if (destObj) {
-        console.log('hit destObj!!!' + destObj)
-        sourceObj = destObj
-      } else if (typeof schema(123) === 'number') {
-        sourceObj = 0
-      } else {
-        sourceObj = ''
-      }
-    }
-
-    // ここがキモ。スキーマに応じた型変換の実施
-    console.log('sourceObj= ' + sourceObj)
-    console.log('destObj1= ' + destObj)
-    destObj = schema(sourceObj)
-    console.log('destObj2= ' + destObj)
-  }
-
-  // non-Object case
-  // 何も行わずにreturn
-  else if (typeof sourceObj !== 'object') {
-    return true
-  }
-
-  // Array case
-  else if (Array.isArray(schema)) {
-    // sourceObjが空白の場合はdestObjに[]を代入してreturn
-    if (!sourceObj.length) {
-      destObj = []
-      return true
-    }
-
-    // それ以外の場合はarrayの要素ごとに再帰的代入
-    destObj = Array(sourceObj.length)
-    sourceObj.forEach((x, k) => {
-      destObj[k] = x
-      updateDeepObject(x, destObj[k], schema[0])
-    })
-  }
-
-  // Object case
-  else {
-    // Objectの場合は全要素について再帰的に代入
-    const ks = Object.keys(schema)
-    ks.forEach((k) => {
-      // if (sourceObj[k] && !destObj[k]) {
-      //   destObj[k] = sourceObj[k]
-      // }
-      // propertyが存在しない場合、nullを代入（undefinedを回避）
-      const source = sourceObj[k] || null
-      const dest = destObj[k] || null
-      // updateDeepObject(sourceObj[k], destObj[k], schema[k])
-      updateDeepObject(source, dest, schema[k])
-    })
-  }
-  return true
+export function updateDeepObject(newObj, currentObj, schema) {
+  const mergeObj = Object.assign(currentObj, newObj)
+  console.log('updateDeepObject')
+  console.log(JSON.stringify(mergeObj))
+  return setTypeOfDeepObject(mergeObj, schema)
 }
 
 /**

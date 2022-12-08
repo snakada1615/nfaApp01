@@ -45,7 +45,6 @@ describe('updateDeepObject', () => {
         isSelected: true,
         mId: 'pong',
         omnReplaceDict: {
-          //      id: "foo",
           text: {
             deepObj: {
               deepProp: [1, 2, '???', 3],
@@ -114,8 +113,8 @@ describe('updateDeepObject', () => {
   const dest4 = {}
 
   it('sourceの構造が完全である場合', () => {
-    updateDeepObject(src1, dest1, OBJECT_SCHEMA)
-    expect(dest1).toEqual({
+    const res = updateDeepObject(src1, dest1, OBJECT_SCHEMA)
+    expect(res).toEqual({
       name: 'source1',
       data: [
         {
@@ -125,7 +124,7 @@ describe('updateDeepObject', () => {
             id: 'foo',
             text: {
               deepObj: {
-                deepProp: [1, 2, '???', 3],
+                deepProp: [1, 2, null, 3],
               },
             },
           },
@@ -135,9 +134,9 @@ describe('updateDeepObject', () => {
   })
 
   it('sourceの一部がかけている場合', () => {
-    updateDeepObject(src2noName, dest4, OBJECT_SCHEMA)
-    console.log(dest4)
-    expect(dest4).toEqual({
+    const res2 = updateDeepObject(src2noName, dest3, OBJECT_SCHEMA)
+    console.log(res2)
+    expect(res2).toEqual({
       name: 'dest1Name',
       data: [
         {
@@ -147,7 +146,7 @@ describe('updateDeepObject', () => {
             id: 'dest1',
             text: {
               deepObj: {
-                deepProp: [1, 2, '???', 3],
+                deepProp: [1, 2, null, 3],
               },
             },
           },
