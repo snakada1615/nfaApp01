@@ -1,5 +1,6 @@
 <template>
   <b-container>
+    {{ familyList }}
     <b-form-group>
       <!--   Add/Editの選択   -->
       <b-form-radio-group
@@ -114,12 +115,12 @@ export default {
     },
   },
   created() {
-    this.initPop = this.$store.getters['fire/initialMembers'].map((item) => ({
-      ...item,
-    }))
-    this.tablePop = this.$store.getters['fire/initialMembers'].map((item) => ({
-      ...item,
-    }))
+    this.initPop = JSON.parse(
+      JSON.stringify(this.$store.getters['fire/initialMembers'])
+    )
+    this.tablePop = JSON.parse(
+      JSON.stringify(this.$store.getters['fire/initialMembers'])
+    )
   },
   methods: {
     test(val) {

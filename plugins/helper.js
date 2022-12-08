@@ -2,6 +2,10 @@
 // ***** こちらは共通変数の定義 *************************************************
 // **************************************************************************
 
+// /////////////////////////////////////////////////////////////
+// ////////////////// ここからschema定義 ///////////////////////////
+// ///////////////////////////////////////////////////////////////
+
 export const fctSchema = [
   {
     Group: String,
@@ -29,8 +33,137 @@ export const driSchema = [
   },
 ]
 
-// **************************************************************************
-// **************************************************************************
+export const FamilySchema = [
+  {
+    name: String,
+    member: [
+      {
+        id: String,
+        name: String,
+        number: Number,
+      },
+    ],
+    diet: [
+      {
+        date: Date,
+        foodName: String,
+        Wt: Number,
+        cropInfo: {
+          Group: String,
+          Name: String,
+          food_grp_id: String,
+          id: String,
+          En: Number,
+          Pr: Number,
+          Fe: Number,
+          Va: Number,
+          Carbohydrate: Number,
+          Fat: Number,
+        },
+      },
+    ],
+    recommendedCrops: [
+      {
+        month: String,
+        keyNutrient: String,
+        weight: Number,
+        share: Number,
+        cropInfo: {
+          Group: String,
+          Name: String,
+          food_grp_id: String,
+          id: String,
+          En: Number,
+          Pr: Number,
+          Fe: Number,
+          Va: Number,
+          Carbohydrate: Number,
+          Fat: Number,
+        },
+        feasibilityScore: [Number],
+      },
+    ],
+  },
+]
+
+export const SingleFamilySchema = {
+  name: String,
+  member: [
+    {
+      id: String,
+      name: String,
+      number: Number,
+    },
+  ],
+  diet: [
+    {
+      date: Date,
+      foodName: String,
+      Wt: Number,
+      cropInfo: {
+        Group: String,
+        Name: String,
+        food_grp_id: String,
+        id: String,
+        En: Number,
+        Pr: Number,
+        Fe: Number,
+        Va: Number,
+        Carbohydrate: Number,
+        Fat: Number,
+      },
+    },
+  ],
+  recommendedCrops: [
+    {
+      month: String,
+      keyNutrient: String,
+      weight: Number,
+      share: Number,
+      cropInfo: {
+        Group: String,
+        Name: String,
+        food_grp_id: String,
+        id: String,
+        En: Number,
+        Pr: Number,
+        Fe: Number,
+        Va: Number,
+        Carbohydrate: Number,
+        Fat: Number,
+      },
+      feasibilityScore: [Number],
+    },
+  ],
+}
+
+export const DietSchema = [
+  {
+    date: String,
+    foodName: String,
+    Wt: Number,
+    cropInfo: {
+      Group: String,
+      Name: String,
+      food_grp_id: String,
+      id: String,
+      En: Number,
+      Pr: Number,
+      Fe: Number,
+      Va: Number,
+      Carbohydrate: Number,
+      Fat: Number,
+    },
+  },
+]
+
+export const familyMemberSchema = [
+  {
+    id: String,
+    name: String,
+    number: Number,
+  },
+]
 
 // **************************************************************************
 // ***** こちらは共通関数の定義 *************************************************
@@ -117,6 +250,42 @@ validate(obj, OBJECT_SCHEMA)
 */
 
 /**
+ * deepObjectを、objの初期値とschemaの型指定に沿って初期化
+ * @param obj 初期値
+ * @param schema 型指定
+ * @returns {{}|null|*[]|*}
+ */
+export function initObject(obj, schema) {
+  if (typeof schema === 'function') {
+    // schema(obj)が0あるいはそれ以外の値の場合意外にnull
+    if (schema(obj) == null) {
+      return null
+    } else {
+      return schema(obj)
+    }
+  } else if (typeof obj !== 'object') {
+    // objがfunctionでもObjectでもない場合にスキップ
+    return null
+  } else if (Array.isArray(schema)) {
+    if (Array.isArray(obj)) {
+      return obj.map((item) => {
+        return initObject(item, schema[0])
+      })
+    } else {
+      return []
+    }
+  } else {
+    const keySchema = Object.keys(schema)
+    const res = {}
+    keySchema.forEach((item) => {
+      const itemKeyObject = obj[item]
+      res[item] = initObject(itemKeyObject, schema[item])
+    })
+    return res
+  }
+}
+
+/**
  * CSVなどの生データに変数の型を付与する（予め定義されたschemaに沿って）
  * @param obj 生データ
  * @param schema 各変数の型情報
@@ -127,7 +296,12 @@ export function setTypeOfDeepObject(obj, schema) {
     // objがnullの際にスキップ
     return null
   } else if (typeof schema === 'function') {
-    return schema(obj) || null
+    // schema(obj)が0あるいはそれ以外の値の場合意外にnull
+    if (schema(obj) == null) {
+      return null
+    } else {
+      return schema(obj)
+    }
   } else if (typeof obj !== 'object') {
     // objがfunctionでもObjectでもない場合にスキップ
     return null

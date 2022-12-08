@@ -1,89 +1,12 @@
+import {
+  DietSchema,
+  familyMemberSchema,
+  FamilySchema,
+  initObject,
+  SingleFamilySchema,
+} from '../plugins/helper'
 import { fireSaveDoc, fireGetDoc } from '@/plugins/firebasePlugin'
 import { foodGroup, validateDeepObject } from '@/plugins/helper'
-
-// /////////////////////////////////////////////////////////////
-// ////////////////// ここからschema定義 ///////////////////////////
-// ///////////////////////////////////////////////////////////////
-
-const FamilySchema = [
-  {
-    name: String,
-    member: [
-      {
-        id: Number,
-        count: Number,
-      },
-    ],
-    diet: [
-      {
-        date: Date,
-        foodName: String,
-        Wt: Number,
-        cropInfo: {
-          Group: String,
-          Name: String,
-          food_grp_id: String,
-          id: String,
-          En: Number,
-          Pr: Number,
-          Fe: Number,
-          Va: Number,
-          Carbohydrate: Number,
-          Fat: Number,
-        },
-      },
-    ],
-    recommendedCrops: [
-      {
-        month: String,
-        keyNutrient: String,
-        weight: Number,
-        share: Number,
-        cropInfo: {
-          Group: String,
-          Name: String,
-          food_grp_id: String,
-          id: String,
-          En: Number,
-          Pr: Number,
-          Fe: Number,
-          Va: Number,
-          Carbohydrate: Number,
-          Fat: Number,
-        },
-        feasibilityScore: [Number],
-      },
-    ],
-  },
-]
-
-const DietSchema = [
-  {
-    date: String,
-    foodName: String,
-    Wt: Number,
-    cropInfo: {
-      Group: String,
-      Name: String,
-      food_grp_id: String,
-      id: String,
-      En: Number,
-      Pr: Number,
-      Fe: Number,
-      Va: Number,
-      Carbohydrate: Number,
-      Fat: Number,
-    },
-  },
-]
-
-const familyMemberSchema = [
-  {
-    id: String,
-    name: String,
-    number: Number,
-  },
-]
 
 // /////////////////////////////////////////////////////////////
 // ////////////////// ここからstore定義 ///////////////////////////
@@ -179,30 +102,33 @@ export const mutations = {
   setUpdateFlag(state, payload) {
     state.isUpdateElements[payload.element] = payload.value
   },
+
   /**
    * Familyの新規追加
    * @param state
    * @param payload
    */
   addNewFamily(state, payload) {
+    // payloadには少なくともnameとmemberを含む必要がある
     // 名前が指定されていなければ何もしない
     if (!payload.name) {
       return
     }
 
-    // 名前が重複していたらerror
+    // nameのチェック。名前が重複していたらerror
     if (state.families.find((item) => item.name === payload)) {
       throw new Error('family name duplication')
     }
-    // 型チェック:失敗したらerror
+    // memberの型チェック:失敗したらerror
     let errPath
     console.log(payload.member)
     validateDeepObject(payload.member, familyMemberSchema, errPath)
 
-    const family = {}
-    family.name = payload.name
-    family.member = payload.member.map((item) => ({ ...item }))
-    state.families.splice(state.families.length, 0, family)
+    // payloadを初期値として含むnewFamilyを初期化
+    const newFamily = initObject(payload, SingleFamilySchema)
+
+    // newFamilyの値をfamiliesに追加
+    state.families.splice(state.families.length, 0, newFamily)
   },
 
   /**
@@ -234,11 +160,8 @@ export const mutations = {
         'wrong parameter:' + typeof payload + 'expected Array'
       )
     }
-    payload.forEach((item) => {
-      console.log(item)
-      let errPath
-      validateDeepObject(item, FamilySchema, errPath)
-    })
+    let errPath
+    validateDeepObject(payload, FamilySchema, errPath)
 
     // objectのためdeep copyを実行
     const newArray = payload.map((item) => ({ ...item }))
@@ -458,6 +381,7 @@ export const actions = {
   },
   removeFamily({ state, commit }, payload) {
     const res = state.families.filter((item) => item.name !== payload)
+    console.log(res)
     commit('updateFamilies', res)
   },
   async saveDri({ state }) {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from '@jest/globals'
-import { setTypeOfDeepObject } from '../plugins/helper'
+import { initObject, setTypeOfDeepObject } from '../plugins/helper'
 import { updateDeepObject } from '@/plugins/helper'
 
 describe('updateDeepObject', () => {
@@ -17,6 +17,56 @@ describe('updateDeepObject', () => {
             },
           },
         },
+      },
+    ],
+  }
+
+  const SingleFamilySchema = {
+    name: String,
+    member: [
+      {
+        id: String,
+        count: Number,
+      },
+    ],
+    diet: [
+      {
+        date: Date,
+        foodName: String,
+        Wt: Number,
+        cropInfo: {
+          Group: String,
+          Name: String,
+          food_grp_id: String,
+          id: String,
+          En: Number,
+          Pr: Number,
+          Fe: Number,
+          Va: Number,
+          Carbohydrate: Number,
+          Fat: Number,
+        },
+      },
+    ],
+    recommendedCrops: [
+      {
+        month: String,
+        keyNutrient: String,
+        weight: Number,
+        share: Number,
+        cropInfo: {
+          Group: String,
+          Name: String,
+          food_grp_id: String,
+          id: String,
+          En: Number,
+          Pr: Number,
+          Fe: Number,
+          Va: Number,
+          Carbohydrate: Number,
+          Fat: Number,
+        },
+        feasibilityScore: [Number],
       },
     ],
   }
@@ -112,6 +162,16 @@ describe('updateDeepObject', () => {
 
   const dest4 = {}
 
+  const dest5 = {
+    name: 'fun',
+    member: [
+      {
+        id: 123,
+        count: 5,
+      },
+    ],
+  }
+
   it('sourceの構造が完全である場合', () => {
     const res = updateDeepObject(src1, dest1, OBJECT_SCHEMA)
     expect(res).toEqual({
@@ -133,6 +193,7 @@ describe('updateDeepObject', () => {
     })
   })
 
+  /*
   it('sourceの一部がかけている場合', () => {
     const res2 = updateDeepObject(src2noName, dest3, OBJECT_SCHEMA)
     console.log(res2)
@@ -154,10 +215,10 @@ describe('updateDeepObject', () => {
       ],
     })
   })
+*/
 
   it('sourceの型変換機能', () => {
     const res = setTypeOfDeepObject(src1, OBJECT_SCHEMA)
-    console.log(res)
     expect(res).toEqual({
       name: 'source1',
       data: [
@@ -175,5 +236,15 @@ describe('updateDeepObject', () => {
         },
       ],
     })
+  })
+
+  it('sourceの型変換機能', () => {
+    const res = initObject(dest4, SingleFamilySchema)
+    console.log(res)
+  })
+
+  it('sourceの型変換機能', () => {
+    const res = initObject(dest5, SingleFamilySchema)
+    console.log(res)
   })
 })
