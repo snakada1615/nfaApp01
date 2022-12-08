@@ -141,11 +141,6 @@ describe('updateDeepObject', () => {
     data: [],
   }
 
-  const dest21 = {
-    name: 'dest2Name',
-    data: null,
-  }
-
   const dest3 = {
     name: 'dest1Name',
     data: [
@@ -190,15 +185,11 @@ describe('updateDeepObject', () => {
     })
   })
 
-  it('validateDeepObjについて', () => {
+  it('validateDeepObjについて1', () => {
     validateDeepObject(dest2, OBJECT_SCHEMA)
     expect(1).toEqual(1)
   })
 
-  it('validateDeepObjについて', () => {
-    validateDeepObject(dest21, OBJECT_SCHEMA)
-    expect(1).toEqual(1)
-  })
   /*
   it('sourceの一部がかけている場合', () => {
     const res2 = updateDeepObject(src2noName, dest3, OBJECT_SCHEMA)
@@ -244,12 +235,12 @@ describe('updateDeepObject', () => {
     })
   })
 
-  it('sourceの型変換機能', () => {
+  it('sourceの型変換機能：初期値指定なし', () => {
     const res = initObject(dest4, SingleFamilySchema)
     console.log(res)
   })
 
-  it('sourceの型変換機能', () => {
+  it('sourceの型変換機能：一部初期値指定', () => {
     const res = initObject(dest5, SingleFamilySchema)
     console.log(res)
   })

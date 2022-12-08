@@ -15,7 +15,22 @@ import { foodGroup, validateDeepObject } from '@/plugins/helper'
 export const state = () => ({
   families: [],
   communities: [],
-  userInfo: {},
+  userInfo: {
+    /**
+     * 現在のユーザー
+     */
+    displayName: 'userTest01',
+    email: '',
+    country: '',
+    subnational1: '',
+    subnational2: '',
+    subnational3: '',
+    organization: '',
+    title: '',
+    uid: '',
+    phoneNumber: '',
+    userType: 'normal',
+  },
   dri: [],
   driObject: {},
   fct: [],
@@ -120,9 +135,7 @@ export const mutations = {
       throw new Error('family name duplication')
     }
     // memberの型チェック:失敗したらerror
-    let errPath
-    console.log(payload.member)
-    validateDeepObject(payload.member, familyMemberSchema, errPath)
+    validateDeepObject(payload.member, familyMemberSchema)
 
     // payloadを初期値として含むnewFamilyを初期化
     const newFamily = initObject(payload, SingleFamilySchema)
@@ -155,13 +168,7 @@ export const mutations = {
    * @param payload
    */
   updateFamilies(state, payload) {
-    if (!Array.isArray(payload)) {
-      throw new TypeError(
-        'wrong parameter:' + typeof payload + 'expected Array'
-      )
-    }
-    let errPath
-    validateDeepObject(payload, FamilySchema, errPath)
+    validateDeepObject(payload, FamilySchema)
 
     // objectのためdeep copyを実行
     const newArray = payload.map((item) => ({ ...item }))
@@ -222,7 +229,10 @@ export const actions = {
     commit('updateLoadingState', payload)
   },
   async fireGetMyApp({ commit }, payload) {
-    return await fireGetDoc(payload.collectionId, payload.documentId)
+    const myApp = await fireGetDoc(payload.collectionId, payload.documentId)
+    if (myApp) {
+      commit('updateFamilies', myApp.families)
+    }
   },
 
   async fireGetPortion({ commit }, payload) {},
@@ -333,7 +343,7 @@ export const actions = {
     }
   },
 
-  async loadMyApp({ dispatch }) {
+  async loadMyApp({ state, dispatch }) {
     dispatch('updateLoadingState', true)
     await dispatch('fireGetDri', {
       collectionId: 'nfaSharedData',
@@ -347,27 +357,34 @@ export const actions = {
       collectionId: 'nfaSharedData',
       documentId: 'portion_nakada01',
     })
+    await dispatch('fireGetMyApp', {
+      collectionId: 'nfaUserData',
+      documentId: state.userInfo.displayName,
+    })
     dispatch('updateLoadingState', false)
   },
 
   async fireSaveMyApp({ dispatch, state }) {
-    const targetDoc = Object.entries(state.isUpdateElements)
-      .filter(([key, value]) => value === true)
-      .map((item) => {
-        return item[0]
-      })
+    // loading screenの表示
     dispatch('updateLoadingState', true)
-    for (const item of targetDoc) {
-      const myDoc = {}
-      myDoc[item] = state[item]
-      await fireSaveDoc('nfaUserData', 'userTest01', myDoc).catch((err) => {
-        console.log(err)
-      })
+
+    await fireSaveDoc('nfaUserData', 'userTest01', {
+      families: state.families,
+      communities: state.communities,
+      userInfo: state.userInfo,
+      current: state.current,
+    }).catch((err) => {
+      console.log(err)
+    })
+
+    // 更新フラグをtrueに戻す
+    Object.entries(state.isUpdateElements).forEach(([key, value]) => {
       dispatch('setUpdateFlag', {
-        element: item,
-        value: false,
+        element: key,
+        value: true,
       })
-    }
+    })
+
     dispatch('updateLoadingState', false)
   },
 
