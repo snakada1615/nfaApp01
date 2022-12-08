@@ -1,5 +1,9 @@
 import { describe, expect, it } from '@jest/globals'
-import { initObject, setTypeOfDeepObject } from '../plugins/helper'
+import {
+  initObject,
+  setTypeOfDeepObject,
+  validateDeepObject,
+} from '../plugins/helper'
 import { updateDeepObject } from '@/plugins/helper'
 
 describe('updateDeepObject', () => {
@@ -133,20 +137,13 @@ describe('updateDeepObject', () => {
   }
 
   const dest2 = {
-    data: [
-      {
-        isSelected: true,
-        mId: 'pong',
-        omnReplaceDict: {
-          //      id: "foo",
-          text: {
-            deepObj: {
-              deepProp: [1, 2, '???', 3],
-            },
-          },
-        },
-      },
-    ],
+    name: 'dest2Name',
+    data: [],
+  }
+
+  const dest21 = {
+    name: 'dest2Name',
+    data: null,
   }
 
   const dest3 = {
@@ -184,7 +181,7 @@ describe('updateDeepObject', () => {
             id: 'foo',
             text: {
               deepObj: {
-                deepProp: [1, 2, null, 3],
+                deepProp: [1, 2, NaN, 3],
               },
             },
           },
@@ -193,6 +190,15 @@ describe('updateDeepObject', () => {
     })
   })
 
+  it('validateDeepObjについて', () => {
+    validateDeepObject(dest2, OBJECT_SCHEMA)
+    expect(1).toEqual(1)
+  })
+
+  it('validateDeepObjについて', () => {
+    validateDeepObject(dest21, OBJECT_SCHEMA)
+    expect(1).toEqual(1)
+  })
   /*
   it('sourceの一部がかけている場合', () => {
     const res2 = updateDeepObject(src2noName, dest3, OBJECT_SCHEMA)
@@ -229,7 +235,7 @@ describe('updateDeepObject', () => {
             id: 'foo',
             text: {
               deepObj: {
-                deepProp: [1, 2, null, 3],
+                deepProp: [1, 2, NaN, 3],
               },
             },
           },

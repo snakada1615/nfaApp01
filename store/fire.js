@@ -381,7 +381,6 @@ export const actions = {
   },
   removeFamily({ state, commit }, payload) {
     const res = state.families.filter((item) => item.name !== payload)
-    console.log(res)
     commit('updateFamilies', res)
   },
   async saveDri({ state }) {

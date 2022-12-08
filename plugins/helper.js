@@ -267,7 +267,7 @@ export function initObject(obj, schema) {
     // objがfunctionでもObjectでもない場合にスキップ
     return null
   } else if (Array.isArray(schema)) {
-    if (Array.isArray(obj)) {
+    if (Array.isArray(obj) && obj.length > 0) {
       return obj.map((item) => {
         return initObject(item, schema[0])
       })
@@ -292,7 +292,7 @@ export function initObject(obj, schema) {
  * @returns {{}|null|*}
  */
 export function setTypeOfDeepObject(obj, schema) {
-  if (obj == null) {
+  if (obj == null || Array.isArray(obj)) {
     // objがnullの際にスキップ
     return null
   } else if (typeof schema === 'function') {
@@ -306,9 +306,13 @@ export function setTypeOfDeepObject(obj, schema) {
     // objがfunctionでもObjectでもない場合にスキップ
     return null
   } else if (Array.isArray(schema)) {
-    return obj.map((item) => {
-      return setTypeOfDeepObject(item, schema[0])
-    })
+    if (Array.isArray(obj) && obj.length > 0) {
+      return obj.map((item) => {
+        return setTypeOfDeepObject(item, schema[0])
+      })
+    } else {
+      return []
+    }
   } else {
     const keySchema = Object.keys(schema)
     const res = {}
@@ -334,8 +338,6 @@ export function setTypeOfDeepObject(obj, schema) {
  */
 export function updateDeepObject(newObj, currentObj, schema) {
   const mergeObj = Object.assign(currentObj, newObj)
-  console.log('updateDeepObject')
-  console.log(JSON.stringify(mergeObj))
   return setTypeOfDeepObject(mergeObj, schema)
 }
 
