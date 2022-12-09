@@ -1,4 +1,10 @@
 import {
+  browserLocalPersistence,
+  getAuth,
+  setPersistence,
+  signInWithEmailAndPassword,
+} from 'firebase/auth'
+import {
   DietSchema,
   familyMemberSchema,
   FamilySchema,
@@ -27,11 +33,10 @@ export const state = () => ({
     subnational3: '',
     organization: '',
     title: '',
-    uid: '',
+    uid: 'userTest01',
     phoneNumber: '',
     userType: 'normal',
   },
-  dri: [],
   driObject: {},
   fct: [],
   fctObject: {},
@@ -45,16 +50,18 @@ export const state = () => ({
    * 現在選択されているfamily, dietDateを記録
    */
   current: {
+    isLoggedIn: false,
     familyName: 'userTest1',
     dietDate: '',
+    driName: 'driNew',
+    fctName: 'fctNew',
+    portionName: 'portion_nakada01',
   },
   isUpdateElements: {
     families: false,
     communities: false,
     userInfo: false,
-    dri: false,
     driObject: false,
-    fct: false,
     fctObject: false,
     calendar: false,
     portionUnit: false,
@@ -62,6 +69,12 @@ export const state = () => ({
 })
 
 export const getters = {
+  fctArray(state) {
+    return Object.values(state.fctObject)
+  },
+  driArray(state) {
+    return Object.values(state.driObject)
+  },
   initialMembers(state) {
     return state.dri.map((item) => {
       return {
@@ -109,6 +122,52 @@ export const getters = {
 }
 
 export const mutations = {
+  /**
+   * ユーザー情報をfireAuthから得たログイン情報に基づいて初期化する
+   * @param state
+   * @param payload
+   */
+  initUser(state, payload) {
+    state.userInfo.uid = payload.uid
+    state.userInfo.displayName = payload.displayName
+    state.userInfo.email = payload.email
+    state.userInfo.phoneNumber = payload.phoneNumber
+    state.userInfo.country = payload.country || ''
+    state.userInfo.subnational1 = payload.subnational1 || ''
+    state.userInfo.subnational2 = payload.subnational2 || ''
+    state.userInfo.subnational3 = payload.subnational3 || ''
+    state.userInfo.organization = payload.organization || ''
+    state.userInfo.title = payload.title || ''
+    state.userInfo.userType = payload.userType || 'normal'
+  },
+
+  /**
+   * persistant
+   * @returns {Promise<unknown>}
+   */
+  getCurrentLogin() {
+    return new Promise((resolve, reject) => {
+      const unsubscribe = getAuth().onAuthStateChanged((user) => {
+        // user オブジェクトを resolve
+        if (user) {
+          resolve(user)
+        } else {
+          reject(new Error('no login'))
+        }
+        // 登録解除
+        unsubscribe()
+      })
+    })
+  },
+
+  /**
+   * ログイン状態を更新
+   * @param state
+   * @param {boolean} payload ログイン状態
+   */
+  updateIsLoggedIn(state, payload) {
+    state.current.isLoggedIn = payload
+  },
   /**
    * 要素ごとのupdateの状況を設定
    * @param state
@@ -171,10 +230,10 @@ export const mutations = {
     validateDeepObject(payload, FamilySchema)
 
     // objectのためdeep copyを実行
-    const newArray = payload.map((item) => ({ ...item }))
+    // const newArray = payload.map((item) => ({ ...item }))
 
     // reactivityを担保するためspliceを使用
-    state.families.splice(0, state.families.length, ...newArray)
+    state.families.splice(0, state.families.length, ...payload)
   },
 
   /**
@@ -184,9 +243,6 @@ export const mutations = {
    */
   updateLoadingState(state, payload) {
     state.loadingStatus = payload
-  },
-  updateDri(state, payload) {
-    state.dri = payload
   },
   updateDriObject(state, payload) {
     state.driObject = Object.assign({}, payload)
@@ -203,6 +259,15 @@ export const mutations = {
 }
 
 export const actions = {
+  /**
+   * ログイン状態のフラグ更新
+   * @param commit
+   * @param payload
+   */
+  updateIsLoggedIn({ commit }, payload) {
+    commit('updateIsLoggedIn', payload)
+  },
+
   /**
    * families[].dietを更新
    * @param state
@@ -318,10 +383,9 @@ export const actions = {
       payload.collectionId,
       payload.documentId
     ).catch((err) => {
-      throw err
+      console.error(err)
     })
     if (dri) {
-      commit('updateDri', Object.values(dri))
       commit('updateDriObject', dri)
     } else {
       throw new Error('fetchDri fail: no data')
@@ -333,10 +397,9 @@ export const actions = {
       payload.collectionId,
       payload.documentId
     ).catch((err) => {
-      throw err
+      console.error(err)
     })
     if (fct) {
-      commit('updateFct', Object.values(fct))
       commit('updateFctObject', fct)
     } else {
       throw new Error('fetchFct fail: no data')
@@ -347,11 +410,11 @@ export const actions = {
     dispatch('updateLoadingState', true)
     await dispatch('fireGetDri', {
       collectionId: 'nfaSharedData',
-      documentId: 'driNew',
+      documentId: state.current.driName,
     })
     await dispatch('fireGetFct', {
       collectionId: 'nfaSharedData',
-      documentId: 'fctNew',
+      documentId: state.current.fctName,
     })
     await dispatch('fireGetPortionUnit', {
       collectionId: 'nfaSharedData',
@@ -375,6 +438,8 @@ export const actions = {
       current: state.current,
     }).catch((err) => {
       console.log(err)
+      alert(err)
+      dispatch('updateLoadingState', false)
     })
 
     // 更新フラグをtrueに戻す
@@ -384,7 +449,6 @@ export const actions = {
         value: true,
       })
     })
-
     dispatch('updateLoadingState', false)
   },
 
@@ -400,11 +464,63 @@ export const actions = {
     const res = state.families.filter((item) => item.name !== payload)
     commit('updateFamilies', res)
   },
-  async saveDri({ state }) {
-    const driBack = {}
-    state.dri.forEach((item) => {
-      driBack[item.id] = item
+  async fireSaveDri({ state }) {
+    await fireSaveDoc('nfaSharedData', state.current.driName, state.driObject)
+  },
+
+  /**
+   * name/passwordでログイン(signInWithEmailAndPasswordを流用)
+   * @param commit
+   * @param payload ログイン情報
+   *     {payload.name, payload.password}
+   * @param state
+   * @returns {Promise<void>}
+   */
+  async loginEmail({ commit, dispatch, state }, payload) {
+    // 名前をemailに変換してから認証
+    const auth = getAuth()
+    const email = payload.name + '@ifna.app'
+
+    // 認証
+    const res = await signInWithEmailAndPassword(
+      auth,
+      email,
+      payload.password
+    ).catch((error) => {
+      // login状態をfalseでセット
+      commit('updateIsLoggedIn', false)
+
+      // errorメッセージ出力
+      const errorCode = error.code
+      const errorMessage = error.message
+      console.log('login error: ' + errorCode + ': ' + errorMessage)
+      throw error
     })
-    await fireSaveDoc('nfaSharedData', 'driNew', driBack)
+    console.log(res.user)
+    const user = res.user
+    commit('initUser', user)
+
+    // login状態をtrueでセット
+    commit('updateIsLoggedIn', true)
+    console.log('login success')
+
+    // 認証状態の永続性をsetPersistenceで設定
+    await setPersistence(auth, browserLocalPersistence)
+      .then(() => {
+        // 成功したらtopページに移動
+        // this.$router.push('/')
+      })
+      .catch((error) => {
+        // 永続性の確保失敗
+        const errorCode = error.code
+        const errorMessage = error.message
+        alert(
+          'failed to acquire persistent login status: ' +
+            errorCode +
+            '-' +
+            errorMessage
+        )
+        throw error
+      })
   },
 }
