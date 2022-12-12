@@ -8,44 +8,40 @@
     >
       <b-row class="my-2">
         <b-col class="px-2">
-          <div class="text-muted">
-            --- required info---
-          </div>
-          <b-input-group class="my-1">
-            <b-input-group-prepend class="w-25">
-              <b-input-group-text class="w-100">
-                user Name
-              </b-input-group-text>
-            </b-input-group-prepend>
-            <b-form-input v-model="newUser" placeholder="Enter username" :state="stateName" />
+          <div class="text-muted">--- required info---</div>
+          <!-- 名前の記入         -->
+          <b-input-group class="my-1" size="sm" prepend="user name">
+            <b-form-input
+              v-model="newUser"
+              placeholder="Enter username"
+              :state="stateName"
+            />
           </b-input-group>
-          <b-input-group class="my-1">
-            <b-input-group-prepend class="w-25">
-              <b-input-group-text class="w-100">
-                password
-              </b-input-group-text>
-            </b-input-group-prepend>
-            <b-form-input v-model="newPass" :type="typePass" placeholder="Enter password" :state="statePass" />
+          <!-- パスワード記入         -->
+          <b-input-group class="my-1" size="sm" prepend="password">
+            <b-form-input
+              v-model="newPass"
+              :type="typePass"
+              placeholder="Enter password"
+              :state="statePass"
+            />
+            <!-- パスワード表示/非表示の切り替え           -->
             <b-input-group-append>
               <b-input-group-text>
-                <b-icon v-if="typePass==='password'" icon="eye" @click="togglePass" />
-                <b-icon v-if="typePass==='text'" icon="eyeSlash" @click="togglePass" />
+                <b-icon :icon="passIcon" @click="togglePass" />
               </b-input-group-text>
             </b-input-group-append>
           </b-input-group>
           <div v-if="errorMessage" class="text-danger" size="sm">
             ({{ errorMessage }})
           </div>
-          <hr>
-          <div class="text-muted">
-            --- optional info---
-          </div>
-          <b-input-group class="my-1">
-            <b-input-group-prepend class="w-25">
-              <b-input-group-text class="w-100">
-                country
-              </b-input-group-text>
-            </b-input-group-prepend>
+          <hr />
+
+          <!-- ユーザーの追加情報登録         -->
+          <div class="text-muted">--- optional info---</div>
+
+          <!-- 国情報           -->
+          <b-input-group class="my-1" size="sm" prepend="country">
             <country-names :key1.sync="user.country" />
             <region-select
               v-if="user.country === 'Ethiopia'"
@@ -54,34 +50,25 @@
               :key1.sync="user.subnational1"
             />
           </b-input-group>
-          <b-input-group class="my-1">
-            <b-input-group-prepend class="w-25">
-              <b-input-group-text class="w-100">
-                organization
-              </b-input-group-text>
-            </b-input-group-prepend>
+
+          <!-- 組織情報         -->
+          <b-input-group class="my-1" size="sm" prepend="organization">
             <b-form-input
               v-model="user.organization"
               placeholder="Enter your organization"
             />
           </b-input-group>
-          <b-input-group class="my-1">
-            <b-input-group-prepend class="w-25">
-              <b-input-group-text class="w-100 text-capitalize">
-                title
-              </b-input-group-text>
-            </b-input-group-prepend>
+
+          <!-- 役職         -->
+          <b-input-group class="my-1" size="sm" prepend="title">
             <b-form-input
               v-model="user.title"
               placeholder="Enter your role in the organization"
             />
           </b-input-group>
-          <b-input-group class="my-1">
-            <b-input-group-prepend class="w-25">
-              <b-input-group-text class="w-100">
-                user type
-              </b-input-group-text>
-            </b-input-group-prepend>
+
+          <!-- admin資格の設定         -->
+          <b-input-group class="my-1" size="sm" prepend="user type">
             <b-form-radio-group
               v-model="user.userType"
               :options="userOptions"
@@ -91,7 +78,6 @@
               @input="onUserTypeChange"
             />
           </b-input-group>
-          <hr>
           <b-button
             variant="primary"
             :disabled="!inputValidate"
@@ -101,21 +87,11 @@
           </b-button>
         </b-col>
       </b-row>
-
-      <pass-check-dialogue
-        :password="myPass"
-        modal-name="passCheckBox"
-        :show-modal.sync="openPassCheckFlag"
-        text-description="you need password to have admin status"
-        @correctInput="onCorrectInput"
-        @wrongInput="onWrongInput"
-      />
     </b-card>
   </b-container>
 </template>
 
 <script>
-import passCheckDialogue from '../components/atoms/passCheckDialogue'
 import { makeToast } from '@/plugins/helper'
 import regionSelect from '@/components/atoms/regionSelect'
 import countryNames from '@/components/atoms/countryNames'
@@ -124,9 +100,8 @@ export default {
   components: {
     regionSelect,
     countryNames,
-    passCheckDialogue
   },
-  data () {
+  data() {
     return {
       /**
        * 新規登録用のユーザー名
@@ -145,51 +120,62 @@ export default {
         subnational1: '',
         subnational2: '',
         subnational3: '',
-        userType: 'normal'
+        userType: 'normal',
       },
       /**
        * userの権限設定
        */
       userOptions: [
         { text: 'normal user', value: 'normal' },
-        { text: 'admin user', value: 'admin' }
+        { text: 'admin user', value: 'admin' },
       ],
       newPass: '',
       typePass: 'password',
       errorMessage: '',
       errorMessageList: [
         'login error: username or password does not match',
-        'registration error: username already in use'
+        'registration error: username already in use',
       ],
       openPassCheckFlag: false,
-      myPass: ''
+      myPass: '',
     }
   },
   computed: {
-    stateName () {
-      return (/^[\w]{3,30}?$/).test(this.newUser)
+    passIcon() {
+      if (this.typePass === 'text') {
+        return 'eye'
+      } else {
+        return 'eyeSlash'
+      }
     },
-    statePass () {
-      return (this.newPass.length >= 3 && this.newPass.length <= 20)
+    stateName() {
+      return /^[\w]{3,30}?$/.test(this.newUser)
     },
-    inputValidate () {
+    statePass() {
+      return this.newPass.length >= 3 && this.newPass.length <= 20
+    },
+    inputValidate() {
       return this.statePass && this.stateName
-    }
+    },
   },
-  created () {
+  created() {
     this.myPass = this.$store.state.fire.adminPass
   },
   methods: {
-    togglePass () {
+    togglePass() {
       if (this.typePass === 'text') {
         this.typePass = 'password'
       } else {
         this.typePass = 'text'
       }
     },
-    async register () {
+    async register() {
       let loginFail = false
-      await this.$store.dispatch('fire/registerEmail', { name: this.newUser, password: this.newPass })
+      await this.$store
+        .dispatch('fire/registerEmail', {
+          name: this.newUser,
+          password: this.newPass,
+        })
         .catch((err) => {
           console.log(err)
           loginFail = true
@@ -207,7 +193,10 @@ export default {
       makeToast(this, 'user data registered!')
 
       // myAppを初期化
-      await this.$store.dispatch('fire/initAll', this.$store.state.fire.myApp.user)
+      await this.$store.dispatch(
+        'fire/initAll',
+        this.$store.state.fire.myApp.user
+      )
       makeToast(this, 'user data initialized!')
 
       // ユーザーの国がEthiopiaの場合とそうでない場合で飛び先を変更
@@ -218,8 +207,10 @@ export default {
       //   await this.$router.push('/')
       // }
     },
-    async updateUserInfo () {
-      const myUser = JSON.parse(JSON.stringify(this.$store.state.fire.myApp.user))
+    async updateUserInfo() {
+      const myUser = JSON.parse(
+        JSON.stringify(this.$store.state.fire.myApp.user)
+      )
       myUser.country = this.user.country
       myUser.organization = this.user.organization
       myUser.title = this.user.title
@@ -233,18 +224,18 @@ export default {
       await this.$store.dispatch('fire/fireSaveAppdata')
       console.log('user profile updated')
     },
-    onUserTypeChange (val) {
+    onUserTypeChange(val) {
       if (val === 'admin') {
         this.openPassCheckFlag = true
       }
     },
-    onWrongInput () {
+    onWrongInput() {
       alert('please check admin password')
       this.user.userType = 'normal'
     },
-    onCorrectInput () {
+    onCorrectInput() {
       makeToast(this, 'admin status have set')
-    }
-  }
+    },
+  },
 }
 </script>

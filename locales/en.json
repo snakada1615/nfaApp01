@@ -13,6 +13,7 @@
       "introduction": "This is an introduction in English."
       },
     "link": {
+      "login": "user login/register",
       "setFamily": "add select family",
       "setCurrentDiet": "assess current diet"
     }

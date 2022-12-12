@@ -51,10 +51,10 @@
         </b-nav-item-dropdown>
 
         <!--  ここからuser情報の表示  -->
-        <b-nav-item-dropdown v-if="false" right>
+        <b-nav-item-dropdown v-if="true" right>
           <!-- Using 'button-content' slot -->
           <template #button-content>
-            <em>User</em>
+            <b-icon :icon="loginIcon" />
           </template>
           <b-dropdown-item
             v-for="item in userInfo"
@@ -172,6 +172,15 @@ export default {
     }
   },
   computed: {
+    loginIcon: {
+      get() {
+        if (this.isLoggedIn) {
+          return 'person-fill'
+        } else {
+          return 'person'
+        }
+      },
+    },
     /**
      * 使用可能な言語の種類
      * @returns {*}
@@ -243,10 +252,10 @@ export default {
      * @returns {boolean}
      */
     isLoggedIn() {
-      return this.$store.state.fire.isLoggedIn
+      return this.$store.state.fire.current.isLoggedIn
     },
     userInfo() {
-      return Object.entries(this.$store.state.fire.myApp.user)
+      return Object.entries(this.$store.state.fire.userInfo)
         .filter(([key]) => {
           return [
             'displayName',

@@ -3,6 +3,7 @@ import {
   getAuth,
   setPersistence,
   signInWithEmailAndPassword,
+  signOut,
 } from 'firebase/auth'
 import {
   DietSchema,
@@ -56,7 +57,9 @@ export const state = () => ({
     driName: 'driNew',
     fctName: 'fctNew',
     portionName: 'portion_nakada01',
+    countryNamesId: 'countryNames',
   },
+  adminPass: '',
   isUpdateElements: {
     families: false,
     communities: false,
@@ -76,7 +79,7 @@ export const getters = {
     return Object.values(state.driObject)
   },
   initialMembers(state) {
-    return state.dri.map((item) => {
+    return Object.values(state.driObject).map((item) => {
       return {
         id: item.id,
         name: item.Name,
@@ -469,6 +472,48 @@ export const actions = {
   },
 
   /**
+   * ログアウト機能
+   * @param commit
+   * @returns {Promise<void>}
+   */
+  logOut({ commit }) {
+    const auth = getAuth()
+    signOut(auth)
+      .then(() => {
+        commit('updateIsLoggedIn', false)
+        // リロード
+        window.location.reload()
+        // this.$router.push('/')
+      })
+      .catch((error) => {
+        // An error happened.
+        const errorCode = error.code
+        const errorMessage = error.message
+        console.log('guest login error: ', errorCode, errorMessage)
+        throw error
+      })
+  },
+
+  /**
+   * 永続化したログイン情報を取得
+   * @returns {Promise<unknown>}
+   */
+  getCurrentLogin() {
+    return new Promise((resolve, reject) => {
+      const unsubscribe = getAuth().onAuthStateChanged((user) => {
+        // user オブジェクトを resolve
+        if (user) {
+          resolve(user)
+        } else {
+          reject(new Error('no login'))
+        }
+        // 登録解除
+        unsubscribe()
+      })
+    })
+  },
+
+  /**
    * name/passwordでログイン(signInWithEmailAndPasswordを流用)
    * @param commit
    * @param payload ログイン情報
@@ -496,7 +541,6 @@ export const actions = {
       console.log('login error: ' + errorCode + ': ' + errorMessage)
       throw error
     })
-    console.log(res.user)
     const user = res.user
     commit('initUser', user)
 
@@ -522,5 +566,24 @@ export const actions = {
         )
         throw error
       })
+  },
+
+  /**
+   * CountryNamesのデータをfireStoreから取得して返す
+   * @param state
+   * @returns {Promise<*>}
+   */
+  async initCountryNames({ state }) {
+    const countries = await fireGetDoc(
+      'nfaSharedData',
+      state.current.countryNamesId
+    ).catch((err) => {
+      throw new Error(err)
+    })
+    if (countries) {
+      return countries
+    } else {
+      throw new Error('initCountryNames fail: no data')
+    }
   },
 }

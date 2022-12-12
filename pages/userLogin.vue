@@ -17,7 +17,7 @@
     <b-button
       size="sm"
       variant="warning"
-      :disabled="logOutValidate"
+      :disabled="!isLoggedIn"
       @click="logOut"
     >
       logout
@@ -61,13 +61,11 @@
     <b-card bg-variant="light">
       <div>
         login status:
-        <span v-if="$store.state.fire.current.isLoggedIn" class="text-success"
-          >on</span
-        >
+        <span v-if="isLoggedIn" class="text-success">on</span>
         <span v-else class="text-danger">off</span>
       </div>
-      <div>name:{{ $store.state.fire.userInfo.displayName }}</div>
-      <div>uid:{{ $store.state.fire.userInfo.uid }}</div>
+      <div>name:{{ displayName }}</div>
+      <div>uid:{{ uid }}</div>
       <hr />
     </b-card>
   </b-container>
@@ -87,6 +85,15 @@ export default {
     }
   },
   computed: {
+    uid() {
+      return this.$store.state.fire.userInfo.uid
+    },
+    displayName() {
+      return this.$store.state.fire.userInfo.displayName
+    },
+    isLoggedIn() {
+      return this.$store.state.fire.current.isLoggedIn
+    },
     stateName() {
       return /^[\w]{3,30}?$/.test(this.user)
     },
@@ -97,7 +104,7 @@ export default {
       return this.statePass && this.stateName
     },
     logOutValidate() {
-      return !this.$store.state.fire.isLoggedIn
+      return !this.isLoggedIn
     },
   },
   methods: {
@@ -134,12 +141,19 @@ export default {
             this.pass = ''
             this.errorMessage = this.errorMessageList[0]
           }
+          // login状態をfalseにセット
+          this.$store.dispatch('fire/updateIsLoggedIn', false)
         })
-      // error messageのクリア（もし表示されている場合には）
+      // login状態をtrueにセット
+      this.$store.dispatch('fire/updateIsLoggedIn', true)
+
+      // error messageのクリア（もし表示れている場合には）
       this.errorMessage = ''
     },
     logOut() {
       this.$store.dispatch('fire/logOut')
+      // login状態をfalseにセット
+      this.$store.dispatch('fire/updateIsLoggedIn', false)
     },
   },
 }

@@ -39,7 +39,12 @@ import {
   setDoc,
 } from 'firebase/firestore'
 import JsonView from 'vue-json-viewer'
-import { driSchema, fctSchema, setTypeOfDeepObject } from '../../plugins/helper'
+import {
+  countrySchema,
+  driSchema,
+  fctSchema,
+  setTypeOfDeepObject,
+} from '../../plugins/helper'
 import { firestoreDb } from '@/plugins/firebasePlugin'
 import { makeToast } from '@/plugins/helper'
 
@@ -111,6 +116,11 @@ export default {
               Va: item.vita,
               max_vol: item.max_vol,
             }
+          } else if (this.sourceDocName.includes('country')) {
+            return {
+              Country: item.Country,
+              'Country Code': item['Country Code'],
+            }
           } else {
             return {}
           }
@@ -123,10 +133,23 @@ export default {
           return fctSchema
         } else if (this.sourceDocName.includes('dri')) {
           return driSchema
+        } else if (this.sourceDocName.includes('country')) {
+          return countrySchema
         } else {
           return {}
         }
       },
+    },
+    uniqueId() {
+      if (this.sourceDocName.includes('fct')) {
+        return 'id'
+      } else if (this.sourceDocName.includes('dri')) {
+        return 'id'
+      } else if (this.sourceDocName.includes('country')) {
+        return 'Country'
+      } else {
+        return ''
+      }
     },
   },
   async created() {
@@ -185,8 +208,13 @@ export default {
 
       // 生データに型を付与
       const myDocWithType = setTypeOfDeepObject(myDoc, mySchema).reduce(
-        (accum, current) => {
-          accum[current.id] = current
+        // array -> Object変換
+        (accum, current, index) => {
+          if (this.uniqueId) {
+            accum[current[this.uniqueId]] = current
+          } else {
+            accum[index] = current
+          }
           return accum
         },
         {}

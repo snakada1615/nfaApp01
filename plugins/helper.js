@@ -33,6 +33,13 @@ export const driSchema = [
   },
 ]
 
+export const countrySchema = [
+  {
+    Country: String,
+    'Country Code': String,
+  },
+]
+
 export const FamilySchema = [
   {
     name: String,
