@@ -58,6 +58,7 @@ export const state = () => ({
     fctName: 'fctNew',
     portionName: 'portion_nakada01',
     countryNamesId: 'countryNames',
+    regionId: 'eth_region',
   },
   adminPass: '',
   isUpdateElements: {
@@ -258,6 +259,14 @@ export const mutations = {
   },
   updatePortionUnit(state, payload) {
     state.portionUnit = payload
+  },
+  /**
+   * regionIdを更新
+   * @param state
+   * @param payload
+   */
+  updateRegionId(state, payload) {
+    state.current.regionId = payload
   },
 }
 
@@ -584,6 +593,24 @@ export const actions = {
       return countries
     } else {
       throw new Error('initCountryNames fail: no data')
+    }
+  },
+  /**
+   * RegionのデータをfireStoreから取得して返す
+   * @param state
+   * @returns {Promise<*>}
+   */
+  async initRegion({ state }) {
+    const region = await fireGetDoc(
+      'nfaSharedData',
+      state.current.regionId
+    ).catch((err) => {
+      throw new Error(err)
+    })
+    if (region) {
+      return region
+    } else {
+      throw new Error('initRegion fail: no data')
     }
   },
 }

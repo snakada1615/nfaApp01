@@ -42,14 +42,15 @@
 
           <!-- 国情報           -->
           <b-input-group class="my-1" size="sm" prepend="country">
-            <country-names :key1.sync="user.country" />
-            <region-select
-              v-if="user.country === 'Ethiopia'"
-              :key3.sync="user.subnational3"
-              :key2.sync="user.subnational2"
-              :key1.sync="user.subnational1"
-            />
+            <country-names :key1.sync="user.country" class="my-0" />
           </b-input-group>
+          <region-select
+            v-if="user.country === 'Ethiopia'"
+            class="pl-3 pr-0"
+            :key3.sync="user.subnational3"
+            :key2.sync="user.subnational2"
+            :key1.sync="user.subnational1"
+          />
 
           <!-- 組織情報         -->
           <b-input-group class="my-1" size="sm" prepend="organization">
@@ -201,16 +202,11 @@ export default {
 
       // ユーザーの国がEthiopiaの場合とそうでない場合で飛び先を変更
       this.$router.push('/startPageEth')
-      // if (this.user.country === 'Ethiopia') {
-      //   await this.$router.push('/startPageEth')
-      // } else {
-      //   await this.$router.push('/')
-      // }
     },
     async updateUserInfo() {
-      const myUser = JSON.parse(
-        JSON.stringify(this.$store.state.fire.myApp.user)
-      )
+      const myUser = this.$store.state.fire.userInfo.map((item) => ({
+        ...item,
+      }))
       myUser.country = this.user.country
       myUser.organization = this.user.organization
       myUser.title = this.user.title

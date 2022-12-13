@@ -43,6 +43,7 @@ import {
   countrySchema,
   driSchema,
   fctSchema,
+  regionSchema,
   setTypeOfDeepObject,
 } from '../../plugins/helper'
 import { firestoreDb } from '@/plugins/firebasePlugin'
@@ -121,6 +122,12 @@ export default {
               Country: item.Country,
               'Country Code': item['Country Code'],
             }
+          } else if (this.sourceDocName.includes('region')) {
+            return {
+              region1: item.region1,
+              region2: item.region2,
+              region3: item.region3,
+            }
           } else {
             return {}
           }
@@ -135,6 +142,8 @@ export default {
           return driSchema
         } else if (this.sourceDocName.includes('country')) {
           return countrySchema
+        } else if (this.sourceDocName.includes('region')) {
+          return regionSchema
         } else {
           return {}
         }
@@ -169,7 +178,6 @@ export default {
   },
   methods: {
     async onSourceSelected(val) {
-      console.log(val)
       this.destDocName = val
       await this.$store.dispatch('fire/updateLoadingState', true)
       const ref = await doc(this.secondaryFirestore, 'dataset', val)

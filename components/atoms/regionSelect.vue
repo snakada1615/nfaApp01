@@ -1,46 +1,45 @@
 <template>
   <b-container>
-    <b-card v-if="regionObj" class="border-0">
-      <b-row>
-        <b-col cols="2" sm="3">
-          <div>{{label1}}</div>
-        </b-col>
-        <b-col cols="10" sm="9">
-          <b-form-select
-            v-if="regionObj"
-            :value="key1Temp"
-            :options="regions1"
-            @change="$emit('update:key1', $event)"
-          />
-        </b-col>
-      </b-row>
-      <b-row>
-        <b-col cols="2" sm="3">
-          <div>{{label2}}</div>
-        </b-col>
-        <b-col cols="10" sm="9">
-          <b-form-select
-            v-if="regionObj"
-            :value="key2Temp"
-            :options="regions2"
-            @change="$emit('update:key2', $event)"
-          />
-        </b-col>
-      </b-row>
-      <b-row>
-        <b-col cols="2" sm="3">
-          <div>{{label3}}</div>
-        </b-col>
-        <b-col cols="10" sm="9">
-          <b-form-select
-            v-if="regionObj"
-            :value="key3Temp"
-            :options="regions3"
-            @change="$emit('update:key3', $event)"
-          />
-        </b-col>
-      </b-row>
-    </b-card>
+    <div v-if="regionObj">
+      <!-- region1の選択     -->
+      <b-input-group size="sm" class="my-1">
+        <b-input-group-prepend>
+          <b-input-group-text>{{ label1 }}</b-input-group-text>
+        </b-input-group-prepend>
+        <b-form-select
+          v-if="regionObj"
+          :value="key1Temp"
+          :options="regions1"
+          @change="$emit('update:key1', $event)"
+        />
+      </b-input-group>
+
+      <!-- region2の選択     -->
+      <b-input-group size="sm" class="my-1">
+        <b-input-group-prepend>
+          <b-input-group-text>{{ label2 }}</b-input-group-text>
+        </b-input-group-prepend>
+        <b-form-select
+          v-if="regionObj"
+          :value="key2Temp"
+          :options="regions2"
+          @change="$emit('update:key2', $event)"
+        />
+      </b-input-group>
+
+      <!-- region3の選択     -->
+      <b-input-group size="sm" class="my-1">
+        <b-input-group-prepend>
+          <b-input-group-text>{{ label3 }}</b-input-group-text>
+        </b-input-group-prepend>
+        <b-form-select
+          v-if="regionObj"
+          :value="key3Temp"
+          :options="regions3"
+          @change="$emit('update:key3', $event)"
+        />
+      </b-input-group>
+    </div>
   </b-container>
 </template>
 
@@ -52,12 +51,19 @@
 export default {
   props: {
     /**
+     * regionの一覧
+     */
+    regionList: {
+      type: Array,
+      default: () => [],
+    },
+    /**
      * 選択された地域1
      */
     key1: {
       type: String,
       required: true,
-      default: ''
+      default: '',
     },
     /**
      * 選択された地域2
@@ -65,7 +71,7 @@ export default {
     key2: {
       type: String,
       required: true,
-      default: ''
+      default: '',
     },
     /**
      * 選択された地域3
@@ -73,28 +79,28 @@ export default {
     key3: {
       type: String,
       required: true,
-      default: ''
+      default: '',
     },
     /**
      * region1のラベル
      */
     label1: {
       type: String,
-      default: 'Region'
+      default: 'Region',
     },
     /**
      * region2のラベル
      */
     label2: {
       type: String,
-      default: 'Zone'
+      default: 'Zone',
     },
     /**
      * region3のラベル
      */
     label3: {
       type: String,
-      default: 'Woreda'
+      default: 'Woreda',
     },
   },
   data() {
@@ -110,22 +116,29 @@ export default {
       /**
        * 初回読み込み時のRegion3用のフラグ
        */
-      initialFlagRegion3: true
+      initialFlagRegion3: true,
     }
+  },
+  /**
+   * 起動時にfireStoreからRegionデータ読み込み
+   * @returns {Promise<void>}
+   */
+  async fetch() {
+    this.dataCsv = await this.$store.dispatch('fire/initRegion')
   },
   computed: {
     /**
      * dataCsvを配列に変換(Object -> Array of Object)
      * @returns {*}
      */
-    regionObj: function () {
+    regionObj() {
       if (this.dataCsv.length === 0) {
         return
       }
       return Object.values(this.dataCsv).reduce((accum, item) => {
         const index1 = Object.keys(accum).indexOf(item.region1)
         if (index1 === -1) {
-          accum[item.region1] = {[item.region2]: new Array(item.region3)}
+          accum[item.region1] = { [item.region2]: new Array(item.region3) }
         } else {
           const index2 = Object.keys(accum[item.region1]).indexOf(item.region2)
           if (index2 === -1) {
@@ -141,28 +154,28 @@ export default {
      * Regionの最上位の階層リスト（b-form-selectで使う）
      * @returns {string[]|*[]}
      */
-    regions1: function () {
+    regions1() {
       const res = Object.keys(this.regionObj)
-      return res ? res : []
+      return res || []
     },
     /**
      * Regionの2番目の階層（b-form-selectで使う）
      *     プロパティkey2, key3の変更はemitで通知
      * @returns {*[]|string[]}
      */
-    regions2: function () {
+    regions2() {
       if (!this.key1Temp) {
         return []
       }
-      //key1の値に対応してregion2を更新
+      // key1の値に対応してregion2を更新
       const res = Object.keys(this.regionObj[this.key1Temp])
 
-      //key2が[region2]に含まれない値の場合、key2, key3を初期化する
-      if (res.indexOf(this.key2) === -1){
+      // key2が[region2]に含まれない値の場合、key2, key3を初期化する
+      if (!res.includes(this.key2)) {
         this.$emit('update:key2', '')
         this.$emit('update:key3', '')
       }
-      return res ? res : []
+      return res || []
     },
 
     /**
@@ -170,7 +183,7 @@ export default {
      *     プロパティkey2, key3の変更はemitで通知
      * @returns {*|*[]}
      */
-    regions3: function () {
+    regions3() {
       if (!this.key1Temp) {
         return []
       }
@@ -178,52 +191,42 @@ export default {
         return []
       }
 
-      //key2の値に対応してregion3を更新
+      // key2の値に対応してregion3を更新
       const res = this.regionObj[this.key1Temp][this.key2Temp]
 
-      //key2が[region2]に含まれない値の場合、key2, key3を初期化する
+      // key2が[region2]に含まれない値の場合、key2, key3を初期化する
       if (!res) {
         this.$emit('update:key2', '')
         this.$emit('update:key3', '')
-      } else {
-        //key3が[region3]に含まれない値の場合、key3を初期化する
-        if (!res.indexOf(this.key3)){
-          this.$emit('update:key3', '')
-        }
+      } else if (!res.indexOf(this.key3)) {
+        // key3が[region3]に含まれない値の場合、key3を初期化する
+        this.$emit('update:key3', '')
       }
-      return res ? res : []
+      return res || []
     },
 
     /**
      * プロパティの代替変数
      * @returns {string}
      */
-    key1Temp: function () {
+    key1Temp() {
       return this.key1
     },
     /**
      * プロパティの代替変数
      * @returns {string}
      */
-    key2Temp: function () {
+    key2Temp() {
       return this.key2
     },
     /**
      * プロパティの代替変数
      * @returns {string}
      */
-    key3Temp: function () {
+    key3Temp() {
       return this.key3
     },
   },
-  /**
-   * 起動時にfireStoreからRegionデータ読み込み
-   * @returns {Promise<void>}
-   */
-  async fetch() {
-    this.dataCsv = await this.$store.dispatch('fire/initRegion')
-  },
-  methods: {
-  }
+  methods: {},
 }
 </script>

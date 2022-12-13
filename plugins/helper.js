@@ -40,6 +40,14 @@ export const countrySchema = [
   },
 ]
 
+export const regionSchema = [
+  {
+    region1: String,
+    region2: String,
+    region3: String,
+  },
+]
+
 export const FamilySchema = [
   {
     name: String,
