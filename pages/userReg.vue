@@ -199,9 +199,7 @@ export default {
         this.$store.state.fire.myApp.user
       )
       makeToast(this, 'user data initialized!')
-
-      // ユーザーの国がEthiopiaの場合とそうでない場合で飛び先を変更
-      this.$router.push('/startPageEth')
+      this.$router.push('/')
     },
     async updateUserInfo() {
       const myUser = this.$store.state.fire.userInfo.map((item) => ({
@@ -216,9 +214,15 @@ export default {
       myUser.subnational3 = this.user.subnational3
 
       // storeのアップデート
+      const vm = this
       await this.$store.dispatch('fire/updateUser', myUser)
-      await this.$store.dispatch('fire/fireSaveAppdata')
-      console.log('user profile updated')
+      await this.$store.dispatch('fire/updateLoadingState', true)
+      await this.$store.dispatch('fire/fireSaveMyApp').catch((err) => {
+        console.log(err)
+        vm.$store.dispatch('fire/updateLoadingState', false)
+      })
+      await this.$store.dispatch('fire/updateLoadingState', false)
+      console.log('userdata updated')
     },
     onUserTypeChange(val) {
       if (val === 'admin') {

@@ -1,5 +1,6 @@
 import {
   browserLocalPersistence,
+  createUserWithEmailAndPassword,
   getAuth,
   setPersistence,
   signInWithEmailAndPassword,
@@ -287,6 +288,15 @@ export const actions = {
    */
   updateDiet({ commit }, payload) {
     commit('updateDiet', payload)
+  },
+
+  /**
+   * ユーザー情報をpayloadで与えられた内容で更新する
+   * @param commit
+   * @param payload
+   */
+  initUser({ commit }, payload) {
+    commit('initUser', payload)
   },
 
   /**
@@ -578,6 +588,56 @@ export const actions = {
   },
 
   /**
+   * name/passwordでアカウント作成(signInWithEmailAndPasswordを流用)
+   *     アカウント作成後に、基本DBをユーザー用に複製(fct, dri)
+   * @param commit
+   * @param state
+   * @param dispatch
+   * @param payload
+   * @returns {Promise<void>}
+   */
+  async registerEmail({ commit, state, dispatch }, payload) {
+    const auth = getAuth()
+    const email = payload.name + '@ifna.app'
+    const res = await createUserWithEmailAndPassword(
+      auth,
+      email,
+      payload.password
+    ).catch((error) => {
+      commit('updateIsLoggedIn', false)
+      throw error
+      // ..
+    })
+    await dispatch('updateUser', {
+      displayName: payload.name,
+      email,
+    }).catch((error) => {
+      commit('updateIsLoggedIn', false)
+      throw error
+      // ..
+    })
+
+    commit('initUser', res.user)
+    commit('updateIsLoggedIn', true)
+    console.log('login success')
+    /**
+     * 認証状態の永続性についてはsetPersistenceで設定
+     */
+    await setPersistence(auth, browserLocalPersistence)
+      .then(() => {
+        console.log('keeping state')
+        // topページに移動
+        this.$router.push('/')
+      })
+      .catch((error) => {
+        const errorCode = error.code
+        const errorMessage = error.message
+        console.log('keeping state error: ', errorCode, errorMessage)
+        throw error
+      })
+  },
+
+  /**
    * CountryNamesのデータをfireStoreから取得して返す
    * @param state
    * @returns {Promise<*>}
@@ -595,6 +655,7 @@ export const actions = {
       throw new Error('initCountryNames fail: no data')
     }
   },
+
   /**
    * RegionのデータをfireStoreから取得して返す
    * @param state
