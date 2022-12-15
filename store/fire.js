@@ -240,7 +240,7 @@ export const mutations = {
     // const newArray = payload.map((item) => ({ ...item }))
 
     // reactivityを担保するためspliceを使用
-    state.families.splice(0, state.myApp.families.length, ...payload)
+    state.myApp.families.splice(0, state.myApp.families.length, ...payload)
   },
 
   /**
