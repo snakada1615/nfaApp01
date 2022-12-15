@@ -77,7 +77,7 @@ export default {
   computed: {
     familyList: {
       get() {
-        return this.$store.state.fire.families
+        return this.$store.state.fire.myApp.families
       },
     },
     familySize: {
@@ -135,7 +135,7 @@ export default {
     },
     selectFamily(val) {
       console.log(val)
-      const resPop = this.$store.state.fire.families.find(
+      const resPop = this.$store.state.fire.myApp.families.find(
         (item) => item.name === val
       ).member
       this.tablePop.splice(0, this.tablePop.length, ...resPop)

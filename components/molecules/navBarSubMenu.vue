@@ -94,7 +94,7 @@
         <b-icon icon="reception0" />
       </div>
     </b-navbar>
-    <loading-box :open-flag="$store.state.fire.loadingStatus" />
+    <loading-box :open-flag="$store.state.fire.myApp.loadingStatus" />
   </b-container>
 </template>
 <script>
@@ -241,7 +241,7 @@ export default {
       return res2
     },
     /**
-     * データ更新の有無($store.state.fire.hasDocumentChanged)を確認
+     * データ更新の有無($store.state.fire.myApp.hasDocumentChanged)を確認
      * @returns {boolean}
      */
     hasDocumentChanged() {
@@ -252,10 +252,10 @@ export default {
      * @returns {boolean}
      */
     isLoggedIn() {
-      return this.$store.state.fire.current.isLoggedIn
+      return this.$store.state.fire.myApp.current.isLoggedIn
     },
     userInfo() {
-      return Object.entries(this.$store.state.fire.userInfo)
+      return Object.entries(this.$store.state.fire.myApp.userInfo)
         .filter(([key]) => {
           return [
             'displayName',

@@ -21,56 +21,58 @@ import { foodGroup, validateDeepObject } from '@/plugins/helper'
 // ///////////////////////////////////////////////////////////////
 
 export const state = () => ({
-  families: [],
-  communities: [],
-  userInfo: {
+  myApp: {
+    families: [],
+    communities: [],
+    userInfo: {
+      /**
+       * 現在のユーザー
+       */
+      displayName: 'userTest01',
+      email: '',
+      country: '',
+      subnational1: '',
+      subnational2: '',
+      subnational3: '',
+      organization: '',
+      title: '',
+      uid: 'userTest01',
+      phoneNumber: '',
+      userType: 'normal',
+    },
     /**
-     * 現在のユーザー
+     * loadingBox表示用のフラグ
      */
-    displayName: 'userTest01',
-    email: '',
-    country: '',
-    subnational1: '',
-    subnational2: '',
-    subnational3: '',
-    organization: '',
-    title: '',
-    uid: 'userTest01',
-    phoneNumber: '',
-    userType: 'normal',
+    loadingStatus: false,
+    /**
+     * 現在選択されているfamily, dietDateを記録
+     */
+    current: {
+      isLoggedIn: false,
+      familyName: 'userTest1',
+      dietDate: '',
+      driName: 'driNew',
+      fctName: 'fctNew',
+      portionName: 'portion_nakada01',
+      countryNamesId: 'countryNames',
+      regionId: 'eth_region',
+    },
+    adminPass: '',
+    isUpdateElements: {
+      families: false,
+      communities: false,
+      userInfo: false,
+      driObject: false,
+      fctObject: false,
+      calendar: false,
+      portionUnit: false,
+    },
   },
   driObject: {},
   fct: [],
   fctObject: {},
   calendar: [],
   portionUnit: [],
-  /**
-   * loadingBox表示用のフラグ
-   */
-  loadingStatus: false,
-  /**
-   * 現在選択されているfamily, dietDateを記録
-   */
-  current: {
-    isLoggedIn: false,
-    familyName: 'userTest1',
-    dietDate: '',
-    driName: 'driNew',
-    fctName: 'fctNew',
-    portionName: 'portion_nakada01',
-    countryNamesId: 'countryNames',
-    regionId: 'eth_region',
-  },
-  adminPass: '',
-  isUpdateElements: {
-    families: false,
-    communities: false,
-    userInfo: false,
-    driObject: false,
-    fctObject: false,
-    calendar: false,
-    portionUnit: false,
-  },
 })
 
 export const getters = {
@@ -90,7 +92,7 @@ export const getters = {
     })
   },
   familyList(state) {
-    return state.families.map((item) => {
+    return state.myApp.families.map((item) => {
       return item.name
     })
   },
@@ -98,7 +100,7 @@ export const getters = {
     // let errPath
     // validateDeepObject(state.families, FamilySchema, errPath)
     const resObject = {}
-    state.families.forEach((item) => {
+    state.myApp.families.forEach((item) => {
       const res = []
       for (const item2 in item.diet) {
         res.push(item2.date)
@@ -109,7 +111,7 @@ export const getters = {
   },
   isUpdateAny(state) {
     let res = false
-    Object.values(state.isUpdateElements).forEach((item) => {
+    Object.values(state.myApp.isUpdateElements).forEach((item) => {
       if (item) {
         res = true
       }
@@ -133,17 +135,17 @@ export const mutations = {
    * @param payload
    */
   initUser(state, payload) {
-    state.userInfo.uid = payload.uid
-    state.userInfo.displayName = payload.displayName
-    state.userInfo.email = payload.email
-    state.userInfo.phoneNumber = payload.phoneNumber
-    state.userInfo.country = payload.country || ''
-    state.userInfo.subnational1 = payload.subnational1 || ''
-    state.userInfo.subnational2 = payload.subnational2 || ''
-    state.userInfo.subnational3 = payload.subnational3 || ''
-    state.userInfo.organization = payload.organization || ''
-    state.userInfo.title = payload.title || ''
-    state.userInfo.userType = payload.userType || 'normal'
+    state.myApp.userInfo.uid = payload.uid
+    state.myApp.userInfo.displayName = payload.displayName
+    state.myApp.userInfo.email = payload.email
+    state.myApp.userInfo.phoneNumber = payload.phoneNumber
+    state.myApp.userInfo.country = payload.country || ''
+    state.myApp.userInfo.subnational1 = payload.subnational1 || ''
+    state.myApp.userInfo.subnational2 = payload.subnational2 || ''
+    state.myApp.userInfo.subnational3 = payload.subnational3 || ''
+    state.myApp.userInfo.organization = payload.organization || ''
+    state.myApp.userInfo.title = payload.title || ''
+    state.myApp.userInfo.userType = payload.userType || 'normal'
   },
 
   /**
@@ -171,7 +173,7 @@ export const mutations = {
    * @param {boolean} payload ログイン状態
    */
   updateIsLoggedIn(state, payload) {
-    state.current.isLoggedIn = payload
+    state.myApp.current.isLoggedIn = payload
   },
   /**
    * 要素ごとのupdateの状況を設定
@@ -179,7 +181,7 @@ export const mutations = {
    * @param payload
    */
   setUpdateFlag(state, payload) {
-    state.isUpdateElements[payload.element] = payload.value
+    state.myApp.isUpdateElements[payload.element] = payload.value
   },
 
   /**
@@ -195,7 +197,7 @@ export const mutations = {
     }
 
     // nameのチェック。名前が重複していたらerror
-    if (state.families.find((item) => item.name === payload)) {
+    if (state.myApp.families.find((item) => item.name === payload)) {
       throw new Error('family name duplication')
     }
     // memberの型チェック:失敗したらerror
@@ -205,7 +207,7 @@ export const mutations = {
     const newFamily = initObject(payload, SingleFamilySchema)
 
     // newFamilyの値をfamiliesに追加
-    state.families.splice(state.families.length, 0, newFamily)
+    state.myApp.families.splice(state.myApp.families.length, 0, newFamily)
   },
 
   /**
@@ -223,7 +225,7 @@ export const mutations = {
     let errPath
     validateDeepObject(payload.diet, DietSchema, errPath)
 
-    state.families[payload.name].diet = Object.assign({}, payload.diet)
+    state.myApp.families[payload.name].diet = Object.assign({}, payload.diet)
   },
 
   /**
@@ -238,7 +240,7 @@ export const mutations = {
     // const newArray = payload.map((item) => ({ ...item }))
 
     // reactivityを担保するためspliceを使用
-    state.families.splice(0, state.families.length, ...payload)
+    state.families.splice(0, state.myApp.families.length, ...payload)
   },
 
   /**
@@ -247,7 +249,7 @@ export const mutations = {
    * @param payload
    */
   updateLoadingState(state, payload) {
-    state.loadingStatus = payload
+    state.myApp.loadingStatus = payload
   },
   updateDriObject(state, payload) {
     state.driObject = Object.assign({}, payload)
@@ -267,7 +269,7 @@ export const mutations = {
    * @param payload
    */
   updateRegionId(state, payload) {
-    state.current.regionId = payload
+    state.myApp.current.regionId = payload
   },
 }
 
@@ -361,7 +363,7 @@ export const actions = {
     // cropCalendarをfireStoreからfetch (cropCalendarIdを使う)
     const cropCalendar = await fireGetDoc(
       'dataset',
-      state.myApp.dataSet.cropCalendarId
+      state.myApp.current.cropCalendarId
     ).catch((err) => {
       throw new Error(err)
     })
@@ -386,7 +388,7 @@ export const actions = {
     // questionsをfireStoreからfetch (questionsIdを使う)
     const questions = await fireGetDoc(
       'dataset',
-      state.myApp.dataSet.questionsId
+      state.myApp.current.questionsId
     ).catch((err) => {
       throw new Error(err)
     })
@@ -432,11 +434,11 @@ export const actions = {
     dispatch('updateLoadingState', true)
     await dispatch('fireGetDri', {
       collectionId: 'nfaSharedData',
-      documentId: state.current.driName,
+      documentId: state.myApp.current.driName,
     })
     await dispatch('fireGetFct', {
       collectionId: 'nfaSharedData',
-      documentId: state.current.fctName,
+      documentId: state.myApp.current.fctName,
     })
     await dispatch('fireGetPortionUnit', {
       collectionId: 'nfaSharedData',
@@ -444,7 +446,7 @@ export const actions = {
     })
     await dispatch('fireGetMyApp', {
       collectionId: 'nfaUserData',
-      documentId: state.userInfo.displayName,
+      documentId: state.myApp.userInfo.displayName,
     })
     dispatch('updateLoadingState', false)
   },
@@ -454,10 +456,10 @@ export const actions = {
     dispatch('updateLoadingState', true)
 
     await fireSaveDoc('nfaUserData', 'userTest01', {
-      families: state.families,
-      communities: state.communities,
-      userInfo: state.userInfo,
-      current: state.current,
+      families: state.myApp.families,
+      communities: state.myApp.communities,
+      userInfo: state.myApp.userInfo,
+      current: state.myApp.current,
     }).catch((err) => {
       console.log(err)
       alert(err)
@@ -465,7 +467,7 @@ export const actions = {
     })
 
     // 更新フラグをtrueに戻す
-    Object.entries(state.isUpdateElements).forEach(([key, value]) => {
+    Object.entries(state.myApp.isUpdateElements).forEach(([key, value]) => {
       dispatch('setUpdateFlag', {
         element: key,
         value: true,
@@ -483,11 +485,15 @@ export const actions = {
     commit('addNewFamily', payload)
   },
   removeFamily({ state, commit }, payload) {
-    const res = state.families.filter((item) => item.name !== payload)
+    const res = state.myApp.families.filter((item) => item.name !== payload)
     commit('updateFamilies', res)
   },
   async fireSaveDri({ state }) {
-    await fireSaveDoc('nfaSharedData', state.current.driName, state.driObject)
+    await fireSaveDoc(
+      'nfaSharedData',
+      state.myApp.current.driName,
+      state.driObject
+    )
   },
 
   /**
@@ -645,7 +651,7 @@ export const actions = {
   async initCountryNames({ state }) {
     const countries = await fireGetDoc(
       'nfaSharedData',
-      state.current.countryNamesId
+      state.myApp.current.countryNamesId
     ).catch((err) => {
       throw new Error(err)
     })
@@ -664,7 +670,7 @@ export const actions = {
   async initRegion({ state }) {
     const region = await fireGetDoc(
       'nfaSharedData',
-      state.current.regionId
+      state.myApp.current.regionId
     ).catch((err) => {
       throw new Error(err)
     })

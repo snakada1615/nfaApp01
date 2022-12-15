@@ -160,7 +160,7 @@ export default {
     },
   },
   created() {
-    this.myPass = this.$store.state.fire.adminPass
+    this.myPass = this.$store.state.fire.myApp.adminPass
   },
   methods: {
     togglePass() {
@@ -202,7 +202,7 @@ export default {
       this.$router.push('/')
     },
     async updateUserInfo() {
-      const myUser = this.$store.state.fire.userInfo.map((item) => ({
+      const myUser = this.$store.state.fire.myApp.userInfo.map((item) => ({
         ...item,
       }))
       myUser.country = this.user.country

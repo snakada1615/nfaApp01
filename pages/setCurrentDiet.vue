@@ -1,6 +1,6 @@
 <template>
   <b-container>
-    <div>current family: {{ $store.state.fire.current.familyName }}</div>
+    <div>current family: {{ $store.state.fire.myApp.current.familyName }}</div>
 
     <!--   Add/Editの選択   -->
     <b-form-radio-group
@@ -57,7 +57,7 @@
       <fct-set-weight-modal
         :v-if="targetCrop"
         :selected-item="targetCrop"
-        :portion-units="$store.state.fire.portionUnit"
+        :portion-units="$store.state.fire.myApp.portionUnit"
         :show-modal.sync="showModal"
         :menu-name.sync="menuName"
         :weight.sync="menuWeight"
@@ -197,15 +197,15 @@ export default {
         res.push(val)
       }
       // reactiveを維持しながらrecipeTableを更新
-      console.log(this.$store.state.fire.families)
+      console.log(this.$store.state.fire.myApp.families)
       this.recipeTableItems.splice(0, this.recipeTableItems.length, ...res)
 
       // reactiveの値を用いてstare.familiesを更新
       this.$store.dispatch('fire/updateDiet', {
-        name: this.$store.state.fire.current.familyName,
+        name: this.$store.state.fire.myApp.current.familyName,
         diet: this.recipeTableItems,
       })
-      console.log(this.$store.state.fire.families)
+      console.log(this.$store.state.fire.myApp.families)
 
       // 更新フラグを立てる
       this.$store.dispatch('fire/setUpdateFlag', {
@@ -215,7 +215,7 @@ export default {
     },
     storeUpdateRecipes() {
       this.$store.dispatch('fire/updateRecipes', {
-        name: this.$store.state.fire.current.familyName,
+        name: this.$store.state.fire.myApp.current.familyName,
         diet: this.recipeTableItems,
       })
     },

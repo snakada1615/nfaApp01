@@ -86,13 +86,13 @@ export default {
   },
   computed: {
     uid() {
-      return this.$store.state.fire.userInfo.uid
+      return this.$store.state.fire.myApp.userInfo.uid
     },
     displayName() {
-      return this.$store.state.fire.userInfo.displayName
+      return this.$store.state.fire.myApp.userInfo.displayName
     },
     isLoggedIn() {
-      return this.$store.state.fire.current.isLoggedIn
+      return this.$store.state.fire.myApp.current.isLoggedIn
     },
     stateName() {
       return /^[\w]{3,30}?$/.test(this.user)
