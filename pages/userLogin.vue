@@ -1,6 +1,7 @@
 <template>
   <b-container>
     <b-button
+      id="jestButton1"
       variant="primary"
       size="sm"
       :disabled="!inputValidate"
@@ -25,6 +26,7 @@
     <b-row class="my-2">
       <b-col cols="11">
         <b-form-input
+          id="jestInput1"
           v-model="user"
           placeholder="Enter username"
           :state="stateName"
@@ -34,6 +36,7 @@
     <b-row class="my-2">
       <b-col cols="11">
         <b-form-input
+          id="jestInput2"
           v-model="pass"
           :type="typePass"
           placeholder="Enter password"
@@ -131,6 +134,7 @@ export default {
         })
     },
     async login() {
+      console.log('// loginにセット')
       await this.$store
         .dispatch('fire/loginEmail', { name: this.user, password: this.pass })
         .catch((err) => {
@@ -144,6 +148,7 @@ export default {
           // login状態をfalseにセット
           this.$store.dispatch('fire/updateIsLoggedIn', false)
         })
+      console.log('// login状態をtrueにセット')
       // login状態をtrueにセット
       this.$store.dispatch('fire/updateIsLoggedIn', true)
 
