@@ -237,11 +237,21 @@ describe('updateDeepObject', () => {
 
   it('sourceの型変換機能：初期値指定なし', () => {
     const res = initObject(dest4, SingleFamilySchema)
-    console.log(res)
+    expect(res).toEqual({
+      name: '0',
+      member: [],
+      diet: [],
+      recommendedCrops: [],
+    })
   })
 
   it('sourceの型変換機能：一部初期値指定', () => {
     const res = initObject(dest5, SingleFamilySchema)
-    console.log(res)
+    expect(res).toEqual({
+      name: 'fun',
+      member: [{ id: '123', count: 5 }],
+      diet: [],
+      recommendedCrops: [],
+    })
   })
 })

@@ -16,6 +16,7 @@
       edit current user
     </b-button>
     <b-button
+      id="jestButton2"
       size="sm"
       variant="warning"
       :disabled="!isLoggedIn"
@@ -134,7 +135,6 @@ export default {
         })
     },
     async login() {
-      console.log('// loginにセット')
       await this.$store
         .dispatch('fire/loginEmail', { name: this.user, password: this.pass })
         .catch((err) => {
@@ -148,9 +148,8 @@ export default {
           // login状態をfalseにセット
           this.$store.dispatch('fire/updateIsLoggedIn', false)
         })
-      console.log('// login状態をtrueにセット')
       // login状態をtrueにセット
-      this.$store.dispatch('fire/updateIsLoggedIn', true)
+      await this.$store.dispatch('fire/updateIsLoggedIn', true)
 
       // error messageのクリア（もし表示れている場合には）
       this.errorMessage = ''

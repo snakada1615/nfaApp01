@@ -17,19 +17,20 @@ describe('userLogin', () => {
 
   // テストの度にstoreの内容を初期化(mock作成)
   beforeEach(() => {
-    dispatch = jest.fn((param) => {
-      if (param === 'fire/loginEmail') {
-        console.log('i got you ')
-        jest.fn().mockResolvedValue(true)
-        console.log('cleared')
-      } else if (param === 'fire/updateIsLoggedIn') {
-        console.log('i got got you ')
-        jest.fn().mockResolvedValue(true)
-      } else {
-        console.log('no no no')
-        jest.fn()
-      }
-      console.log('hey!, cleared')
+    dispatch = jest.fn().mockImplementation((param) => {
+      return new Promise((resolve, reject) => {
+        if (param === 'fire/loginEmail') {
+          state.fire.myApp.current.isLoggedIn = true
+          resolve('loginEmail success')
+        } else if (param === 'fire/updateIsLoggedIn') {
+          resolve(true)
+        } else if (param === 'fire/logOut') {
+          state.fire.myApp.current.isLoggedIn = false
+          resolve(true)
+        } else {
+          reject(new Error('fail to find param'))
+        }
+      })
     })
 
     // storeのモックを作成
@@ -103,14 +104,17 @@ describe('userLogin', () => {
 
   it('is a Vue instance', async () => {
     const button1 = wrapper.findComponent('#jestButton1')
+    const button2 = wrapper.findComponent('#jestButton2')
     const input1 = wrapper.findComponent('#jestInput1')
     const input2 = wrapper.findComponent('#jestInput2')
 
     // <button1>が表示される
     expect(button1.isVisible()).toBeTruthy()
+    expect(button2.isVisible()).toBeTruthy()
 
-    // 初期状態ではloginボタンはdisabled
+    // 初期状態ではloginボタン、logOutボタンはdisabled
     expect(button1.attributes()).toHaveProperty('disabled')
+    expect(button2.attributes()).toHaveProperty('disabled')
 
     // 謝ったname, passをセット(名前に空白文字)
     await input1.setValue('poka9  hontasu')
@@ -126,6 +130,26 @@ describe('userLogin', () => {
     // loginボタンのdisableが解除されたことを確認
     expect(button1.attributes()).not.toHaveProperty('disabled')
 
+    // ボタンクリックでuserとpassがdispatchされることを確認
     button1.trigger('click')
+
+    // dispatchされるactionの確認
+    expect(dispatch.mock.calls[0][0]).toEqual('fire/loginEmail')
+
+    // dispatchされるparamの確認
+    expect(dispatch.mock.calls[0][1]).toEqual({
+      name: 'poka9hontasu',
+      password: 'baka no showko',
+    })
+
+    console.log(state.fire.myApp.current.isLoggedIn)
+    console.log(button2.attributes())
+
+    // ボタンクリックでlogoutがdispatchされることを確認
+    button2.trigger('click')
+    console.log(dispatch.mock.calls[0])
+
+    // logOutボタンのdisableが解除されたことを確認
+    expect(button2.attributes()).not.toHaveProperty('disabled')
   })
 })
