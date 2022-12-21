@@ -17,18 +17,19 @@ describe('userLogin', () => {
 
   // テストの度にstoreの内容を初期化(mock作成)
   beforeEach(() => {
-    dispatch = jest.fn().mockImplementation((param) => {
+    dispatch = jest.fn().mockImplementation((commandCalled, payload) => {
       return new Promise((resolve, reject) => {
-        if (param === 'fire/loginEmail') {
-          state.fire.myApp.current.isLoggedIn = true
+        if (commandCalled === 'fire/loginEmail') {
           resolve('loginEmail success')
-        } else if (param === 'fire/updateIsLoggedIn') {
+        } else if (commandCalled === 'fire/updateIsLoggedIn') {
+          console.log('updateIsLoggedIn, Now: ' + payload)
+          state.fire.myApp.current.isLoggedIn = payload
           resolve(true)
-        } else if (param === 'fire/logOut') {
-          state.fire.myApp.current.isLoggedIn = false
+        } else if (commandCalled === 'fire/logOut') {
+          state.fire.myApp.current.isLoggedIn = payload
           resolve(true)
         } else {
-          reject(new Error('fail to find param'))
+          reject(new Error('fail to find commandCalled'))
         }
       })
     })
@@ -102,19 +103,35 @@ describe('userLogin', () => {
     })
   })
 
-  it('is a Vue instance', async () => {
+  it('shows button-login on startup', () => {
     const button1 = wrapper.findComponent('#jestButton1')
+    expect(button1.isVisible()).toBeTruthy()
+  })
+
+  it('shows button-logout on startup', () => {
     const button2 = wrapper.findComponent('#jestButton2')
+    expect(button2.isVisible()).toBeTruthy()
+  })
+
+  it('disable button-login on startup', () => {
+    const button1 = wrapper.findComponent('#jestButton1')
+    expect(button1.attributes()).toHaveProperty('disabled')
+  })
+
+  it('is not logged-in on startup', () => {
+    expect(state.fire.myApp.current.isLoggedIn).not.toBeTruthy()
+    expect(wrapper.vm.isLoggedIn).not.toBeTruthy()
+  })
+
+  it('disable button-logOut on load', () => {
+    const button2 = wrapper.findComponent('#jestButton2')
+    expect(button2.attributes()).toHaveProperty('disabled')
+  })
+
+  it('disable button-login when user input is wrong', async () => {
     const input1 = wrapper.findComponent('#jestInput1')
     const input2 = wrapper.findComponent('#jestInput2')
-
-    // <button1>が表示される
-    expect(button1.isVisible()).toBeTruthy()
-    expect(button2.isVisible()).toBeTruthy()
-
-    // 初期状態ではloginボタン、logOutボタンはdisabled
-    expect(button1.attributes()).toHaveProperty('disabled')
-    expect(button2.attributes()).toHaveProperty('disabled')
+    const button1 = wrapper.findComponent('#jestButton1')
 
     // 謝ったname, passをセット(名前に空白文字)
     await input1.setValue('poka9  hontasu')
@@ -122,6 +139,12 @@ describe('userLogin', () => {
 
     // loginボタンのdisableが付与されたことを確認
     expect(button1.attributes()).toHaveProperty('disabled')
+  })
+
+  it('enable button-login when user input is correct', async () => {
+    const input1 = wrapper.findComponent('#jestInput1')
+    const input2 = wrapper.findComponent('#jestInput2')
+    const button1 = wrapper.findComponent('#jestButton1')
 
     // 正しいname, passをセット
     await input1.setValue('poka9hontasu')
@@ -129,9 +152,20 @@ describe('userLogin', () => {
 
     // loginボタンのdisableが解除されたことを確認
     expect(button1.attributes()).not.toHaveProperty('disabled')
+  })
+
+  it('dispatch user and password when button-login is clicked', async () => {
+    const button1 = wrapper.findComponent('#jestButton1')
+    const button2 = wrapper.findComponent('#jestButton2')
+    const input1 = wrapper.findComponent('#jestInput1')
+    const input2 = wrapper.findComponent('#jestInput2')
+
+    // 正しいname, passをセット
+    await input1.setValue('poka9hontasu')
+    await input2.setValue('baka no showko')
 
     // ボタンクリックでuserとpassがdispatchされることを確認
-    button1.trigger('click')
+    await button1.trigger('click')
 
     // dispatchされるactionの確認
     expect(dispatch.mock.calls[0][0]).toEqual('fire/loginEmail')
@@ -142,14 +176,12 @@ describe('userLogin', () => {
       password: 'baka no showko',
     })
 
-    console.log(state.fire.myApp.current.isLoggedIn)
-    console.log(button2.attributes())
-
-    // ボタンクリックでlogoutがdispatchされることを確認
-    button2.trigger('click')
-    console.log(dispatch.mock.calls[0])
+    // loginできたことを確認
+    expect(state.fire.myApp.current.isLoggedIn).toBeTruthy()
+    expect(wrapper.vm.isLoggedIn).toBeTruthy()
 
     // logOutボタンのdisableが解除されたことを確認
+    console.log(button2.html())
     expect(button2.attributes()).not.toHaveProperty('disabled')
   })
 })
