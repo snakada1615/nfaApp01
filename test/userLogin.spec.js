@@ -14,6 +14,8 @@ describe('userLogin', () => {
   let state
   let wrapper
   let dispatch
+  let store
+  let actions
 
   // テストの度にstoreの内容を初期化(mock作成)
   beforeEach(() => {
@@ -34,6 +36,13 @@ describe('userLogin', () => {
       })
     })
 
+    actions = {
+      fire: {
+        loginEmail: jest.fn().mockResolvedValue('loginEmail success'),
+        updateIsLoggedIn: jest.fn((value) => value),
+        logOut: jest.fn(),
+      },
+    }
     // storeのモックを作成
     state = {
       fire: {
@@ -92,15 +101,19 @@ describe('userLogin', () => {
       },
     }
 
-    wrapper = mount(userLogin, {
-      localVue,
-      mocks: {
-        $store: {
-          state,
-          dispatch,
-        },
-      },
+    store = new Vuex.Store({
+      state,
+      actions,
     })
+    // wrapper = mount(userLogin, {
+    //   localVue,
+    //   mocks: {
+    //     $store: {
+    //       state,
+    //       dispatch,
+    //     },
+    //   },
+    // })
   })
 
   it('shows button-login on startup', () => {
