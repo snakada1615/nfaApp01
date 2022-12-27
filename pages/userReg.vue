@@ -93,6 +93,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import { makeToast } from '@/plugins/helper'
 import regionSelect from '@/components/atoms/regionSelect'
 import countryNames from '@/components/atoms/countryNames'
@@ -142,6 +143,7 @@ export default {
     }
   },
   computed: {
+    ...mapState('fire', ['myApp']),
     passIcon() {
       if (this.typePass === 'text') {
         return 'eye'
@@ -160,7 +162,7 @@ export default {
     },
   },
   created() {
-    this.myPass = this.$store.state.fire.myApp.adminPass
+    this.myPass = this.myApp.adminPass
   },
   methods: {
     togglePass() {
@@ -194,15 +196,12 @@ export default {
       makeToast(this, 'user data registered!')
 
       // myAppを初期化
-      await this.$store.dispatch(
-        'fire/initAll',
-        this.$store.state.fire.myApp.user
-      )
+      await this.$store.dispatch('fire/initAll', this.myApp.user)
       makeToast(this, 'user data initialized!')
       this.$router.push('/')
     },
     async updateUserInfo() {
-      const myUser = this.$store.state.fire.myApp.userInfo.map((item) => ({
+      const myUser = this.myApp.userInfo.map((item) => ({
         ...item,
       }))
       myUser.country = this.user.country

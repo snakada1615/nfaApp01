@@ -118,6 +118,10 @@ export const getters = {
     })
     return res
   },
+  currentFamilyName(state) {
+    const email = state.myApp.userInfo.email
+    return email.substring(0, email.indexOf('@'))
+  },
   /**
    * FCTに含まれるFood Groupの一覧
    * @returns {*[]}

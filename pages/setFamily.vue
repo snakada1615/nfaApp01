@@ -66,13 +66,14 @@
     <!-- メンバー構成の設定 -->
     <update-family
       :member.sync="tablePop"
-      :dri="$store.state.fire.driObject"
+      :dri="myApp.driObject"
       @update="updateFlagForFamily"
     />
   </b-container>
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import { makeToast } from '@/plugins/helper'
 import updateFamily from '@/components/molecules/updateFamily'
 
@@ -94,9 +95,10 @@ export default {
     }
   },
   computed: {
+    ...mapState('fire', ['myApp']),
     familyList: {
       get() {
-        return this.$store.state.fire.myApp.families
+        return this.myApp.families
       },
     },
     familySize: {
@@ -173,7 +175,7 @@ export default {
      * @param val
      */
     selectFamily(val) {
-      const resPop = this.$store.state.fire.myApp.families.find(
+      const resPop = this.myApp.families.find(
         (item) => item.name === val
       ).member
       this.tablePop.splice(0, this.tablePop.length, ...resPop)

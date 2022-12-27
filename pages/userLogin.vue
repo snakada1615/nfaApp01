@@ -20,7 +20,7 @@
       size="sm"
       variant="warning"
       :disabled="!isLoggedIn"
-      @click="logOut"
+      @click="logOutUser"
     >
       logout
     </b-button>
@@ -68,13 +68,14 @@
         <span v-if="isLoggedIn" class="text-success">on</span>
         <span v-else class="text-danger">off</span>
       </div>
-      <div>name:{{ displayName }}</div>
+      <div>name:{{ currentFamilyName }}</div>
       <div>uid:{{ uid }}</div>
       <hr />
     </b-card>
   </b-container>
 </template>
 <script>
+import { mapState, mapActions, mapGetters } from 'vuex'
 export default {
   data() {
     return {
@@ -89,14 +90,16 @@ export default {
     }
   },
   computed: {
+    ...mapState('fire', ['myApp']),
+    ...mapGetters({ currentFamilyName: 'fire/currentFamilyName' }),
     uid() {
-      return this.$store.state.fire.myApp.userInfo.uid
+      return this.myApp.userInfo.uid
     },
     displayName() {
-      return this.$store.state.fire.myApp.userInfo.displayName
+      return this.myApp.userInfo.displayName
     },
     isLoggedIn() {
-      return this.$store.state.fire.myApp.current.isLoggedIn
+      return this.myApp.current.isLoggedIn
     },
     stateName() {
       return /^[\w]{3,30}?$/.test(this.user)
@@ -112,6 +115,12 @@ export default {
     },
   },
   methods: {
+    ...mapActions('fire', [
+      'registerEmail',
+      'loginEmail',
+      'updateIsLoggedIn',
+      'logOut',
+    ]),
     togglePass() {
       if (this.typePass === 'text') {
         this.typePass = 'password'
@@ -120,24 +129,21 @@ export default {
       }
     },
     async register() {
-      await this.$store
-        .dispatch('fire/registerEmail', {
-          name: this.user,
-          password: this.pass,
-        })
-        .catch((err) => {
-          console.log(err)
-          if (err.message.indexOf('auth/email-already-in-use')) {
-            this.user = ''
-            this.pass = ''
-            this.errorMessage = this.errorMessageList[1]
-          }
-        })
+      await this.registerEmail({
+        name: this.user,
+        password: this.pass,
+      }).catch((err) => {
+        console.log(err)
+        if (err.message.indexOf('auth/email-already-in-use')) {
+          this.user = ''
+          this.pass = ''
+          this.errorMessage = this.errorMessageList[1]
+        }
+      })
     },
     async login() {
-      await this.$store
-        .dispatch('fire/loginEmail', { name: this.user, password: this.pass })
-        .catch((err) => {
+      await this.loginEmail({ name: this.user, password: this.pass }).catch(
+        (err) => {
           console.log(err)
           // error messageの表示
           if (err.message.indexOf('auth/internal-error')) {
@@ -146,18 +152,19 @@ export default {
             this.errorMessage = this.errorMessageList[0]
           }
           // login状態をfalseにセット
-          this.$store.dispatch('fire/updateIsLoggedIn', false)
-        })
+          this.updateIsLoggedIn(false)
+        }
+      )
       // login状態をtrueにセット
-      await this.$store.dispatch('fire/updateIsLoggedIn', true)
+      await this.updateIsLoggedIn(true)
 
       // error messageのクリア（もし表示れている場合には）
       this.errorMessage = ''
     },
-    logOut() {
-      this.$store.dispatch('fire/logOut')
+    logOutUser() {
+      this.logOut()
       // login状態をfalseにセット
-      this.$store.dispatch('fire/updateIsLoggedIn', false)
+      this.updateIsLoggedIn(false)
     },
   },
 }
