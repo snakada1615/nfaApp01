@@ -45,66 +45,74 @@ describe('userLogin', () => {
     }
     // storeのモックを作成
     state = {
-      fire: {
-        myApp: {
-          families: [],
-          communities: [],
-          userInfo: {
-            /**
-             * 現在のユーザー
-             */
-            displayName: 'userTest01',
-            email: '',
-            country: '',
-            subnational1: '',
-            subnational2: '',
-            subnational3: '',
-            organization: '',
-            title: '',
-            uid: 'userTest01',
-            phoneNumber: '',
-            userType: 'normal',
-          },
+      myApp: {
+        families: [],
+        communities: [],
+        userInfo: {
           /**
-           * loadingBox表示用のフラグ
+           * 現在のユーザー
            */
-          loadingStatus: false,
-          /**
-           * 現在選択されているfamily, dietDateを記録
-           */
-          current: {
-            isLoggedIn: false,
-            familyName: 'userTest1',
-            dietDate: '',
-            driName: 'driNew',
-            fctName: 'fctNew',
-            portionName: 'portion_nakada01',
-            countryNamesId: 'countryNames',
-            regionId: 'eth_region',
-          },
-          adminPass: '',
-          isUpdateElements: {
-            families: false,
-            communities: false,
-            userInfo: false,
-            driObject: false,
-            fctObject: false,
-            calendar: false,
-            portionUnit: false,
-          },
+          displayName: 'userTest01',
+          email: '',
+          country: '',
+          subnational1: '',
+          subnational2: '',
+          subnational3: '',
+          organization: '',
+          title: '',
+          uid: 'userTest01',
+          phoneNumber: '',
+          userType: 'normal',
         },
-        driObject: {},
-        fct: [],
-        fctObject: {},
-        calendar: [],
-        portionUnit: [],
+        /**
+         * loadingBox表示用のフラグ
+         */
+        loadingStatus: false,
+        /**
+         * 現在選択されているfamily, dietDateを記録
+         */
+        current: {
+          isLoggedIn: false,
+          familyName: 'userTest1',
+          dietDate: '',
+          driName: 'driNew',
+          fctName: 'fctNew',
+          portionName: 'portion_nakada01',
+          countryNamesId: 'countryNames',
+          regionId: 'eth_region',
+        },
+        adminPass: '',
+        isUpdateElements: {
+          families: false,
+          communities: false,
+          userInfo: false,
+          driObject: false,
+          fctObject: false,
+          calendar: false,
+          portionUnit: false,
+        },
       },
+      driObject: {},
+      fct: [],
+      fctObject: {},
+      calendar: [],
+      portionUnit: [],
     }
 
     store = new Vuex.Store({
-      state,
-      actions,
+      modules: {
+        fire: {
+          namespaced: true,
+          state,
+        },
+      },
     })
+
+    wrapper = mount(userLogin, {
+      localVue,
+      store,
+    })
+
     // wrapper = mount(userLogin, {
     //   localVue,
     //   mocks: {
