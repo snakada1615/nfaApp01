@@ -71,6 +71,11 @@
       <div>name:{{ currentFamilyName }}</div>
       <div>uid:{{ uid }}</div>
       <hr />
+      {{ myApp.current }}
+      <hr />
+      {{ currentFamilyName }}
+      {{ $store.getters['fire/currentFamilyName'] }}
+      {{ myApp.userInfo }}
     </b-card>
   </b-container>
 </template>
@@ -91,7 +96,7 @@ export default {
   },
   computed: {
     ...mapState('fire', ['myApp']),
-    ...mapGetters({ currentFamilyName: 'fire/currentFamilyName' }),
+    ...mapGetters('fire', ['currentFamilyName']),
     uid() {
       return this.myApp.userInfo.uid
     },

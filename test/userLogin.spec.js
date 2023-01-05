@@ -13,97 +13,64 @@ localVue.use(Vuex)
 describe('userLogin', () => {
   let state
   let wrapper
-  let dispatch
   let store
   let actions
+  let getters
 
   // テストの度にstoreの内容を初期化(mock作成)
   beforeEach(() => {
-    dispatch = jest.fn().mockImplementation((commandCalled, payload) => {
-      return new Promise((resolve, reject) => {
-        if (commandCalled === 'fire/loginEmail') {
-          resolve('loginEmail success')
-        } else if (commandCalled === 'fire/updateIsLoggedIn') {
-          console.log('updateIsLoggedIn, Now: ' + payload)
-          state.fire.myApp.current.isLoggedIn = payload
-          resolve(true)
-        } else if (commandCalled === 'fire/logOut') {
-          state.fire.myApp.current.isLoggedIn = payload
-          resolve(true)
-        } else {
-          reject(new Error('fail to find commandCalled'))
-        }
-      })
-    })
-
     actions = {
-      fire: {
-        loginEmail: jest.fn().mockResolvedValue('loginEmail success'),
-        updateIsLoggedIn: jest.fn((value) => value),
-        logOut: jest.fn(),
-      },
+      loginEmail: jest.fn().mockImplementation((payLoad) => {
+        return new Promise((resolve) => {
+          resolve('loginEmail success')
+        })
+      }),
+      updateIsLoggedIn: jest.fn().mockImplementation((payload) => {
+        return new Promise((resolve) => {
+          // state.myApp.current.isLoggedIn = payload
+          resolve('loginStatus changed')
+        })
+      }),
+      logOut: jest.fn().mockImplementation(() => {
+        return new Promise((resolve) => {
+          // console.log(state.myApp.current.isLoggedIn)
+          // state.myApp.current.isLoggedIn = false
+          // console.log(state.myApp.current.isLoggedIn)
+          resolve('loginStatus changed')
+        })
+      }),
     }
+
     // storeのモックを作成
     state = {
       myApp: {
-        families: [],
-        communities: [],
         userInfo: {
           /**
            * 現在のユーザー
            */
           displayName: 'userTest01',
-          email: '',
-          country: '',
-          subnational1: '',
-          subnational2: '',
-          subnational3: '',
-          organization: '',
-          title: '',
           uid: 'userTest01',
           phoneNumber: '',
           userType: 'normal',
         },
         /**
-         * loadingBox表示用のフラグ
-         */
-        loadingStatus: false,
-        /**
          * 現在選択されているfamily, dietDateを記録
          */
         current: {
           isLoggedIn: false,
-          familyName: 'userTest1',
-          dietDate: '',
-          driName: 'driNew',
-          fctName: 'fctNew',
-          portionName: 'portion_nakada01',
-          countryNamesId: 'countryNames',
-          regionId: 'eth_region',
-        },
-        adminPass: '',
-        isUpdateElements: {
-          families: false,
-          communities: false,
-          userInfo: false,
-          driObject: false,
-          fctObject: false,
-          calendar: false,
-          portionUnit: false,
         },
       },
-      driObject: {},
-      fct: [],
-      fctObject: {},
-      calendar: [],
-      portionUnit: [],
     }
+
+    getters = { currentFamilyName: () => 'ahobaka' }
 
     store = new Vuex.Store({
       modules: {
         fire: {
           namespaced: true,
           state,
+          getters,
+          actions,
         },
       },
     })
@@ -112,16 +79,6 @@ describe('userLogin', () => {
       localVue,
       store,
     })
-
-    // wrapper = mount(userLogin, {
-    //   localVue,
-    //   mocks: {
-    //     $store: {
-    //       state,
-    //       dispatch,
-    //     },
-    //   },
-    // })
   })
 
   it('shows button-login on startup', () => {
@@ -134,22 +91,22 @@ describe('userLogin', () => {
     expect(button2.isVisible()).toBeTruthy()
   })
 
-  it('disable button-login on startup', () => {
+  it('button-login is disabled on startup', () => {
     const button1 = wrapper.findComponent('#jestButton1')
     expect(button1.attributes()).toHaveProperty('disabled')
   })
 
-  it('is not logged-in on startup', () => {
-    expect(state.fire.myApp.current.isLoggedIn).not.toBeTruthy()
+  it('Not logged-in on startup', () => {
+    expect(state.myApp.current.isLoggedIn).not.toBeTruthy()
     expect(wrapper.vm.isLoggedIn).not.toBeTruthy()
   })
 
-  it('disable button-logOut on load', () => {
+  it('button-logOut is disabled on load', () => {
     const button2 = wrapper.findComponent('#jestButton2')
     expect(button2.attributes()).toHaveProperty('disabled')
   })
 
-  it('disable button-login when user input is wrong', async () => {
+  it('button-login is disabled when user input is wrong', async () => {
     const input1 = wrapper.findComponent('#jestInput1')
     const input2 = wrapper.findComponent('#jestInput2')
     const button1 = wrapper.findComponent('#jestButton1')
@@ -162,7 +119,7 @@ describe('userLogin', () => {
     expect(button1.attributes()).toHaveProperty('disabled')
   })
 
-  it('enable button-login when user input is correct', async () => {
+  it('button-login is enabled when user input is correct', async () => {
     const input1 = wrapper.findComponent('#jestInput1')
     const input2 = wrapper.findComponent('#jestInput2')
     const button1 = wrapper.findComponent('#jestButton1')
@@ -175,34 +132,61 @@ describe('userLogin', () => {
     expect(button1.attributes()).not.toHaveProperty('disabled')
   })
 
-  it('dispatch user and password when button-login is clicked', async () => {
-    const button1 = wrapper.findComponent('#jestButton1')
-    const button2 = wrapper.findComponent('#jestButton2')
-    const input1 = wrapper.findComponent('#jestInput1')
-    const input2 = wrapper.findComponent('#jestInput2')
+  it(
+    'button-login is clicked -> dispatch user&pass -> login success -> ' +
+      'button-logout click -> logout success',
+    async () => {
+      const button1 = wrapper.findComponent('#jestButton1')
+      const button2 = wrapper.findComponent('#jestButton2')
+      const input1 = wrapper.findComponent('#jestInput1')
+      const input2 = wrapper.findComponent('#jestInput2')
 
-    // 正しいname, passをセット
-    await input1.setValue('poka9hontasu')
-    await input2.setValue('baka no showko')
+      // 正しいname, passをセット
+      await input1.setValue('poka9hontasu')
+      await input2.setValue('baka no showko')
 
-    // ボタンクリックでuserとpassがdispatchされることを確認
-    await button1.trigger('click')
+      // ボタンクリックでuserとpassがdispatchされることを確認
+      await button1.trigger('click')
 
-    // dispatchされるactionの確認
-    expect(dispatch.mock.calls[0][0]).toEqual('fire/loginEmail')
+      // DOMの更新を保証
+      await wrapper.vm.$nextTick()
 
-    // dispatchされるparamの確認
-    expect(dispatch.mock.calls[0][1]).toEqual({
-      name: 'poka9hontasu',
-      password: 'baka no showko',
-    })
+      // dispatchされるaction、paramの確認
+      expect(actions.loginEmail).toHaveBeenCalledWith(expect.any(Object), {
+        name: 'poka9hontasu',
+        password: 'baka no showko',
+      })
 
-    // loginできたことを確認
-    expect(state.fire.myApp.current.isLoggedIn).toBeTruthy()
-    expect(wrapper.vm.isLoggedIn).toBeTruthy()
+      // updateIsLoggedInが、param = trueで呼ばれたことを確認
+      expect(actions.updateIsLoggedIn).toHaveBeenCalledWith(
+        expect.any(Object),
+        true
+      )
+      state.myApp.current.isLoggedIn = true
 
-    // logOutボタンのdisableが解除されたことを確認
-    console.log(button2.html())
-    expect(button2.attributes()).not.toHaveProperty('disabled')
-  })
+      // loginできたことを確認
+      expect(state.myApp.current.isLoggedIn).toBeTruthy()
+      expect(wrapper.vm.isLoggedIn).toBeTruthy()
+      expect(wrapper.vm.$store.state.fire.myApp.current.isLoggedIn).toBeTruthy()
+
+      // logOutボタンのdisableが解除されたことを確認
+      wrapper.vm.$store.state.fire.myApp.current.isLoggedIn = true
+      await wrapper.vm.$nextTick()
+      expect(button2.attributes()).not.toHaveProperty('disabled')
+
+      // logoutボタンクリック
+      await button2.trigger('click')
+
+      // DOMの更新を保証
+      await wrapper.vm.$nextTick()
+
+      // dispatchされるactionの確認
+      expect(actions.logOut).toHaveBeenCalled()
+      wrapper.vm.$store.state.fire.myApp.current.isLoggedIn = false
+
+      // logOutできたことを確認
+      expect(state.myApp.current.isLoggedIn).not.toBeTruthy()
+      expect(wrapper.vm.isLoggedIn).not.toBeTruthy()
+    }
+  )
 })

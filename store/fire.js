@@ -120,7 +120,7 @@ export const getters = {
   },
   currentFamilyName(state) {
     const email = state.myApp.userInfo.email
-    return email.substring(0, email.indexOf('@'))
+    return email.substring(0, email.indexOf('@')) || ''
   },
   /**
    * FCTに含まれるFood Groupの一覧
@@ -138,9 +138,9 @@ export const mutations = {
    * @param state
    * @param payload
    */
-  initUser(state, payload) {
+  initUser(state, payload, getters) {
     state.myApp.userInfo.uid = payload.uid
-    state.myApp.userInfo.displayName = payload.displayName
+    state.myApp.userInfo.displayName = getters['fire/currentFamilyName']
     state.myApp.userInfo.email = payload.email
     state.myApp.userInfo.phoneNumber = payload.phoneNumber
     state.myApp.userInfo.country = payload.country || ''
@@ -618,16 +618,13 @@ export const actions = {
       throw error
       // ..
     })
-    await dispatch('updateUser', {
-      displayName: payload.name,
-      email,
-    }).catch((error) => {
+
+    await commit('initUser', res.user).catch((error) => {
       commit('updateIsLoggedIn', false)
       throw error
       // ..
     })
 
-    commit('initUser', res.user)
     commit('updateIsLoggedIn', true)
     console.log('login success')
     /**

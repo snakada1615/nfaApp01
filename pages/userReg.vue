@@ -12,14 +12,18 @@
           <!-- 名前の記入         -->
           <b-input-group class="my-1" size="sm" prepend="user name">
             <b-form-input
+              id="jestForm1"
               v-model="newUser"
               placeholder="Enter username"
               :state="stateName"
             />
           </b-input-group>
+          {{ $store.state.fire.myApp.userInfo }}
+          currentFamilyName = {{ $store.getters['fire/currentFamilyName'] }}
           <!-- パスワード記入         -->
           <b-input-group class="my-1" size="sm" prepend="password">
             <b-form-input
+              id="jestForm2"
               v-model="newPass"
               :type="typePass"
               placeholder="Enter password"
@@ -80,6 +84,7 @@
             />
           </b-input-group>
           <b-button
+            id="jestButton1"
             variant="primary"
             :disabled="!inputValidate"
             @click="register"
@@ -182,10 +187,12 @@ export default {
         .catch((err) => {
           console.log(err)
           loginFail = true
-          if (err.message.indexOf('auth/email-already-in-use')) {
+          if (err.message.includes('auth/email-already-in-use')) {
             this.newUser = ''
             this.newPass = ''
             this.errorMessage = this.errorMessageList[1]
+          } else {
+            this.errorMessage = err.message
           }
         })
       if (loginFail) {

@@ -7,13 +7,14 @@ export default async function ({ store, redirect, route }) {
   // 永続化したログイン情報を取得する
   let user
   const location = route.name
+
   user = await store.dispatch('fire/getCurrentLogin').catch((err) => {
     console.error(err)
     user = null
   })
 
   // ログイン情報が取得できた場合
-  if (user) {
+  if (user && !!location) {
     // ログイン状態を更新
     await store.dispatch('fire/updateIsLoggedIn', true)
 
@@ -23,11 +24,14 @@ export default async function ({ store, redirect, route }) {
 
   // ログイン情報が取得できない場合
   // 特定のページ以外はホーム画面に戻る
+  // addressが指定されない場合もホーム画面に戻る
   else if (
-    !location.includes('userLogin') &&
-    !location.includes('userReg') &&
-    !location.includes('tool') &&
-    !location.includes('index')
+    !location ||
+    (!location.includes('userLogin') &&
+      !location.includes('userReg') &&
+      !location.includes('tool') &&
+      !location.includes('test') &&
+      !location.includes('index'))
   ) {
     alert('please login/register first to use all functions')
     return redirect('/')
