@@ -98,7 +98,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapMutations, mapActions } from 'vuex'
 import { makeToast } from '@/plugins/helper'
 import regionSelect from '@/components/atoms/regionSelect'
 import countryNames from '@/components/atoms/countryNames'
@@ -170,6 +170,8 @@ export default {
     this.myPass = this.myApp.adminPass
   },
   methods: {
+    ...mapMutations('fire', ['initFamilies', 'initCommunities', 'initCurrent']),
+    ...mapActions('fire', ['registerEmail', 'updateLoadingState']),
     togglePass() {
       if (this.typePass === 'text') {
         this.typePass = 'password'
@@ -179,49 +181,42 @@ export default {
     },
     async register() {
       let loginFail = false
-      await this.$store
-        .dispatch('fire/registerEmail', {
-          name: this.newUser,
-          password: this.newPass,
-        })
-        .catch((err) => {
-          console.log(err)
-          loginFail = true
-          if (err.message.includes('auth/email-already-in-use')) {
-            this.newUser = ''
-            this.newPass = ''
-            this.errorMessage = this.errorMessageList[1]
-          } else {
-            this.errorMessage = err.message
-          }
-        })
+      await this.registerEmail({
+        name: this.newUser,
+        email: this.newUser + '@ifna.app',
+        password: this.newPass,
+        displayName: this.newUser,
+        uid: '',
+        country: this.user.country,
+        organization: this.user.organization,
+        title: this.user.title,
+        userType: this.user.userType,
+        subnational1: this.user.subnational1,
+        subnational2: this.user.subnational2,
+        subnational3: this.user.subnational3,
+      }).catch((err) => {
+        console.log(err)
+        loginFail = true
+        if (err.message.includes('auth/email-already-in-use')) {
+          this.newUser = ''
+          this.newPass = ''
+          this.errorMessage = this.errorMessageList[1]
+        } else {
+          this.errorMessage = err.message
+        }
+      })
       if (loginFail) {
         return
       }
-      // user情報を更新
-      await this.updateUserInfo()
-      makeToast(this, 'user data registered!')
 
       // myAppを初期化
-      await this.$store.dispatch('fire/initAll', this.myApp.user)
-      makeToast(this, 'user data initialized!')
-      this.$router.push('/')
-    },
-    async updateUserInfo() {
-      const myUser = this.myApp.userInfo.map((item) => ({
-        ...item,
-      }))
-      myUser.country = this.user.country
-      myUser.organization = this.user.organization
-      myUser.title = this.user.title
-      myUser.userType = this.user.userType
-      myUser.subnational1 = this.user.subnational1
-      myUser.subnational2 = this.user.subnational2
-      myUser.subnational3 = this.user.subnational3
+      // await this.$store.dispatch('fire/initAll', this.myApp.user)
+      await this.initFamilies()
+      await this.initCommunities()
+      await this.initCurrent()
 
-      // storeのアップデート
+      // ユーザー情報をstoreに記録
       const vm = this
-      await this.$store.dispatch('fire/updateUser', myUser)
       await this.$store.dispatch('fire/updateLoadingState', true)
       await this.$store.dispatch('fire/fireSaveMyApp').catch((err) => {
         console.log(err)
@@ -229,6 +224,9 @@ export default {
       })
       await this.$store.dispatch('fire/updateLoadingState', false)
       console.log('userdata updated')
+
+      makeToast(this, 'user data initialized!')
+      this.$router.push('/')
     },
     onUserTypeChange(val) {
       if (val === 'admin') {

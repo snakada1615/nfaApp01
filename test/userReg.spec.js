@@ -86,4 +86,22 @@ describe('userLogin', () => {
     expect(button1.isVisible()).toBeTruthy()
     expect(button1.attributes()).toHaveProperty('disabled')
   })
+
+  it('button1 enabled if name and pass set properly', () => {
+    wrapper = mount(userReg, {
+      localVue,
+      store,
+    })
+
+    const nameField = wrapper.findComponent('#jestForm1')
+    const passwordField = wrapper.findComponent('#jestForm2')
+    const button1 = wrapper.findComponent('#jestButton1')
+
+    // name, passをセット
+    nameField.setValue('ore nakada')
+    passwordField.setValue('nakanoarai')
+
+    // loginボタンのdisableが付与されたことを確認
+    expect(button1.attributes()).toHaveProperty('disabled')
+  })
 })

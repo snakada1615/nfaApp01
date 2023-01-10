@@ -138,11 +138,11 @@ export const mutations = {
    * @param state
    * @param payload
    */
-  initUser(state, payload, getters) {
+  initUser(state, payload) {
+    console.log(state.myApp.userInfo)
     state.myApp.userInfo.uid = payload.uid
-    state.myApp.userInfo.displayName = getters['fire/currentFamilyName']
+    state.myApp.userInfo.displayName = payload.displayName
     state.myApp.userInfo.email = payload.email
-    state.myApp.userInfo.phoneNumber = payload.phoneNumber
     state.myApp.userInfo.country = payload.country || ''
     state.myApp.userInfo.subnational1 = payload.subnational1 || ''
     state.myApp.userInfo.subnational2 = payload.subnational2 || ''
@@ -150,6 +150,27 @@ export const mutations = {
     state.myApp.userInfo.organization = payload.organization || ''
     state.myApp.userInfo.title = payload.title || ''
     state.myApp.userInfo.userType = payload.userType || 'normal'
+  },
+
+  initFamilies(state) {
+    state.myApp.families = []
+  },
+
+  initCommunities(state) {
+    state.myApp.communities = []
+  },
+
+  initCurrent(state) {
+    state.myApp.current = {
+      isLoggedIn: false,
+      familyName: 'userTest1',
+      dietDate: '',
+      driName: 'driNew',
+      fctName: 'fctNew',
+      portionName: 'portion_nakada01',
+      countryNamesId: 'countryNames',
+      regionId: 'eth_region',
+    }
   },
 
   /**
@@ -459,7 +480,7 @@ export const actions = {
     // loading screenの表示
     dispatch('updateLoadingState', true)
 
-    await fireSaveDoc('nfaUserData', 'userTest01', {
+    await fireSaveDoc('nfaUserData', state.myApp.userInfo.displayName, {
       families: state.myApp.families,
       communities: state.myApp.communities,
       userInfo: state.myApp.userInfo,
@@ -608,22 +629,21 @@ export const actions = {
    */
   async registerEmail({ commit, state, dispatch }, payload) {
     const auth = getAuth()
-    const email = payload.name + '@ifna.app'
+    // const email = payload.name + '@ifna.app'
+    console.log(payload)
     const res = await createUserWithEmailAndPassword(
       auth,
-      email,
+      payload.email,
       payload.password
     ).catch((error) => {
+      console.log('did i get error?')
       commit('updateIsLoggedIn', false)
       throw error
       // ..
     })
 
-    await commit('initUser', res.user).catch((error) => {
-      commit('updateIsLoggedIn', false)
-      throw error
-      // ..
-    })
+    payload.uid = res.user.uid
+    await commit('initUser', payload)
 
     commit('updateIsLoggedIn', true)
     console.log('login success')
