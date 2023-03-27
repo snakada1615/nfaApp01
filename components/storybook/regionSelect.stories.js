@@ -41,9 +41,17 @@ export default {
       defaultValue: 'Woreda',
     },
     // 個別にコンポーネントのemitイベントを定義する
-    selected: {
-      description: 'emitイベント',
-      action: 'item selected',
+    'update:key1': {
+      description: 'emitイベント:key1更新',
+      action: 'key1 changed',
+    },
+    'update:key2': {
+      description: 'emitイベント:key2更新',
+      action: 'key2 changed',
+    },
+    'update:key3': {
+      description: 'emitイベント:key3更新',
+      action: 'key3 changed',
     },
   },
 }
