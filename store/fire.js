@@ -259,14 +259,18 @@ export const mutations = {
    * @param payload
    */
   updateFamilies(state, payload) {
-    validateDeepObject(payload, FamilySchema)
+    if (Object.keys(payload).length) {
+      validateDeepObject(payload, FamilySchema)
 
-    // objectのためdeep copyを実行
-    // const newArray = payload.map((item) => ({ ...item }))
-
-    // reactivityを担保するためspliceを使用
-    state.myApp.families.splice(0, state.myApp.families.length, ...payload)
+      // reactivityを担保するためspliceを使用
+      state.myApp.families.splice(0, state.myApp.families.length, ...payload)
+    } else {
+      // payload = []の場合は初期値として[]を設定
+      state.myApp.families = []
+    }
   },
+
+  updateCommunities(state, payload) {},
 
   /**
    * 外部データの読み込み時のstatus表示用フラグ
@@ -299,6 +303,9 @@ export const mutations = {
 }
 
 export const actions = {
+  initAll({ commit }) {
+    commit('updateFamilies', [])
+  },
   /**
    * ログイン状態のフラグ更新
    * @param commit
@@ -630,7 +637,6 @@ export const actions = {
   async registerEmail({ commit, state, dispatch }, payload) {
     const auth = getAuth()
     // const email = payload.name + '@ifna.app'
-    console.log(payload)
     const res = await createUserWithEmailAndPassword(
       auth,
       payload.email,
