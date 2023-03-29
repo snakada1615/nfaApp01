@@ -56,6 +56,16 @@ export default {
   },
 }
 
+/*
+const Template = (args, { argTypes }) => ({
+  props: Object.keys(argTypes),
+  components: { RegionSelect },
+  template: `<custom-buttons v-bind="$props" /> `,
+})
+export const SecondTime = Template.bind({})
+SecondTime.args = {}
+*/
+
 export const DefaultRegionSelect = (args, { argTypes }) => ({
   components: { RegionSelect },
   props: Object.keys(argTypes),
