@@ -7,6 +7,7 @@ export default async function ({ store, redirect, route }) {
   // 永続化したログイン情報を取得する
   let user
   const location = route.name
+  console.log(route.name)
 
   user = await store.dispatch('fire/getCurrentLogin').catch((err) => {
     console.error(err)
@@ -15,6 +16,7 @@ export default async function ({ store, redirect, route }) {
 
   // ログイン情報が取得できた場合
   if (user && !!location) {
+    console.log('yes logged in')
     // ログイン状態を更新
     await store.dispatch('fire/updateIsLoggedIn', true)
 
