@@ -1,3 +1,4 @@
+import { action } from '@storybook/addon-actions'
 import fctBox from '~/components/molecules/fctBox'
 export default {
   title: 'NFA-app/molecules/fctBox',
@@ -10,9 +11,14 @@ export default {
       defaultValue: [],
     },
     // 個別にコンポーネントのemitイベントを定義する
-    rowClick: {
+    fctClick: {
       description: 'テーブルの行をクリックした際にその行の情報をemit',
-      action: 'item selected',
+    },
+    fctDblClick: {
+      description: 'テーブルの行をダブルクリックした際にその行の情報をemit',
+    },
+    fctClickPlus: {
+      description: 'テーブルの行の＋をクリックした際にその行の情報をemit',
     },
   },
 }
@@ -64,7 +70,17 @@ const Template = (args) => ({
   setup() {
     return { args }
   },
-  template: '<fctBox v-bind="args" />',
+  template:
+    '<fctBox ' +
+    'v-bind="args" ' +
+    '@fctClick="fctClick" ' +
+    '@fctDblClick="fctDblClick" ' +
+    '@fctClickPlus="fctClickPlus"/>',
+  methods: {
+    fctClick: action('fctClick'),
+    fctDblClick: action('fctDblClick'),
+    fctClickPlus: action('fctClickPlus'),
+  },
 })
 
 export const DefaultFctBox = Template.bind({})

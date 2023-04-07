@@ -1,6 +1,5 @@
 <template>
   <b-container>
-
     <!-- このテーブルで年齢・性別群ごとの対象人数を入力する   -->
     <b-table
       class="jest_table"
@@ -8,7 +7,7 @@
       bordered
       head-row-variant="success"
       table-variant="light"
-      :fixed=true
+      :fixed="true"
       :items="tablePop"
       :fields="fieldDRI"
       :sort-by.sync="sortBy"
@@ -31,14 +30,16 @@
       striped
       bordered
       small
-      :fixed=true
+      :fixed="true"
       head-row-variant="success"
       table-variant="light"
       :items="tableDri"
       :fields="fieldTableDri"
     >
       <template #cell(Value)="data">
-        <span class="text-info">{{ formatNumber(data.value, data.index) }}</span>
+        <span class="text-info">{{
+          formatNumber(data.value, data.index)
+        }}</span>
       </template>
     </b-table>
     KC: KiloCalorie, MC: MegaCalorie, GC: GigaCalorie
@@ -46,7 +47,7 @@
 </template>
 
 <script>
-import {setDigit} from "@/plugins/helper"
+import { setDigit } from '@/plugins/helper'
 
 /**
  * @desc 対象となる年齢、性別、人数を選択することで、当該グループの栄養必要量をemit
@@ -59,8 +60,8 @@ export default {
      */
     target: {
       type: Array,
-      default: () => [{id: 0, count: 1}],
-      required: true
+      default: () => [{ id: 0, count: 1 }],
+      required: true,
     },
     /**
      *  driのデータセット
@@ -78,7 +79,7 @@ export default {
     driItems: {
       type: Array,
       default: () => [],
-      required: true
+      required: true,
     },
     /**
      * target.countの上限値
@@ -94,9 +95,9 @@ export default {
        * 表示用のフィールド定義
        */
       fieldDRI: [
-        {key: 'id', sortable: true, tdClass: 'd-none', thClass: 'd-none'},
-        {key: 'Name', sortable: false},
-        {key: 'number', sortable: false},
+        { key: 'id', sortable: true, tdClass: 'd-none', thClass: 'd-none' },
+        { key: 'Name', sortable: false },
+        { key: 'number', sortable: false },
       ],
       /**
        * sortのためのkey列を定義
@@ -106,8 +107,8 @@ export default {
        * 栄養必要量の合計値を示すテーブルのフィールド定義
        */
       fieldTableDri: [
-        {key: 'Item', sortable: false},
-        {key: 'Value', sortable: false},
+        { key: 'Item', sortable: false },
+        { key: 'Value', sortable: false },
       ],
       /**
        * 最初のテーブルを埋めるデータ（年齢・性別毎の人数）
@@ -126,7 +127,7 @@ export default {
       handler() {
         this.updateAllTable()
       },
-    }
+    },
   },
   methods: {
     /**
@@ -136,6 +137,8 @@ export default {
      * @returns {string|*} 戻り値（テキスト）
      */
     formatNumber(val, index) {
+      console.log(val)
+      console.log(index)
       if (index === 0) {
         return 'mixed'
       }
@@ -150,20 +153,20 @@ export default {
      * @returns {boolean} バリデーション結果
      */
     statusPopulationNumber(val) {
-      return (val >= 0 && val <= this.max)
+      return val >= 0 && val <= this.max
     },
     /**
      * targetプロパティの更新時に内部変数 (tablePop, tableDri)を更新
      */
     updateAllTable() {
       this.tablePop.length = 0
-      this.tablePop = JSON.parse(JSON.stringify(
-        this.updateTablePop(this.driItems, this.target)
-      ))
+      this.tablePop = JSON.parse(
+        JSON.stringify(this.updateTablePop(this.driItems, this.target))
+      )
       this.tableDri.length = 0
-      this.tableDri = JSON.parse(JSON.stringify(
-        this.updateTableDri(this.tablePop)
-      ))
+      this.tableDri = JSON.parse(
+        JSON.stringify(this.updateTableDri(this.tablePop))
+      )
       const res = {}
       this.tableDri.forEach(function (val) {
         res[val.Item] = val.Value
@@ -177,7 +180,7 @@ export default {
       /**
        * 必要栄養量の更新を親コンポーネントに通知
        */
-      this.$emit('changeNutritionValue', {total: res2, target: this.target})
+      this.$emit('changeNutritionValue', { total: res2, target: this.target })
     },
     /**
      * DRIのテーブル（合計値）を更新
@@ -204,12 +207,12 @@ export default {
         result.Fe += Number(value.Fe) * Number(value.number)
       })
       return [
-        {Item: 'target', Value: 'mixed'},
-        {Item: 'Energy', Value: result.En},
-        {Item: 'Protein', Value: result.Pr},
-        {Item: 'Vit_A', Value: result.Va},
-        {Item: 'Iron', Value: result.Fe},
-        {Item: 'id', Value: 0}
+        { Item: 'target', Value: 'mixed' },
+        { Item: 'Energy', Value: result.En },
+        { Item: 'Protein', Value: result.Pr },
+        { Item: 'Vit_A', Value: result.Va },
+        { Item: 'Iron', Value: result.Fe },
+        { Item: 'id', Value: 0 },
       ]
     },
     /**
@@ -221,7 +224,7 @@ export default {
     updateTablePop(driValue, targetValue) {
       return driValue.map(function (driItem) {
         const res = targetValue.filter(
-          item => Number(item.id) === Number(driItem.id)
+          (item) => Number(item.id) === Number(driItem.id)
         )
         driItem.number = res.length ? res[0].count : 0
         return driItem
@@ -240,6 +243,6 @@ export default {
         }
       })
     },
-  }
+  },
 }
 </script>

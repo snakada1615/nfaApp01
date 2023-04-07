@@ -87,6 +87,9 @@
 <script>
 import { foodGroup } from '@/plugins/helper'
 
+/**
+ * 食品成分表を表示し、必要な作物を選択する
+ */
 export default {
   name: 'FctBox',
   props: {
@@ -175,7 +178,7 @@ export default {
     },
     /**
      * テーブルの行をクリックした際にその行の情報をemit
-     * @param record
+     * @event fctClick
      */
     rowClick(record) {
       this.$emit('fctClick', record)
