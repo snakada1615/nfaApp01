@@ -1,0 +1,19 @@
+import { action } from '@storybook/addon-actions'
+import fctSetWeightModal from '~/components/molecules/fctSetWeightModal'
+export default {
+  title: 'NFA-app/molecules/fctSetWeightModal',
+  component: fctSetWeightModal,
+  // 下記のparametersの設定はコンポーネントにあるすべてのemitイベントをロギングすることができます
+  // parameters: { actions: { argTypesRegex: '.*' } },
+  argTypes: {},
+}
+
+const Template = (args) => ({
+  components: { fctSetWeightModal },
+  setup() {
+    return { args }
+  },
+  template: '<fctSetWeightModal ' + 'v-bind="args" />',
+})
+
+export const DefaultFctSetWeightModal = Template.bind({})

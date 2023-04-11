@@ -356,6 +356,7 @@ export function updateDeepObject(newObj, currentObj, schema) {
 
 /**
  * 数字の桁数を３桁に自動調整し、単位を追記して返す
+ * unitkey [0..3]
  * @param val
  * @param unitKey
  * @returns {string}

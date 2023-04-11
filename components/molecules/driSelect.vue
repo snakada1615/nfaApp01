@@ -50,7 +50,8 @@
 import { setDigit } from '@/plugins/helper'
 
 /**
- * @desc 対象となる年齢、性別、人数を選択することで、当該グループの栄養必要量をemit
+ * - 対象となる年齢、性別、人数を設定することで、当該グループの栄養必要量をemit
+ * - todo: driItems, targetを組み合わせたbigTableをcomputed propとして組み込む
  */
 export default {
   props: {
@@ -137,15 +138,13 @@ export default {
      * @returns {string|*} 戻り値（テキスト）
      */
     formatNumber(val, index) {
-      console.log(val)
-      console.log(index)
       if (index === 0) {
         return 'mixed'
       }
       if (index === 5) {
         return val
       }
-      return setDigit(val, index)
+      return setDigit(val, index - 1)
     },
     /**
      * population入力値のバリデーション

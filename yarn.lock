@@ -15754,6 +15754,11 @@ vue-no-ssr@^1.1.1:
   resolved "https://registry.yarnpkg.com/vue-no-ssr/-/vue-no-ssr-1.1.1.tgz#875f3be6fb0ae41568a837f3ac1a80eaa137b998"
   integrity sha512-ZMjqRpWabMPqPc7gIrG0Nw6vRf1+itwf0Itft7LbMXs2g3Zs/NFmevjZGN1x7K3Q95GmIjWbQZTVerxiBxI+0g==
 
+vue-rate-it@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/vue-rate-it/-/vue-rate-it-2.1.0.tgz#4c016aa56a5e2fa3a0e87e2fcd3d8280fea1404e"
+  integrity sha512-shRbwoSuRg+0TfYcWjgNY1Torh7spSYq8UKZk+uUBT2M6yImN5KNWSw6T5sq3DLQwH5xbPNWVYs8Mw89c0jU8A==
+
 vue-router@^3.5.1:
   version "3.6.5"
   resolved "https://registry.yarnpkg.com/vue-router/-/vue-router-3.6.5.tgz#95847d52b9a7e3f1361cb605c8e6441f202afad8"

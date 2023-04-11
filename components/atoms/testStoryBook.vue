@@ -1,19 +1,14 @@
 <template>
   <b-container>
-    Push Meeeeeee!
-    <b-button @click="onClick">push me</b-button>
+    <b-modal id="modalInputWeight"> this is modal </b-modal>
+    <b-button v-b-modal="'modalInputWeight'">Show Modal</b-button>
+    <b-modal id="modalTest1">this is second modal</b-modal>
   </b-container>
 </template>
 
 <script>
 export default {
   name: 'TestStoryBook',
-  methods: {
-    onClick() {
-      this.$emit('clickedEmit', true)
-      alert('clicked')
-    },
-  },
 }
 </script>
 

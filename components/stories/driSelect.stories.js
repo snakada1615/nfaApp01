@@ -11,7 +11,10 @@ export default {
   argTypes: {
     // 個別にコンポーネントのemitイベントを定義する
     'update:target': {
-      description: 'テーブルの行をクリックした際にその行の情報をemit',
+      description: '対象人数の変更を親コンポーネントに通知',
+    },
+    changeNutritionValue: {
+      description: '必要栄養素量の変更を親コンポーネントに通知',
     },
   },
 }
@@ -59,9 +62,11 @@ const Template = (args) => ({
     '<driSelect ' +
     'v-bind="args" ' +
     '@update:target="updateNewFamily" ' +
+    '@changeNutritionValue="changeNutritionValue"' +
     '/>',
   methods: {
-    updateNewFamily: action('updateNewFamily'),
+    updateNewFamily: action('update　family　member'),
+    changeNutritionValue: action('update　nutrition target'),
   },
 })
 

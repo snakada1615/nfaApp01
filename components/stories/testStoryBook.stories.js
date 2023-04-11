@@ -8,12 +8,7 @@ export default {
   // parameters: { actions: { argTypesRegex: '.*' } },
   argTypes: {
     // 個別にコンポーネントのemitイベントを定義する
-    onClick: {},
   },
-}
-
-export const actionsData = {
-  onClick: action('pin-task'),
 }
 
 const Template = (args) => ({
@@ -21,8 +16,15 @@ const Template = (args) => ({
   setup() {
     return { args }
   },
-  template: '<testStoryBook @clickedEmit="onClick" v-bind="args" />',
-  methods: { onClick: action('click-b') },
+  template:
+    '<div><b-button @click="halo">yes</b-button><testStoryBook v-bind="args" /></div>',
+  methods: {
+    onClick: action('update　family　member'),
+    halo() {
+      this.$bvModal.show('modalTest1')
+    },
+  },
 })
 
 export const DefaultTestStoryBook = Template.bind({})
+DefaultTestStoryBook.args = {}

@@ -148,12 +148,12 @@
 </template>
 
 <script>
+/**
+ * foodModal
+ *- fctTableから行の値を受け取ってmodalに表示する
+ *- ユーザーが入力したweight値をOkクリック時にemit
+ */
 export default {
-  /**
-   * foodModal
-   *     fctTableから行の値を受け取ってmodalに表示する
-   *     ユーザーが入力したweight値をOkクリック時にemit
-   */
   props: {
     /**
      * modalに表示するデータarray of object、
@@ -193,6 +193,9 @@ export default {
       type: String,
       required: true,
     },
+    /**
+     * 典型的なメニュー名称
+     */
     typicalMenu: {
       type: Array,
       default: () => [
@@ -268,6 +271,29 @@ export default {
        * 食材の重さの入力値:portionの単位量
        */
       portionSize: 0,
+      /**
+       * portionUnitの初期値
+       */
+      defaultPortions: [
+        {
+          FCT_id: '0',
+          id: '999',
+          count_method: 'ton',
+          unit_weight: 1000000,
+        },
+        {
+          FCT_id: '0',
+          id: '998',
+          count_method: 'Kg',
+          unit_weight: 1000,
+        },
+        {
+          FCT_id: '0',
+          id: '997',
+          count_method: 'gram',
+          unit_weight: 1,
+        },
+      ],
     }
   },
   computed: {
@@ -300,51 +326,15 @@ export default {
      */
     portionList() {
       const vm = this
-      if (vm.selectedItem === '') {
-        return [
-          {
-            FCT_id: '0',
-            id: '999',
-            count_method: 'ton',
-            unit_weight: 1000000,
-          },
-          {
-            FCT_id: '0',
-            id: '998',
-            count_method: 'Kg',
-            unit_weight: 1000,
-          },
-          {
-            FCT_id: '0',
-            id: '997',
-            count_method: 'gram',
-            unit_weight: 1,
-          },
-        ]
+      // if (vm.fctItems.length === 0 || vm.selectedItem === '') {
+      // portionUnit=[] または品目が選択されていない場合には初期値を返す
+      if (Object.keys(vm.portionUnits).length === 0 || vm.selectedItem === '') {
+        return [...vm.defaultPortions]
       }
-      const res = this.portionUnits.filter((dat) => {
+      const res = vm.portionUnits.filter((dat) => {
         return dat.FCT_id === vm.selectedItem.id
       })
-      res.push(
-        {
-          FCT_id: '0',
-          id: '999',
-          count_method: 'ton',
-          unit_weight: 1000000,
-        },
-        {
-          FCT_id: '0',
-          id: '998',
-          count_method: 'Kg',
-          unit_weight: 1000,
-        },
-        {
-          FCT_id: '0',
-          id: '997',
-          count_method: 'gram',
-          unit_weight: 1,
-        }
-      )
+      res.push(...vm.defaultPortions)
       return res
     },
     /**
@@ -379,31 +369,6 @@ export default {
           : '/img/crops/no_image.png'
         this.portionSize = item[0].unit_weight
       }
-    },
-    setDigit(item, unitKey) {
-      let res = ''
-      const units = [
-        { 1: ' g', 2: ' kg', 3: ' t' },
-        { 1: ' µg', 2: ' mg', 3: ' g' },
-        { 1: ' mg', 2: ' g', 3: ' kt' },
-        { 1: ' KC', 2: ' MC', 3: ' GC' },
-      ]
-      switch (true) {
-        case item < 1000:
-          res = String(item) + units[unitKey]['1']
-          break
-        case item >= 1000 && item < 1000000:
-          res = String(Math.round(item / 1000)) + units[unitKey]['2']
-          break
-        case item >= 1000000:
-          res = String(Math.round(item / 1000000)) + units[unitKey]['3']
-          break
-        default:
-          console.error('parameter not valid:setDigit')
-          res = ''
-          break
-      }
-      return res
     },
     /**
      * テーブル内の要素（items）と入力されたWtを一つのObjectに合成して返す
