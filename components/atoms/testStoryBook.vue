@@ -1,14 +1,34 @@
 <template>
   <b-container>
-    <b-modal id="modalInputWeight"> this is modal </b-modal>
-    <b-button v-b-modal="'modalInputWeight'">Show Modal</b-button>
-    <b-modal id="modalTest1">this is second modal</b-modal>
+    {{ myFamily }}
   </b-container>
 </template>
 
 <script>
+import { arrayValidator, objectValidator } from 'vue-props-validation'
+
 export default {
   name: 'TestStoryBook',
+  props: {
+    myFamily: {
+      type: Array,
+      required: true,
+      validator: arrayValidator({
+        type: Object,
+        validator: objectValidator({
+          id: [String, Number],
+          name: { type: String, required: true },
+          age: Number,
+          isCat: Boolean,
+          vaccinationDates: {
+            type: Array,
+            required: false,
+            validator: arrayValidator([Date, String, Number]),
+          },
+        }),
+      }),
+    },
+  },
 }
 </script>
 

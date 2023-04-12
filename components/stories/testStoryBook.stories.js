@@ -1,4 +1,3 @@
-import { action } from '@storybook/addon-actions'
 import testStoryBook from '~/components/atoms/testStoryBook'
 
 export default {
@@ -11,20 +10,18 @@ export default {
   },
 }
 
+// const myFamily = ['mari', 'yuto', 'moe']
+const myFamily = 'nakaniwa'
+
 const Template = (args) => ({
   components: { testStoryBook },
   setup() {
     return { args }
   },
-  template:
-    '<div><b-button @click="halo">yes</b-button><testStoryBook v-bind="args" /></div>',
-  methods: {
-    onClick: action('update　family　member'),
-    halo() {
-      this.$bvModal.show('modalTest1')
-    },
-  },
+  template: '<testStoryBook v-bind="args" />',
 })
 
 export const DefaultTestStoryBook = Template.bind({})
-DefaultTestStoryBook.args = {}
+DefaultTestStoryBook.args = {
+  myFamily,
+}

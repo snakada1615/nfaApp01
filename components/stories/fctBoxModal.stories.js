@@ -25,14 +25,11 @@ const Template = (args) => ({
     openModal() {
       this.$bvModal.show('fctBoxModal')
     },
-    updateMenuCase(val) {
-      menu = val
-      action('updateMenu')
-    },
+    updateMenuCase: action('updateMenu'),
   },
 })
 
-let menu = JSON.parse(
+const menu = JSON.parse(
   JSON.stringify(recipeTableStories.DefaultRecipeTable.args.items)
 )
 

@@ -464,7 +464,6 @@ export default {
      */
     addItem(result) {
       const vm = this
-      console.log(result)
 
       let res = []
       let addNew = true
@@ -472,9 +471,9 @@ export default {
         // もし既存データとidおよび食事名が一致した場合には追加ではなく既存の値を変更
         if (
           item.cropInfo.id === result.cropInfo.id &&
-          item.menuName === result.menuName
+          item.foodName === result.menuName
         ) {
-          item.Wt = Number(result.weight)
+          item.Wt = Number(result.Wt)
           addNew = false
         }
         return item

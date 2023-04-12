@@ -9,41 +9,15 @@
           class="my-2"
         >
           <template #header>
-            <div class="font-weight-bold">Family information</div>
+            <div class="font-weight-bold">Add diet information</div>
           </template>
-          <b-input-group v-if="!hideCaseInfo" prepend="select" class="mb-2">
-            <b-form-select
-              v-model="pageIdComputed"
-              :options="pageOptions"
-              :state="stateFamilyNameSelection"
-              aria-describedby="invalid-familyName"
-            />
-            <b-input-group-append>
-              <b-button @click="$bvModal.show('nameInputBox')">
-                change name
-              </b-button>
-            </b-input-group-append>
-            <!-- This will only be shown if the preceding input has an invalid state -->
-            <b-form-invalid-feedback id="invalid-familyName">
-              please change family name
-            </b-form-invalid-feedback>
-          </b-input-group>
-
-          <input-box
-            modal-name="nameInputBox"
-            title="Set family name"
-            label="Input family name"
-            :text-input.sync="pageMemo[pageIdComputed]"
-            @update:textInput="
-              updatePageMemo(pageMemo[pageIdComputed], pageIdComputed)
-            "
-          />
 
           <b-button variant="info" @click="showFct = !showFct">
             add crop
           </b-button>
         </b-card>
       </b-col>
+
       <b-col cols="12" lg="6">
         <b-card
           header-bg-variant="success"
@@ -67,6 +41,7 @@
           </div>
         </b-card>
       </b-col>
+
       <b-col cols="12" lg="6">
         <b-card
           header-bg-variant="success"
@@ -130,7 +105,8 @@
         </b-card>
       </b-col>
     </b-row>
-    <fct-box
+
+    <fct-box-modal
       :show-modal.sync="showFct"
       :items="myFct"
       :menu-cases.sync="currentMenu[pageIdComputed]"
@@ -141,6 +117,7 @@
 </template>
 
 <script>
+import objectValidator from 'vue-props-validation'
 import {
   getNutritionSupplyList,
   validateMyFamily,
@@ -151,14 +128,12 @@ import {
 } from '@/plugins/helper'
 import recipeTable from '@/components/molecules/recipeTable'
 import nutritionBar from '@/components/molecules/nutritionBar'
-import fctBox from '@/components/molecules/fctBox'
-import inputBox from '@/components/atoms/inputBox'
+import fctBoxModal from '@/components/molecules/fctBoxModal'
+import diversityTable from '@/components/atoms/diversityTable'
 
 /**
- * @desc 4つのコンポーネントを組み合わせて食事評価
- * 1. FctTableModal
- *    利用する品目の選択→栄養供給量の決定
- * 2. foodModal
+ * @desc 3つのコンポーネントを組み合わせて食事評価
+ * 2. foodBoxModal
  *    利用する品目の摂取量決定→栄養供給量の決定
  * 3. recipeTable
  *    選択された品目一覧を示す
@@ -166,13 +141,12 @@ import inputBox from '@/components/atoms/inputBox'
  *    栄養素の充足状況をバーチャートで示す
  *
  */
-
 export default {
   components: {
     recipeTable,
     nutritionBar,
-    fctBox,
-    inputBox,
+    fctBoxModal,
+    diversityTable,
   },
   props: {
     myFamily: {

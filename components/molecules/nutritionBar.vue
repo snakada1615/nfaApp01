@@ -9,7 +9,7 @@
       </b-col>
       <b-col :cols="colWidthThird" class="px-0 d-flex justify-content-center">
         <fa-rating
-          v-model="rating"
+          :rating="rating"
           :glyph="myicon"
           :item-size="20"
           :spacing="-5"
@@ -23,7 +23,7 @@
         >
         </fa-rating>
         <div v-show="showReset" class="mx-2">
-          <a href="#" @click.prevent="rating = 0">Reset</a>
+          <b-button size="sm" @click="resetRating">Reset</b-button>
         </div>
       </b-col>
       <b-col :cols="colWidthFourth" class="px-0 d-flex justify-content-start">
@@ -178,6 +178,8 @@ export default {
     },
     /**
      * rating表示用のアイコンの設定
+     * 現在は未使用
+     *
      * @param index
      */
     setIcon(index) {
@@ -186,15 +188,18 @@ export default {
           this.myicon = navicon
           break
         case 2:
-          this.myicon = apple
+          this.myicon = navicon
           break
         case 3:
-          this.myicon = ThumbsUp
+          this.myicon = navicon
           break
         default:
           this.myicon = navicon
           break
       }
+    },
+    resetRating() {
+      this.$emit('update:rating', 0)
     },
   },
 }
