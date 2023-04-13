@@ -11,7 +11,7 @@ export default {
 }
 
 // const myFamily = ['mari', 'yuto', 'moe']
-const myFamily = 'nakaniwa'
+const myFamily = { name: 'nakaniwa', age: 'fained' }
 
 const Template = (args) => ({
   components: { testStoryBook },
