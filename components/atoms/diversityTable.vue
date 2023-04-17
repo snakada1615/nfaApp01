@@ -23,6 +23,8 @@
 </template>
 
 <script>
+import { objectValidator, arrayValidator } from 'vue-props-validation'
+
 /**
  * - 食の多様性を食べた食品群（緑）、食べていない食品群（黄）で色分けして表示
  */
@@ -34,6 +36,13 @@ export default {
      */
     diversityStatus: {
       type: Array,
+      validate: arrayValidator({
+        type: Object,
+        validate: objectValidator({
+          name: String,
+          status: Boolean,
+        }),
+      }),
       required: true,
     },
   },

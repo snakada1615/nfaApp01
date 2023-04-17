@@ -1,6 +1,7 @@
 <template>
   <b-container>
     <b-row class="my-2">
+      <!-- 作物追加用のボタン  -->
       <b-col cols="12" lg="6">
         <b-card
           header-bg-variant="success"
@@ -18,30 +19,12 @@
         </b-card>
       </b-col>
 
+      <!-- 作物多様化状態の表示 -->
       <b-col cols="12" lg="6">
-        <b-card
-          header-bg-variant="success"
-          border-variant="success"
-          bg-variant="light"
-          class="my-2"
-        >
-          <template #header>
-            <div class="font-weight-bold">Dietary diversity</div>
-          </template>
-          <div
-            v-for="(grp, index) in foodGroup"
-            :key="index"
-            class="border my-1 px-1"
-            :class="{
-              'bg-warning': !diversityStatus[pageIdComputed][index][grp],
-              'bg-success': diversityStatus[pageIdComputed][index][grp],
-            }"
-          >
-            {{ grp }}
-          </div>
-        </b-card>
+        <diversity-table diversity-status="diversityStatus" />
       </b-col>
 
+      <!-- Nutrition barの表示 -->
       <b-col cols="12" lg="6">
         <b-card
           header-bg-variant="success"
@@ -87,6 +70,8 @@
           </b-row>
         </b-card>
       </b-col>
+
+      <!-- recepi-tableの表示 -->
       <b-col cols="12" lg="6">
         <b-card
           header-bg-variant="success"
@@ -106,6 +91,7 @@
       </b-col>
     </b-row>
 
+    <!-- 食事入力用のダイアログ -->
     <fct-box-modal
       :show-modal.sync="showFct"
       :items="myFct"
@@ -117,10 +103,9 @@
 </template>
 
 <script>
-import objectValidator from 'vue-props-validation'
+import { objectValidator, arrayValidator } from 'vue-props-validation'
 import {
   getNutritionSupplyList,
-  validateMyFamily,
   getNutritionDemandList,
   updatePfc,
   getPfcScale,
@@ -152,13 +137,47 @@ export default {
     myFamily: {
       type: Object,
       required: true,
-      validator(value) {
-        return validateMyFamily(value)
-      },
+      validator: objectValidator({
+        note: String,
+        familyStructure: {
+          type: Array,
+          validator: arrayValidator({
+            type: Object,
+            validator: objectValidator({
+              count: Number,
+              id: String,
+            }),
+          }),
+        },
+        menuCases: {
+          type: Array,
+          validator: arrayValidator({
+            type: Object,
+            validator: objectValidator({
+              date: String,
+              cropInfo: {},
+              Wt: Number,
+              foodName: String,
+            }),
+          }),
+        },
+      }),
     },
     myDri: {
       type: Array,
       required: true,
+      validator: arrayValidator({
+        type: Object,
+        validator: objectValidator({
+          id: String,
+          name: String,
+          En: Number,
+          Pr: Number,
+          Va: Number,
+          Fe: Number,
+          max_vol: Number,
+        }),
+      }),
     },
     myFct: {
       type: Array,
