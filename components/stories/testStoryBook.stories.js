@@ -7,6 +7,7 @@ export default {
   // parameters: { actions: { argTypesRegex: '.*' } },
   argTypes: {
     // 個別にコンポーネントのemitイベントを定義する
+    // test
   },
 }
 
