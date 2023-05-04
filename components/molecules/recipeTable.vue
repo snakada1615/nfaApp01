@@ -144,10 +144,6 @@ export default {
       type: Array,
       required: true,
     },
-    dummyDrawFlag: {
-      type: Number,
-      default: 0,
-    },
   },
   data() {
     return {
