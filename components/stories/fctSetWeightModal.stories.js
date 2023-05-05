@@ -12,14 +12,14 @@ const weight = 0
 const name = 'modal01'
 const menuName = 'tendon'
 const items = {
-  Carbohydrate: '67.9',
-  En: '315',
-  Fe: '1.9',
-  Fat: '0.4',
+  Carbohydrate: 67.9,
+  En: 315,
+  Fe: 1.9,
+  Pr: 3.4,
+  Va: '',
+  Fat: 0.4,
   Food_grp: 'Starchy roots, tubers and their products',
   Name: 'Yam tuber, flour',
-  Pr: '3.4',
-  Va: '',
   Group: 'Grains, roots and tubers',
   food_grp_id: '2',
   id: '110',

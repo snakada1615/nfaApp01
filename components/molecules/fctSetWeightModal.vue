@@ -148,6 +148,8 @@
 </template>
 
 <script>
+import { objectValidator } from 'vue-props-validation'
+
 /**
  * foodModal
  *- fctTableから行の値を受け取ってmodalに表示する
@@ -171,6 +173,15 @@ export default {
     selectedItem: {
       type: Object,
       required: true,
+      validator: objectValidator({
+        En: Number,
+        Fe: Number,
+        Pr: Number,
+        Va: Number,
+        Name: String,
+        Group: String,
+        id: String,
+      }),
     },
     /**
      * portion換算用の変換表

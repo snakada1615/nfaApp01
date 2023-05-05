@@ -80,7 +80,7 @@
         <!-- A custom formatted cell for field 'foodName' -->
         <template #cell(foodName)="data">
           <span style="font-size: small">
-            <!-- 'new'と表記されている場合に「!」マークを表示-->
+            <!-- [new]と表記されている場合に「!」マークを表示-->
             <b-icon
               v-if="addExclamation(data.value)"
               icon="exclamation-circle"
@@ -129,6 +129,7 @@
 </template>
 
 <script>
+import { arrayValidator, objectValidator } from 'vue-props-validation'
 import { setDigit } from '@/plugins/helper'
 
 /**
@@ -138,11 +139,20 @@ import { setDigit } from '@/plugins/helper'
 export default {
   props: {
     /**
-     * 食品名及び栄養成分の一覧を含む配列
+     * 対象家庭で摂取した食品名及び栄養成分の一覧
      */
-    items: {
+    recipe: {
       type: Array,
       required: true,
+      validator: arrayValidator({
+        type: Object,
+        validator: objectValidator({
+          date: String,
+          cropInfo: {},
+          Wt: Number,
+          foodName: String,
+        }),
+      }),
     },
   },
   data() {
@@ -199,10 +209,10 @@ export default {
      */
     itemWeightedCompute: {
       get() {
-        if (this.items.length === 0) {
+        if (this.recipe.length === 0) {
           return []
         }
-        return this.updateItemWeight(this.items)
+        return this.updateItemWeight(this.recipe)
       },
     },
     /**
@@ -276,7 +286,7 @@ export default {
      * @param id
      */
     delItem(id) {
-      const res = this.items.filter((item, index) => index !== id)
+      const res = this.recipe.filter((item, index) => index !== id)
       this.$emit('itemDeleted', res)
     },
     editItem(val) {

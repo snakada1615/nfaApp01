@@ -29,6 +29,23 @@ const myFamily = [
   },
 ]
 
+const wrongFamiy = [
+  {
+    id: 8,
+    name: 'nakaniwa',
+    age: 'hisotries',
+    isCat: false,
+    vaccinationDates: ['hotel', 7, 'hop'],
+  },
+  {
+    id: 32,
+    name: 'hong',
+    age: 5,
+    isCat: true,
+    vaccinationDates: [22, 17, 9],
+  },
+]
+
 const Template = (args) => ({
   components: { testStoryBook },
   setup() {
@@ -38,6 +55,10 @@ const Template = (args) => ({
 })
 
 export const DefaultTestStoryBook = Template.bind({})
+export const WrongTestStoryBook = Template.bind({})
 DefaultTestStoryBook.args = {
   myFamily,
+}
+WrongTestStoryBook.args = {
+  myFamily: wrongFamiy,
 }

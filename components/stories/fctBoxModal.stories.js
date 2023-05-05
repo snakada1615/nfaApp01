@@ -18,7 +18,7 @@ const Template = (args) => ({
   },
   template:
     '<div><b-button variant="primary" @click="openModal">open Modal</b-button>' +
-    '<fctBoxModal @update:menuCases="updateMenuCase"' +
+    '<fctBoxModal @update:menuCases="updateMenuCase" ' +
     'v-bind="args" />' +
     '</div>',
   methods: {
@@ -29,15 +29,11 @@ const Template = (args) => ({
   },
 })
 
-const menu = JSON.parse(
-  JSON.stringify(recipeTableStories.DefaultRecipeTable.args.items)
-)
-
 export const DefaultFctBoxModal = Template.bind({})
 DefaultFctBoxModal.args = {
   myName: 'fctBoxModal',
   fctItems: fctBoxStories.DefaultFctBox.args.items,
-  menuCases: menu,
+  recipe: recipeTableStories.DefaultRecipeTable.args.recipe,
   portionUnits: {},
   showModal: false,
 }

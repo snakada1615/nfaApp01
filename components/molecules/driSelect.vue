@@ -47,6 +47,7 @@
 </template>
 
 <script>
+import { arrayValidator, objectValidator } from 'vue-props-validation'
 import { setDigit } from '@/plugins/helper'
 
 /**
@@ -61,8 +62,14 @@ export default {
      */
     target: {
       type: Array,
-      default: () => [{ id: 0, count: 1 }],
       required: true,
+      validator: arrayValidator({
+        type: Object,
+        validator: objectValidator({
+          id: String,
+          count: Number,
+        }),
+      }),
     },
     /**
      *  driのデータセット
@@ -81,6 +88,17 @@ export default {
       type: Array,
       default: () => [],
       required: true,
+      validator: arrayValidator({
+        type: Object,
+        validator: objectValidator({
+          id: String,
+          En: Number,
+          Pr: Number,
+          Va: Number,
+          max_vol: Number,
+          Name: String,
+        }),
+      }),
     },
     /**
      * target.countの上限値

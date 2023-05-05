@@ -137,7 +137,7 @@
       <b-card class="mb-2" border-variant="success">
         <span class="font-weight-bold text-primary">diet record</span>
         <recipe-table
-          :items="menuCases"
+          :recipe="recipe"
           head-row-variant="success"
           @itemDeleted="deleteSupply"
           @rowClick="onRecipeClicked"
@@ -159,6 +159,7 @@
 </template>
 
 <script>
+import { arrayValidator, objectValidator } from 'vue-props-validation'
 import fctBox from '@/components/molecules/fctBox'
 import recipeTable from '@/components/molecules/recipeTable'
 import FctSetWeightModal from '@/components/molecules/fctSetWeightModal'
@@ -198,9 +199,25 @@ export default {
     fctItems: {
       type: Array,
       required: true,
+      validator: arrayValidator({
+        type: Object,
+        validator: objectValidator({
+          Carbohydrate: Number,
+          En: Number,
+          Fe: Number,
+          Fat: Number,
+          Food_grp: String,
+          Name: String,
+          Pr: Number,
+          Va: Number,
+          Group: String,
+          food_grp_id: String,
+          id: String,
+        }),
+      }),
     },
     /**
-     * menuテーブル用のデータ
+     * 対象家庭で摂取した食品名及び栄養成分の一覧
      *   {
      *     foodName: 'hiru-gohan',
      *     Wt: 54,
@@ -219,9 +236,18 @@ export default {
      *     },
      *  },
      */
-    menuCases: {
+    recipe: {
       type: Array,
       required: true,
+      validator: arrayValidator({
+        type: Object,
+        validator: objectValidator({
+          date: String,
+          cropInfo: {},
+          Wt: Number,
+          foodName: String,
+        }),
+      }),
     },
     /**
      * portion換算用の変換表

@@ -85,6 +85,7 @@
 </template>
 
 <script>
+import { arrayValidator, objectValidator } from 'vue-props-validation'
 import { foodGroup } from '@/plugins/helper'
 
 /**
@@ -99,6 +100,22 @@ export default {
     items: {
       type: Array,
       required: true,
+      validator: arrayValidator({
+        type: Object,
+        validator: objectValidator({
+          Carbohydrate: Number,
+          En: Number,
+          Fe: Number,
+          Fat: Number,
+          Food_grp: String,
+          Name: String,
+          Pr: Number,
+          Va: Number,
+          Group: String,
+          food_grp_id: String,
+          id: String,
+        }),
+      }),
     },
   },
   data() {

@@ -1,6 +1,6 @@
 // import { action } from '@storybook/addon-actions'
 import dietEvaluation from '@/components/organisms/dietEvaluation'
-import recipeTableStories from '@/components/stories/recipeTable.stories'
+import * as recipeTableStories from '@/components/stories/recipeTable.stories'
 export default {
   title: 'NFA-app/organisms/dietEvaluation',
   component: dietEvaluation,
@@ -17,7 +17,7 @@ const Template = (args) => ({
   template: '<diet-evaluation ' + 'v-bind="args" />',
 })
 
-export const DefaultRecipeTable = Template.bind({})
-DefaultRecipeTable.args = {
-  recipe: recipeTableStories.default.items,
+export const DefaultDietEvaluation = Template.bind({})
+DefaultDietEvaluation.args = {
+  recipe: recipeTableStories.DefaultRecipeTable.args.items,
 }
