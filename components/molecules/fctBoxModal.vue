@@ -255,6 +255,15 @@ export default {
     portionUnits: {
       type: Array,
       required: true,
+      validator: arrayValidator({
+        type: Object,
+        validator: objectValidator({
+          id: String,
+          FCT_id: String,
+          count_method: String,
+          unit_weight: Number,
+        }),
+      }),
     },
     /**
      * モーダルの表示用トリガー
@@ -461,11 +470,11 @@ export default {
       this.selectedItem = JSON.parse(JSON.stringify(rec))
     },
     /**
-     * 最終結果(menuCases)をemit
+     * 最終結果(recipe)をemit
      */
     clickOk() {
       const vm = this
-      vm.$emit('modalOk', vm.menuCases)
+      vm.$emit('modalOk', vm.recipe)
       // データをクリアして入力用ダイアログを閉じる
       vm.selectedItem = ''
       vm.portionCount = 0
@@ -486,14 +495,14 @@ export default {
       vm.showInputModal = false
     },
     /**
-     * 入力ダイアログの内容をselectedItemに追記して、menuCasesの配列に追加後、更新のためemit
+     * 入力ダイアログの内容をselectedItemに追記して、recipeの配列に追加後、更新のためemit
      */
     addItem(result) {
       const vm = this
 
       let res = []
       let addNew = true
-      res = vm.menuCases.map((item) => {
+      res = vm.recipe.map((item) => {
         // もし既存データとidおよび食事名が一致した場合には追加ではなく既存の値を変更
         if (
           item.cropInfo.id === result.cropInfo.id &&
@@ -512,7 +521,7 @@ export default {
       }
 
       // 更新した値をemit
-      this.$emit('update:menuCases', res)
+      this.$emit('update:recipe', res)
 
       // データをクリアして入力用ダイアログを閉じる
       vm.selectedItem = ''
@@ -523,12 +532,12 @@ export default {
     },
     /**
      * recipeTableの削除ボタンをクリックした際に
-     *     削除後の値をemitしてmenuCasesを更新
+     *     削除後の値をemitしてrecipeを更新
      * @param val
      */
     deleteSupply(val) {
       // 更新した値をemit
-      this.$emit('update:menuCases', val)
+      this.$emit('update:recipe', val)
     },
     /**
      * recipeTableの行をクリックした場合に、その行の内容を

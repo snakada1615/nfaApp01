@@ -6,15 +6,8 @@ import {
   signInWithEmailAndPassword,
   signOut,
 } from 'firebase/auth'
-import {
-  DietSchema,
-  familyMemberSchema,
-  FamilySchema,
-  initObject,
-  SingleFamilySchema,
-} from '../plugins/helper'
 import { fireSaveDoc, fireGetDoc } from '@/plugins/firebasePlugin'
-import { foodGroup, validateDeepObject } from '@/plugins/helper'
+import { foodGroup } from '@/plugins/helper'
 
 // /////////////////////////////////////////////////////////////
 // ////////////////// ここからstore定義 ///////////////////////////
@@ -98,7 +91,6 @@ export const getters = {
   },
   surveyDateList(state) {
     // let errPath
-    // validateDeepObject(state.families, FamilySchema, errPath)
     const resObject = {}
     state.myApp.families.forEach((item) => {
       const res = []
@@ -225,14 +217,12 @@ export const mutations = {
     if (state.myApp.families.find((item) => item.name === payload)) {
       throw new Error('family name duplication')
     }
-    // memberの型チェック:失敗したらerror
-    validateDeepObject(payload.member, familyMemberSchema)
 
     // payloadを初期値として含むnewFamilyを初期化
-    const newFamily = initObject(payload, SingleFamilySchema)
+    // const newFamily = initObject(payload, SingleFamilySchema)
 
     // newFamilyの値をfamiliesに追加
-    state.myApp.families.splice(state.myApp.families.length, 0, newFamily)
+    state.myApp.families.splice(state.myApp.families.length, 0, payload)
   },
 
   /**
@@ -246,10 +236,6 @@ export const mutations = {
       throw new TypeError('error.typeError')
     }
 
-    // 型チェック:失敗したらerror
-    let errPath
-    validateDeepObject(payload.diet, DietSchema, errPath)
-
     state.myApp.families[payload.name].diet = Object.assign({}, payload.diet)
   },
 
@@ -259,8 +245,6 @@ export const mutations = {
    * @param payload
    */
   updateFamilies(state, payload) {
-    validateDeepObject(payload, FamilySchema)
-
     // objectのためdeep copyを実行
     // const newArray = payload.map((item) => ({ ...item }))
 

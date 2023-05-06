@@ -6,352 +6,108 @@
 // ////////////////// ここからschema定義 ///////////////////////////
 // ///////////////////////////////////////////////////////////////
 
-export const fctSchema = [
-  {
-    Group: String,
-    Name: String,
-    food_grp_id: String,
-    id: String,
-    En: Number,
-    Pr: Number,
-    Fe: Number,
-    Va: Number,
-    Carbohydrate: Number,
-    Fat: Number,
-  },
-]
-
-export const driSchema = [
-  {
-    Name: String,
-    id: String,
-    En: Number,
-    Pr: Number,
-    Fe: Number,
-    Va: Number,
-    max_vol: Number,
-  },
-]
-
-export const countrySchema = [
-  {
-    Country: String,
-    'Country Code': String,
-  },
-]
-
-export const regionSchema = [
-  {
-    region1: String,
-    region2: String,
-    region3: String,
-  },
-]
-
-export const FamilySchema = [
-  {
-    name: String,
-    member: [
-      {
-        id: String,
-        name: String,
-        number: Number,
-      },
-    ],
-    diet: [
-      {
-        date: Date,
-        foodName: String,
-        Wt: Number,
-        cropInfo: {
-          Group: String,
-          Name: String,
-          food_grp_id: String,
-          id: String,
-          En: Number,
-          Pr: Number,
-          Fe: Number,
-          Va: Number,
-          Carbohydrate: Number,
-          Fat: Number,
-        },
-      },
-    ],
-    recommendedCrops: [
-      {
-        month: String,
-        keyNutrient: String,
-        weight: Number,
-        share: Number,
-        cropInfo: {
-          Group: String,
-          Name: String,
-          food_grp_id: String,
-          id: String,
-          En: Number,
-          Pr: Number,
-          Fe: Number,
-          Va: Number,
-          Carbohydrate: Number,
-          Fat: Number,
-        },
-        feasibilityScore: [Number],
-      },
-    ],
-  },
-]
-
-export const SingleFamilySchema = {
-  name: String,
-  member: [
-    {
-      id: String,
-      name: String,
-      number: Number,
-    },
-  ],
-  diet: [
-    {
-      date: Date,
-      foodName: String,
-      Wt: Number,
-      cropInfo: {
-        Group: String,
-        Name: String,
-        food_grp_id: String,
-        id: String,
-        En: Number,
-        Pr: Number,
-        Fe: Number,
-        Va: Number,
-        Carbohydrate: Number,
-        Fat: Number,
-      },
-    },
-  ],
-  recommendedCrops: [
-    {
-      month: String,
-      keyNutrient: String,
-      weight: Number,
-      share: Number,
-      cropInfo: {
-        Group: String,
-        Name: String,
-        food_grp_id: String,
-        id: String,
-        En: Number,
-        Pr: Number,
-        Fe: Number,
-        Va: Number,
-        Carbohydrate: Number,
-        Fat: Number,
-      },
-      feasibilityScore: [Number],
-    },
-  ],
-}
-
-export const DietSchema = [
-  {
-    date: String,
-    foodName: String,
-    Wt: Number,
-    cropInfo: {
-      Group: String,
-      Name: String,
-      food_grp_id: String,
-      id: String,
-      En: Number,
-      Pr: Number,
-      Fe: Number,
-      Va: Number,
-      Carbohydrate: Number,
-      Fat: Number,
-    },
-  },
-]
-
-export const familyMemberSchema = [
-  {
-    id: String,
-    name: String,
-    number: Number,
-  },
-]
-
 // **************************************************************************
 // ***** こちらは共通関数の定義 *************************************************
 // **************************************************************************
-
 /**
- * Object validation
- *     Objectであるかどうかチェック
- * @param item 検査対象の変数
- * @returns {boolean}
+ * menuCasesに含まれるfood Groupから、何種類の食品群が含まれるか判定
+ * @returns {*[]}
  */
-export function isObject(item) {
-  return typeof item === 'object' && item !== null && !Array.isArray(item)
-}
-
-/**
- * nested Objectの型チェック
- * @param obj チェックするターゲット
- * @param schema 型定義のためのスキーマ
- * @param path どこで問題があったかを示す
- * @returns {boolean}
- */
-export function validateDeepObject(obj, schema, path = '') {
-  let ok
-
-  if (obj == null) ok = obj === schema
-  else if (typeof schema === 'function') {
-    ok = obj.constructor === schema
-  } else if (typeof obj !== 'object') ok = obj === schema
-  else if (Array.isArray(schema))
-    ok =
-      Array.isArray(obj) &&
-      obj.every((x, k) =>
-        validateDeepObject(x, schema[0], path + '[' + k + ']')
-      )
-  else {
-    const ko = Object.keys(obj)
-    const ks = Object.keys(schema)
-    ok =
-      ko.length === ks.length &&
-      ks.every((k) => validateDeepObject(obj[k], schema[k], path + '.' + k))
-  }
-  if (!ok) throw new TypeError('Wrong parameter in ' + path)
-  return true
-}
-
-// example usage:
-/*
-const OBJECT_SCHEMA = {
-  name: String,
-  data: [{
-    isSelected: Boolean,
-    mId: String,
-    omnReplaceDict: {
-      id: String,
-      text: {
-        deepObj: {
-          deepProp: [Number]
-        }
-
-      },
-    },
-  }],
-};
-
-const obj = {
-  name: "foo",
-  data: [{
-    isSelected: true,
-    mId: "bar",
-    omnReplaceDict: {
-      id: "foo",
-      text: {
-        deepObj: {
-          deepProp: [1, 2, "???", 3]
-        }
-
-      },
-    },
-  }]
-};
-
-validate(obj, OBJECT_SCHEMA)
-*/
-
-/**
- * deepObjectを、objの初期値とschemaの型指定に沿って初期化
- * @param obj 初期値
- * @param schema 型指定
- * @returns {{}|null|*[]|*}
- */
-export function initObject(obj, schema) {
-  if (typeof schema === 'function') {
-    // objがnull/undefinedの場合にblankとして0を返す
-    if (obj == null) {
-      return schema(0)
-    } else {
-      return schema(obj)
-    }
-  } else if (typeof schema !== 'object') {
-    // objがfunctionでもObjectでもない場合にスキップ
-    return null
-  } else if (Array.isArray(schema)) {
-    if (Array.isArray(obj) && obj.length > 0) {
-      return obj.map((item) => {
-        return initObject(item, schema[0])
-      })
-    } else {
-      return []
-    }
-  } else {
-    const keySchema = Object.keys(schema)
-    const res = {}
-    keySchema.forEach((item) => {
-      const itemKeyObject = obj[item]
-      res[item] = initObject(itemKeyObject, schema[item])
+export function getDiversityStatus(menuCases, foodGroup) {
+  const res = foodGroup.map((groupTemp) => {
+    return { name: groupTemp, status: false }
+  })
+  if (menuCases !== []) {
+    menuCases.forEach((foodsTemp) => {
+      const indexTemp = foodGroup.indexOf(foodsTemp.cropInfo.Group)
+      if (indexTemp >= 0) {
+        res[indexTemp].status = true
+      }
     })
+    return res
+  } else {
     return res
   }
 }
 
 /**
- * CSVなどの生データに変数の型を付与する（予め定義されたschemaに沿って）
- * @param obj 生データ
- * @param schema 各変数の型情報
- * @returns {{}|null|*}
+ * ターゲットグループの構成とdri一蘭から栄養需要を計算する
+ * @param target ターゲット構成[id, count]
+ * @param dri
+ * @returns {*}
  */
-export function setTypeOfDeepObject(obj, schema) {
-  if (obj == null) {
-    // objがnullの際にschemaの型に応じたblank値を返す
-    if (typeof schema === 'function') {
-      return schema(0)
-    } else if (typeof schema !== 'object') {
-      return null
-    } else if (Array.isArray(schema)) {
-      return []
-    } else {
-      return {}
-    }
-  } else if (typeof schema === 'function') {
-    return schema(obj)
-  } else if (typeof obj !== 'object') {
-    // objがfunctionでもObjectでもない場合にスキップ
-    return null
-  } else if (Array.isArray(schema)) {
-    if (Array.isArray(obj)) {
-      return obj.map((item) => {
-        return setTypeOfDeepObject(item, schema[0])
-      })
-    } else {
-      return setTypeOfDeepObject(null, schema[0])
-    }
-  } else {
-    const keySchema = Object.keys(schema)
-    const res = {}
-    keySchema.forEach((item) => {
-      const itemKeyObject = obj[item]
-      res[item] = setTypeOfDeepObject(itemKeyObject, schema[item])
-    })
-    return res
+export function getNutritionDemand(target, dri) {
+  const initObj = {
+    En: 0,
+    Pr: 0,
+    Va: 0,
+    Fe: 0,
   }
+  if (!target || target.length === 0) {
+    return initObj
+  }
+  return target.reduce((accumulator, currentItem) => {
+    const count = Number(currentItem.count)
+    const driValue = dri.find((item) => item.id === currentItem.id)
+    if (!driValue) {
+      throw new Error('targetMember not matching...')
+    }
+    accumulator.En += count * Number(driValue.En)
+    accumulator.Pr += count * Number(driValue.Pr)
+    accumulator.Va += count * Number(driValue.Va)
+    accumulator.Fe += count * Number(driValue.Fe)
+    return accumulator
+  }, initObj)
 }
 
 /**
- * 型付きのObjectをsourceObjからdestObjに代入
- * @param newObj
- * @param currentObj
- * @param schema
- * @returns {boolean}
+ * 選択された作物一蘭から栄養供給量を計算
+ * @param datArray (type: recipe)
+ * @param stapleCheck
+ * @returns {*}
  */
-export function updateDeepObject(newObj, currentObj, schema) {
-  const mergeObj = Object.assign(currentObj, newObj)
-  return setTypeOfDeepObject(mergeObj, schema)
+export function getNutritionSupply(datArray, stapleCheck = 0) {
+  return datArray.reduce(
+    (accumulator, item) => {
+      // Pr, Fe, Fatについて、別変数を用意
+      let myPr = item.cropInfo.Pr ? Number(item.cropInfo.Pr) : 0
+      let myFe = item.cropInfo.Fe ? Number(item.cropInfo.Fe) : 0
+      let myFat = item.cropInfo.Fat ? Number(item.cropInfo.Fat) : 0
+
+      // stapleCheck=1, かつ食品群がstapleであった場合、Pr、Fe の値を無視
+      if (stapleCheck === 1 && item.cropInfo.food_grp_id === '1') {
+        myPr = 0
+        myFe = 0
+        myFat = 0
+      }
+
+      // En, Va, Carbohydrate, Wtについて、別変数を用意
+      const En = item.cropInfo.En ? Number(item.cropInfo.En) : 0
+      const Va = item.cropInfo.Va ? Number(item.cropInfo.Va) : 0
+      const Carbohydrate = item.cropInfo.Carbohydrate
+        ? Number(item.cropInfo.Carbohydrate)
+        : 0
+      const Wt = Number(item.Wt)
+
+      accumulator.En += (En * Wt) / 100
+      accumulator.Pr += (myPr * Wt) / 100
+      accumulator.Va += (Va * Wt) / 100
+      accumulator.Fe += (myFe * Wt) / 100
+      accumulator.Carbohydrate += (Carbohydrate * Wt) / 100
+      accumulator.Fat += (myFat * Wt) / 100
+      accumulator.Wt += Wt
+      return accumulator
+    },
+    {
+      En: 0,
+      Pr: 0,
+      Va: 0,
+      Fe: 0,
+      Wt: 0,
+      Carbohydrate: 0,
+      Fat: 0,
+    }
+  )
 }
 
 /**

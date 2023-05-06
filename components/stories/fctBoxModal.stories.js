@@ -18,14 +18,14 @@ const Template = (args) => ({
   },
   template:
     '<div><b-button variant="primary" @click="openModal">open Modal</b-button>' +
-    '<fctBoxModal @update:menuCases="updateMenuCase" ' +
+    '<fctBoxModal @update:recipe="updateRecipe" ' +
     'v-bind="args" />' +
     '</div>',
   methods: {
     openModal() {
       this.$bvModal.show('fctBoxModal')
     },
-    updateMenuCase: action('updateMenu'),
+    updateRecipe: action('updateRecipe'),
   },
 })
 
@@ -34,6 +34,6 @@ DefaultFctBoxModal.args = {
   myName: 'fctBoxModal',
   fctItems: fctBoxStories.DefaultFctBox.args.items,
   recipe: recipeTableStories.DefaultRecipeTable.args.recipe,
-  portionUnits: {},
+  portionUnits: [],
   showModal: false,
 }

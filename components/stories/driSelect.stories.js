@@ -49,7 +49,7 @@ const myParam = {
       id: '2',
     },
   ],
-  target: [{ id: 0, count: 1 }],
+  target: [{ id: '2', count: 2 }],
   max: 500,
 }
 
