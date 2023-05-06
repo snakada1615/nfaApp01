@@ -16,4 +16,4 @@ const Template = (args) => ({
   template: '<fctSetWeightModal ' + 'v-bind="args" />',
 })
 
-export const DefaultFctSetWeightModal = Template.bind({})
+export const Default = Template.bind({})

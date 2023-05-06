@@ -19,11 +19,11 @@ const Template = (args) => ({
   template: '<diet-evaluation ' + 'v-bind="args" />',
 })
 
-export const DefaultDietEvaluation = Template.bind({})
-DefaultDietEvaluation.args = {
-  recipe: recipeTableStories.DefaultRecipeTable.args.recipe,
-  targetMember: driSelectStories.DefaultDriSelect.args.target,
-  myFct: fctBoxModalStories.DefaultFctBoxModal.args.fctItems,
-  myDri: driSelectStories.DefaultDriSelect.args.driItems,
-  portionUnits: fctBoxModalStories.DefaultFctBoxModal.args.portionUnits,
+export const Default = Template.bind({})
+Default.args = {
+  recipe: recipeTableStories.Default.args.recipe,
+  targetMember: driSelectStories.Default.args.target,
+  myFct: fctBoxModalStories.Default.args.fctItems,
+  myDri: driSelectStories.Default.args.driItems,
+  portionUnits: fctBoxModalStories.Default.args.portionUnits,
 }

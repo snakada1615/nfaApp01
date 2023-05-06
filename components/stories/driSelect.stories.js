@@ -70,8 +70,8 @@ const Template = (args) => ({
   },
 })
 
-export const DefaultDriSelect = Template.bind({})
-DefaultDriSelect.args = {
+export const Default = Template.bind({})
+Default.args = {
   driItems: [...myParam.driItems],
   target: myParam.target,
   max: myParam.max,

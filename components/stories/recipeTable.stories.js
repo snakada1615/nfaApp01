@@ -70,7 +70,7 @@ const Template = (args) => ({
   template: '<recipeTable ' + 'v-bind="args" />',
 })
 
-export const DefaultRecipeTable = Template.bind({})
-DefaultRecipeTable.args = {
+export const Default = Template.bind({})
+Default.args = {
   recipe: items,
 }

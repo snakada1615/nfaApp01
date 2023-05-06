@@ -29,11 +29,11 @@ const Template = (args) => ({
   },
 })
 
-export const DefaultFctBoxModal = Template.bind({})
-DefaultFctBoxModal.args = {
+export const Default = Template.bind({})
+Default.args = {
   myName: 'fctBoxModal',
-  fctItems: fctBoxStories.DefaultFctBox.args.items,
-  recipe: recipeTableStories.DefaultRecipeTable.args.recipe,
+  fctItems: fctBoxStories.Default.args.items,
+  recipe: recipeTableStories.Default.args.recipe,
   portionUnits: [],
   showModal: false,
 }

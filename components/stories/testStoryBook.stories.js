@@ -54,9 +54,9 @@ const Template = (args) => ({
   template: '<testStoryBook v-bind="args" />',
 })
 
-export const DefaultTestStoryBook = Template.bind({})
+export const Default = Template.bind({})
 export const WrongTestStoryBook = Template.bind({})
-DefaultTestStoryBook.args = {
+Default.args = {
   myFamily,
 }
 WrongTestStoryBook.args = {

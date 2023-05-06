@@ -1,4 +1,4 @@
-import { action } from '@storybook/addon-actions'
+// import { action } from '@storybook/addon-actions'
 import nutritionBar from '~/components/molecules/nutritionBar'
 export default {
   title: 'NFA-app/molecules/nutritionBar',
@@ -19,8 +19,8 @@ const Template = (args) => ({
   template: '<nutritionBar ' + 'v-bind="args" />',
 })
 
-export const DefaultNutritionBar = Template.bind({})
-DefaultNutritionBar.args = {
+export const Default = Template.bind({})
+Default.args = {
   rating,
   label,
 }

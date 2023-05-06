@@ -83,7 +83,7 @@ const Template = (args) => ({
   },
 })
 
-export const DefaultFctBox = Template.bind({})
-DefaultFctBox.args = {
+export const Default = Template.bind({})
+Default.args = {
   items: [...items],
 }

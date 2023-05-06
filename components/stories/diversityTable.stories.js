@@ -30,7 +30,7 @@ const Template = (args) => ({
   template: '<diversityTable ' + 'v-bind="args" />',
 })
 
-export const DefaultDiversityTable = Template.bind({})
-DefaultDiversityTable.args = {
+export const Default = Template.bind({})
+Default.args = {
   diversityStatus: diversityVariable,
 }

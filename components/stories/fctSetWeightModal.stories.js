@@ -58,8 +58,8 @@ const Template = (args) => ({
   },
 })
 
-export const DefaultFctSetWeightModal = Template.bind({})
-DefaultFctSetWeightModal.args = {
+export const DefaultFct = Template.bind({})
+DefaultFct.args = {
   selectedItem: items,
   weight,
   name,

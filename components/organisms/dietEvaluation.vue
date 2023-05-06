@@ -1,13 +1,6 @@
 <template>
   <b-container>
     <b-row class="my-2">
-      ----------------
-      <div>{{ nutritionDemand }}</div>
-      ----------------
-      <div>{{ nutritionSupply }}</div>
-      ----------------
-      <div>{{ nutritionRating }}</div>
-
       <!-- 作物追加用のボタン  -->
       <b-col cols="12" lg="6">
         <b-card
