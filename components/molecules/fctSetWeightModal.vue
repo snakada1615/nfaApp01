@@ -18,25 +18,6 @@
         </b-col>
       </b-row>
 
-      <!--   Add/Cancelボタン   -->
-      <b-row align-h="end" class="my-2">
-        <b-col class="d-flex justify-content-end">
-          <b-button
-            variant="primary"
-            class="mx-1"
-            size="sm"
-            :disabled="!stateFoodName || !stateFoodVolume"
-            @click="clickOk(foodVolume)"
-          >
-            Add
-          </b-button>
-
-          <b-button class="mx-0" size="sm" @click="clickCancel">
-            Cancel
-          </b-button>
-        </b-col>
-      </b-row>
-
       <!--   食事名と食材ボリュームの記録   -->
       <b-card
         header-bg-variant="success"
@@ -122,6 +103,25 @@
           </b-col>
         </b-row>
       </b-card>
+
+      <!--   Add/Cancelボタン   -->
+      <b-row align-h="end" class="my-2">
+        <b-col class="d-flex justify-content-end">
+          <b-button
+            variant="primary"
+            class="mx-1"
+            size="sm"
+            :disabled="!stateFoodName || !stateFoodVolume"
+            @click="clickOk(foodVolume)"
+          >
+            Add
+          </b-button>
+
+          <b-button class="mx-0" size="sm" @click="clickCancel">
+            Cancel
+          </b-button>
+        </b-col>
+      </b-row>
 
       <!-- 食材の写真表示 -->
       <b-card

@@ -3,20 +3,7 @@ import driSelect from '~/components/molecules/driSelect'
 export default {
   title: 'NFA-app/molecules/driSelect',
   component: driSelect,
-  target: {},
-  driItems: {},
-  max: {},
-  // 下記のparametersの設定はコンポーネントにあるすべてのemitイベントをロギングすることができます
-  // parameters: { actions: { argTypesRegex: '.*' } },
-  argTypes: {
-    // 個別にコンポーネントのemitイベントを定義する
-    'update:target': {
-      description: '対象人数の変更を親コンポーネントに通知',
-    },
-    changeNutritionValue: {
-      description: '必要栄養素量の変更を親コンポーネントに通知',
-    },
-  },
+  argTypes: {},
 }
 
 const myParam = {
@@ -60,13 +47,11 @@ const Template = (args) => ({
   },
   template:
     '<driSelect ' +
-    'v-bind="args" ' +
     '@update:target="updateNewFamily" ' +
-    '@changeNutritionValue="changeNutritionValue"' +
+    'v-bind="args" ' +
     '/>',
   methods: {
-    updateNewFamily: action('update　family　member'),
-    changeNutritionValue: action('update　nutrition target'),
+    updateNewFamily: action('update family member'),
   },
 })
 

@@ -63,6 +63,32 @@ const items = [
     food_grp_id: '6',
     id: '273',
   },
+  {
+    Carbohydrate: 20.3,
+    En: 114,
+    Fe: 1.1,
+    Fat: 0.3,
+    Food_grp: 'Starchy roots, tubers and their products',
+    Name: 'Sweet potato, deep yellow',
+    Pr: 1.5,
+    Va: 397,
+    Group: 'Vitamin A rich fruits and Vegetable',
+    food_grp_id: '2',
+    id: '85',
+  },
+  {
+    Carbohydrate: 3.8,
+    En: 27,
+    Fe: 0.6,
+    Fat: 0.1,
+    Food_grp: 'Vegetables and their products',
+    Name: 'Cabbage',
+    Pr: 1.6,
+    Va: 8,
+    Group: 'Other fruits and vegetables',
+    food_grp_id: '4',
+    id: '155',
+  },
 ]
 
 const Template = (args) => ({

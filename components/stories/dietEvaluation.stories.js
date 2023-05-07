@@ -1,4 +1,4 @@
-// import { action } from '@storybook/addon-actions'
+import { action } from '@storybook/addon-actions'
 import dietEvaluation from '@/components/organisms/dietEvaluation'
 import * as recipeTableStories from '@/components/stories/recipeTable.stories'
 import * as fctBoxModalStories from '@/components/stories/fctBoxModal.stories'
@@ -17,6 +17,9 @@ const Template = (args) => ({
     return { args }
   },
   template: '<diet-evaluation ' + 'v-bind="args" />',
+  methods: {
+    updateRecipe: action('update'),
+  },
 })
 
 export const Default = Template.bind({})

@@ -92,7 +92,7 @@
       :recipe="recipe"
       :fct-items="myFct"
       my-name="fctBox01"
-      @update:recipe="$emit('update:recipe', $event)"
+      @update:recipe="updateRecipe"
     />
   </b-container>
 </template>
@@ -301,6 +301,13 @@ export default {
             10
           : 0,
       }
+    },
+    /**
+     * recipeの更新を親に伝達
+     * @param val
+     */
+    updateRecipe(val) {
+      this.$emit('update:recipe', val)
     },
   },
 }
