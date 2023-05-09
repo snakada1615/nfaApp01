@@ -16,7 +16,8 @@ const Template = (args) => ({
   setup() {
     return { args }
   },
-  template: '<diet-evaluation ' + 'v-bind="args" />',
+  template:
+    '<diet-evaluation ' + 'v-bind="args" @update:recipe="updateRecipe"/>',
   methods: {
     updateRecipe: action('update'),
   },

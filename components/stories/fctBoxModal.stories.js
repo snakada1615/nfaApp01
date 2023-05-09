@@ -1,5 +1,5 @@
 import { action } from '@storybook/addon-actions'
-import fctBoxModal from '~/components/molecules/fctBoxModal'
+import fctBoxModal from '@/components/molecules/recipeModal'
 import * as fctBoxStories from '@/components/stories/fctBox.stories'
 import * as recipeTableStories from '@/components/stories/recipeTable.stories'
 

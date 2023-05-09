@@ -84,9 +84,8 @@
         </b-card>
       </b-col>
     </b-row>
-
     <!-- 食事入力用のダイアログ -->
-    <fct-box-modal
+    <recipe-modal
       :show-modal.sync="showFctBox"
       :portion-units="portionUnits"
       :recipe="recipe"
@@ -101,20 +100,22 @@
 import { arrayValidator, objectValidator } from 'vue-props-validation'
 import recipeTable from '@/components/molecules/recipeTable'
 import diversityTable from '@/components/atoms/diversityTable'
-import fctBoxModal from '@/components/molecules/fctBoxModal'
+import recipeModal from '@/components/molecules/recipeModal'
 import nutritionBar from '@/components/molecules/nutritionBar'
 import {
   getDiversityStatus,
   getNutritionDemand,
   getNutritionSupply,
 } from '@/plugins/helper'
+import EditCalendar from '@/components/molecules/editCalendar'
 
 export default {
   name: 'DietEvaluation',
   components: {
+    EditCalendar,
     recipeTable,
     diversityTable,
-    fctBoxModal,
+    recipeModal,
     nutritionBar,
   },
   props: {
@@ -302,6 +303,8 @@ export default {
           : 0,
       }
     },
+  },
+  methods: {
     /**
      * recipeの更新を親に伝達
      * @param val
