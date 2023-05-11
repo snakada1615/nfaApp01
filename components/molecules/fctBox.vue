@@ -11,7 +11,6 @@
 
       <template #append>
         <b-dropdown text="Group" variant="primary" size="sm">
-          <b-select v-model="filter" items="foodGroup" />
           <b-dropdown-item
             v-for="grpName in foodGroup"
             :key="grpName"

@@ -201,9 +201,14 @@ export async function removeUserByName(displayName) {
   }
 }
 
-export async function fireSaveDoc(collectionId, docId, myDoc) {
+export async function fireSaveDoc(
+  collectionId,
+  docId,
+  myDoc,
+  mergeFlag = true
+) {
   const ref = doc(firestoreDb, collectionId, docId)
-  await setDoc(ref, myDoc).catch((err) => {
+  await setDoc(ref, myDoc, { merge: mergeFlag }).catch((err) => {
     throw new Error('Error in fireSaveQuestions:' + err)
   })
 }

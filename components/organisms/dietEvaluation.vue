@@ -107,12 +107,10 @@ import {
   getNutritionDemand,
   getNutritionSupply,
 } from '@/plugins/helper'
-import EditCalendar from '@/components/molecules/editCalendar'
 
 export default {
   name: 'DietEvaluation',
   components: {
-    EditCalendar,
     recipeTable,
     diversityTable,
     recipeModal,
