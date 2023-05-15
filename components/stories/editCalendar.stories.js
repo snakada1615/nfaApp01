@@ -1,5 +1,5 @@
 import { action } from '@storybook/addon-actions'
-import editCalendar from '@/components/molecules/editCalendar'
+import editCalendar from '~/components/organisms/editCalendar'
 
 export default {
   title: 'NFA-app/molecules/editCalendar',
@@ -84,5 +84,5 @@ const Template = (args) => ({
 
 export const Default = Template.bind({})
 Default.args = {
-  currentCalendar: items,
+  calendarContent: items,
 }

@@ -107,7 +107,7 @@ import {
   getNutritionDemand,
   getNutritionSupply,
 } from '@/plugins/helper'
-import EditCalendar from '@/components/molecules/editCalendar'
+import EditCalendar from '~/components/organisms/editCalendar'
 
 export default {
   name: 'DietEvaluation',

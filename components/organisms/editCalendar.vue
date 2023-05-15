@@ -10,14 +10,13 @@
       <div class="mb-2 ml-3">
         current calendar:
         <span class="text-danger font-weight-bold">
-          <!--          {{ currentCalendarName }}-->
-          test_calendar
+          {{ calendarName }}
         </span>
       </div>
 
       <!-- 作物にフィルターをかける -->
       <b-input-group
-        v-if="currentCalendar.length"
+        v-if="calendarContent.length"
         class="mb-1 mt-3"
         prepend="filter"
       >
@@ -36,7 +35,7 @@
 
       <!-- カレンダーの表示 -->
       <b-table
-        v-if="currentCalendar.length"
+        v-if="calendarContent.length"
         striped
         sticky-header
         :items="currentCalendarFiltered"
@@ -105,7 +104,11 @@ export default {
       type: String,
       default: 'Edit crop calendar',
     },
-    currentCalendar: {
+    calendarName: {
+      type: String,
+      default: 'defaultCalendar',
+    },
+    calendarContent: {
       type: Array,
       required: false,
       validator: arrayValidator({
@@ -191,7 +194,7 @@ export default {
      */
     FoodGrp() {
       const uniqueGroup = []
-      const calendar = this.currentCalendar
+      const calendar = this.calendarContent
       if (calendar) {
         calendar.forEach(function (elem) {
           if (!uniqueGroup.includes(elem.Group)) {
@@ -203,9 +206,9 @@ export default {
     },
     currentCalendarFiltered() {
       if (!this.groupFilter) {
-        return this.currentCalendar
+        return this.calendarContent
       } else {
-        return this.currentCalendar.filter(
+        return this.calendarContent.filter(
           (item) => item.Group === this.groupFilter
         )
       }
