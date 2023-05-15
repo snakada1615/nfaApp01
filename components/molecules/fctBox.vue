@@ -89,6 +89,7 @@ import { foodGroup } from '@/plugins/helper'
 
 /**
  * 食品成分表を表示し、必要な作物を選択する
+ *
  */
 export default {
   name: 'FctBox',

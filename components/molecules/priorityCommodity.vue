@@ -85,6 +85,13 @@
 import { arrayValidator, objectValidator } from 'vue-props-validation'
 // import fctTableModal from '@/components/organisms/FctTableModal'
 
+/**
+ * #月ごとの優先作物の選定
+ * ３つのParamに対して、値を選択してemit
+ * 1. selectedMonth
+ * 1. selectedNutrient
+ * 1. cropList
+ */
 export default {
   name: 'PriorityCommodity',
   components: {
@@ -111,6 +118,22 @@ export default {
     fct: {
       type: Array,
       required: true,
+      validator: arrayValidator({
+        type: Object,
+        validator: objectValidator({
+          Carbohydrate: Number,
+          En: Number,
+          Fe: Number,
+          Fat: Number,
+          Food_grp: String,
+          Name: String,
+          Pr: Number,
+          Va: Number,
+          Group: String,
+          food_grp_id: String,
+          id: String,
+        }),
+      }),
     },
     /**
      * 作物カレンダー
@@ -118,9 +141,30 @@ export default {
     cropCalendar: {
       type: Array,
       required: true,
+      validator: arrayValidator({
+        type: Object,
+        validator: objectValidator({
+          1: String,
+          2: String,
+          3: String,
+          4: String,
+          5: String,
+          6: String,
+          7: String,
+          8: String,
+          9: String,
+          10: String,
+          11: String,
+          12: String,
+          FCT_id: String,
+          Group: String,
+          Name: String,
+          id: String,
+        }),
+      }),
     },
     /**
-     *
+     * 選択された優先品目のArray
      */
     cropList: {
       type: Array,
@@ -136,7 +180,22 @@ export default {
             type: Number,
             default: -1,
           },
-          selectedCrop: Object,
+          selectedCrop: {
+            type: Object,
+            validator: objectValidator({
+              Carbohydrate: Number,
+              En: Number,
+              Fe: Number,
+              Fat: Number,
+              Food_grp: String,
+              Name: String,
+              Pr: Number,
+              Va: Number,
+              Group: String,
+              food_grp_id: String,
+              id: String,
+            }),
+          },
         }),
       }),
     },
