@@ -95,3 +95,11 @@ export class RecipeCases extends ResponsiveArray {
     }
   }
 }
+
+export class PriorityCommodities extends ResponsiveArray {
+  init(size) {
+    for (let i = 0; i < size - 1; i++) {
+      super.add({ month: -1, index: -1, selectedCrop: {} })
+    }
+  }
+}
