@@ -1,7 +1,7 @@
 <template>
   <b-container>
     <b-card
-      style="min-width: 530px;"
+      style="min-width: 530px"
       header-bg-variant="success"
       bg-variant="light"
       border-variant="success"
@@ -12,9 +12,7 @@
       </template>
       <b-row>
         <b-col>
-          <b-form-group
-            class="ml-2"
-          >
+          <b-form-group class="ml-2">
             <b-form-radio-group
               v-model="selectedNutrientComputed"
               :options="nutrientOptions"
@@ -35,7 +33,7 @@
       </b-row>
     </b-card>
     <b-card
-      style="min-width: 530px;"
+      style="min-width: 530px"
       header-bg-variant="success"
       bg-variant="light"
       border-variant="success"
@@ -61,7 +59,8 @@
                 size="sm"
                 variant="info"
                 @click="showFctDialogue(index)"
-              >select</b-button>
+                >select</b-button
+              >
             </span>
           </div>
         </b-list-group-item>
@@ -72,40 +71,78 @@
       my-modal-header="Food Composition Table"
       :show-modal.sync="showFct"
       :items="fctFilterByMonth"
-      @modalOk="onCropSelected($event, {index: addCropId, month: selectedMonthComputed})"
+      @modalOk="
+        onCropSelected($event, {
+          index: addCropId,
+          month: selectedMonthComputed,
+        })
+      "
     />
   </b-container>
 </template>
 
 <script>
-import fctTableModal from '@/components/organisms/FctTableModal'
+import { arrayValidator, objectValidator } from 'vue-props-validation'
+// import fctTableModal from '@/components/organisms/FctTableModal'
 
 export default {
   name: 'PriorityCommodity',
   components: {
-    fctTableModal
+    //    fctTableModal,
   },
   props: {
+    /**
+     * 評価対象となる月
+     */
     selectedMonth: {
       type: Number,
-      required: true
+      required: true,
     },
+    /**
+     * 評価対象となる栄養素
+     */
     selectedNutrient: {
       type: String,
-      required: true
+      required: true,
     },
+    /**
+     * 食品成分表
+     */
     fct: {
       type: Array,
-      required: true
+      required: true,
     },
+    /**
+     * 作物カレンダー
+     */
     cropCalendar: {
       type: Array,
-      required: true
+      required: true,
     },
+    /**
+     *
+     */
     cropList: {
       type: Array,
-      required: true
+      required: true,
+      validator: arrayValidator({
+        type: Object,
+        validator: objectValidator({
+          month: {
+            type: Number,
+            default: 1,
+          },
+          index: {
+            type: Number,
+            default: -1,
+          },
+          selectedCrop: Object,
+        }),
+      }),
     },
+    /**
+     * 月の表示オプション
+     */
     monthOptions: {
       type: Array,
       default: () => {
@@ -121,10 +158,13 @@ export default {
           { value: 9, text: 'Sep' },
           { value: 10, text: 'Oct' },
           { value: 11, text: 'Nov' },
-          { value: 12, text: 'Dec' }
+          { value: 12, text: 'Dec' },
         ]
-      }
+      },
     },
+    /**
+     * 栄養素名の表示オプション
+     */
     nutrientOptions: {
       type: Array,
       default: () => {
@@ -132,12 +172,12 @@ export default {
           { text: 'Energy', value: 'En' },
           { text: 'Protein', value: 'Pr' },
           { text: 'Vitamin A', value: 'Va' },
-          { text: 'Iron', value: 'Fe' }
+          { text: 'Iron', value: 'Fe' },
         ]
-      }
-    }
+      },
+    },
   },
-  data () {
+  data() {
     return {
       /**
        * fctTableModal表示用のフラグ
@@ -146,53 +186,62 @@ export default {
       /**
        * 現在入力中の作物リストのid
        */
-      addCropId: -1
+      addCropId: -1,
     }
   },
   computed: {
     cropListByMonth: {
-      get () {
+      get() {
         const vm = this
         if (vm.selectedMonthComputed === -1) {
           return []
         }
-        return vm.cropList.filter(item => item.month === vm.selectedMonthComputed).map((item2) => {
-          return Object.keys(item2.selectedCrop).length ? item2.selectedCrop.Name : ''
-        })
-      }
+        return vm.cropList
+          .filter((item) => item.month === vm.selectedMonthComputed)
+          .map((item2) => {
+            return Object.keys(item2.selectedCrop).length
+              ? item2.selectedCrop.Name
+              : ''
+          })
+      },
     },
-    fctFilterByMonth () {
+    fctFilterByMonth() {
       if (this.selectedMonthComputed === -1) {
         return JSON.parse(JSON.stringify(this.fct))
       }
-      const filteredId = this.cropCalendar.filter(item =>
-        (item[this.selectedMonthComputed] === '1') || (item[this.selectedMonthComputed] === '2')).map((item2) => {
-        return item2.FCT_id
-      })
-      return this.fct.filter(item => filteredId.includes(item.id))
+      const filteredId = this.cropCalendar
+        .filter(
+          (item) =>
+            item[this.selectedMonthComputed] === '1' ||
+            item[this.selectedMonthComputed] === '2'
+        )
+        .map((item2) => {
+          return item2.FCT_id
+        })
+      return this.fct.filter((item) => filteredId.includes(item.id))
     },
     selectedNutrientComputed: {
-      get () {
+      get() {
         return this.selectedNutrient
       },
-      set (val) {
+      set(val) {
         this.$emit('update:selectedNutrient', val)
-      }
+      },
     },
     selectedMonthComputed: {
-      get () {
+      get() {
         return this.selectedMonth
       },
-      set (val) {
+      set(val) {
         this.$emit('update:selectedMonth', val)
-      }
-    }
+      },
+    },
   },
   methods: {
     /**
      * fctダイアログのトリガー
      */
-    showFctDialogue (index) {
+    showFctDialogue(index) {
       if (this.fctFilterByMonth.length === 0) {
         alert('there is no available crop for this month')
         return
@@ -205,16 +254,16 @@ export default {
      * @param val
      * @param options
      */
-    onCropSelected (val, options) {
+    onCropSelected(val, options) {
       // 選択された作物の重量を100gにセット
       val.Wt = 100
       // cropList全体を更新する場合
       const returnValue = this.cropList.map((item) => {
-        if ((item.month === options.month) && (item.index === options.index)) {
+        if (item.month === options.month && item.index === options.index) {
           return {
             month: item.month,
             index: item.index,
-            selectedCrop: JSON.parse(JSON.stringify(val))
+            selectedCrop: JSON.parse(JSON.stringify(val)),
           }
         } else {
           return item
@@ -224,9 +273,9 @@ export default {
       this.$emit('changeCrop', {
         month: options.month,
         index: options.index,
-        selectedCrop: val
+        selectedCrop: val,
       })
-    }
-  }
+    },
+  },
 }
 </script>

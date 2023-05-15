@@ -1,11 +1,17 @@
 <template>
   <b-container>
+    {{ ban }}
+    <hr />
+    {{ myCrop.cropInfo }}
     <fct-box :items="myItem" />
   </b-container>
 </template>
 
 <script>
 import fctBox from '@/components/molecules/fctBox'
+import { FeasibilityCases, RecipeCases, RecipeItem } from '@/plugins/construct'
+import * as driSelectStories from '@/components/stories/driSelect.stories'
+import * as fctBoxStories from '@/components/stories/fctBox.stories'
 
 export default {
   name: 'MyTest01',
@@ -14,6 +20,9 @@ export default {
   },
   data() {
     return {
+      test: [],
+      test2: new RecipeCases(),
+      myCrop: {},
       myItem: [
         {
           Carbohydrate: 67.9,
@@ -56,6 +65,29 @@ export default {
         },
       ],
     }
+  },
+  created() {
+    this.ban = new FeasibilityCases()
+    fctBoxStories.Default.args.items.forEach((item) => {
+      this.ban.add({
+        dri: driSelectStories.Default.args.driItems,
+        cropInfo: item,
+      })
+    })
+    this.ban.replace(1, { baka: 'aho' })
+
+    // this.$set(this.test2, 0, new RecipeCases())
+    // this.test2 = Object.assign([], new RecipeCases())
+    this.test2.init({
+      count: 5,
+      data: driSelectStories.Default.args.driItems,
+    })
+
+    this.myCrop = new RecipeItem({
+      cropInfo: fctBoxStories.Default.args.items[0],
+      Wt: 221,
+      foodName: 'unchi',
+    })
   },
 }
 </script>
