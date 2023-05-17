@@ -1,4 +1,4 @@
-// import { action } from '@storybook/addon-actions'
+import { action } from '@storybook/addon-actions'
 import priorityCommodity from '~/components/molecules/priorityCommodity'
 import * as fctBoxModalStories from '~/components/stories/fctBoxModal.stories'
 
@@ -107,7 +107,16 @@ const calendar = [
 const cropList = []
 const feasibilityCases = [
   {
-    target: [{ id: 'sss', Number: 4 }],
+    familyMember: [
+      { id: 'pong01', count: 1 },
+      { id: 'pong02', count: 2 },
+      { id: 'pong03', count: 3 },
+      { id: 'pong04', count: 2 },
+      { id: 'pong05', count: 4 },
+    ],
+    familyId: 'baka01',
+    caseId: 'baka01_3_110',
+    ansList: [-99, -99, -99, -99, -99, -99, -99, -99, -99, -99, -99, -99],
     selectedCrop: {
       Carbohydrate: 67.9,
       En: 315,
@@ -122,6 +131,12 @@ const feasibilityCases = [
       id: '110',
     },
     month: '3',
+    note: '',
+    prodTarget: {
+      Wt: 123,
+      Wt365: 43432,
+      share: 93,
+    },
   },
 ]
 
@@ -130,7 +145,19 @@ const Template = (args) => ({
   setup() {
     return { args }
   },
-  template: '<priorityCommodity ' + 'v-bind="args" />',
+  template:
+    '<priorityCommodity ' +
+    '@update:feasibilityCases="updateFeasibilityCases" ' +
+    '@changeCrop="changeCrop" ' +
+    '@update:selectedNutrient="updateNutrient" ' +
+    '@update:selectedMonth="updateMonth" ' +
+    'v-bind="args" />',
+  methods: {
+    updateNutrient: action('updateNutrient'),
+    updateMonth: action('updateMonth'),
+    updateFeasibilityCases: action('updateFeasibilityCases'),
+    changeCrop: action('changeCrop'),
+  },
 })
 
 export const Default = Template.bind({})
@@ -141,4 +168,22 @@ Default.args = {
   cropCalendar: calendar,
   cropList,
   feasibilityCases,
+  familyInfo: {
+    familyMember: feasibilityCases[0].familyMember,
+    familyId: feasibilityCases[0].familyId,
+  },
+}
+
+export const noSelection = Template.bind({})
+noSelection.args = {
+  selectedMonth: month,
+  selectedNutrient: keyNutrient,
+  fct: fctBoxModalStories.Default.args.items,
+  cropCalendar: calendar,
+  cropList,
+  feasibilityCases: [],
+  familyInfo: {
+    familyMember: feasibilityCases[0].familyMember,
+    familyId: feasibilityCases[0].familyId,
+  },
 }

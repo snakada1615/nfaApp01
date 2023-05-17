@@ -1,0 +1,1 @@
+(window.webpackJsonp=window.webpackJsonp||[]).push([[15],{"./locales/ja.json":function(module){module.exports=JSON.parse('{"links":{"home":"ほーむ","about":"あばうと","en":"えいご","ja":"にほんご"},"home":{"title":{"introduction":"このページは日本語で設定されています"}},"apple":"りんご","hello":"こんにちは"}')}}]);

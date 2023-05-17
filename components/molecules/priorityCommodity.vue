@@ -59,6 +59,10 @@
       </b-button>
 
       <!-- 既存の優先品目一覧 -->
+      <div v-if="cropListByMonth.length === 0">
+        <div class="mx-auto bg-warning">no crop selected yet</div>
+      </div>
+
       <b-list-group>
         <b-list-group-item
           v-for="(crop, index) in cropListByMonth"
@@ -256,6 +260,9 @@ export default {
               -99, -99, -99, -99, -99, -99, -99, -99, -99, -99, -99, -99,
             ],
           },
+          /**
+           * 対象家族のID
+           */
           familyId: {
             type: String,
           },
@@ -269,25 +276,33 @@ export default {
       }),
     },
     /**
-     * 対象家族の構成
+     * 対象家庭の情報
      */
-    familyMember: {
-      type: Array,
+    familyInfo: {
+      type: Object,
       required: true,
-      validator: arrayValidator({
-        type: Object,
-        validator: objectValidator({
-          id: String,
-          count: Number,
-        }),
+      validate: objectValidator({
+        /**
+         * 家族構成
+         */
+        familyMember: {
+          type: Array,
+          required: true,
+          validator: arrayValidator({
+            type: Object,
+            validator: objectValidator({
+              id: String,
+              count: Number,
+            }),
+          }),
+        },
+        /**
+         * 対象家族のID
+         */
+        familyId: {
+          type: String,
+        },
       }),
-    },
-    /**
-     * 対象家族のID
-     */
-    familyId: {
-      type: String,
-      required: true,
     },
     /**
      * 月の表示オプション
@@ -343,6 +358,19 @@ export default {
     }
   },
   computed: {
+    /**
+     * 対象家族のID
+     */
+    familyId() {
+      console.log(this.familyInfo)
+      return this.familyInfo.familyId
+    },
+    /**
+     * 対象家族の構成
+     */
+    familyMember() {
+      return this.familyInfo.familyMember
+    },
     /**
      * property（selectedNutrient）をリアクティブにするため
      */
@@ -461,7 +489,7 @@ export default {
 
       switch (dialogOption.mode) {
         case 0:
-          returnValue = returnValue.push(newValue)
+          returnValue.push(newValue)
           break
 
         case 1: {
@@ -487,9 +515,9 @@ export default {
         }
       }
 
-      this.$emit('update:feasibilityCases', returnValue)
+      vm.$emit('update:feasibilityCases', returnValue)
       if (dialogOption.mode !== 2) {
-        this.$emit('changeCrop', {
+        vm.$emit('changeCrop', {
           month: vm.selectedMonth,
           familyId: vm.familyId,
           caseId: dialogOption.caseId,
