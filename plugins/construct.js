@@ -49,57 +49,85 @@ export class CropInfo {
   }
 }
 
-export class RecipeItem {
-  constructor(data) {
-    this.cropInfo = new CropInfo(data.cropInfo)
-    this.Wt = data.Wt
-    this.foodName = data.foodName
-  }
-}
-
-export class FeasibilityCase {
-  constructor(data) {
-    this.target = data.dri.map(function (item) {
-      return { id: item.id, count: 0 }
-    })
-    this.selectedCrop = new CropInfo(data.cropInfo)
-    this.note = ''
-    this.ansList = [-99, -99, -99, -99, -99, -99, -99, -99, -99, -99, -99, -99]
-  }
-}
-
 export class FeasibilityCases extends ResponsiveArray {
   add(data) {
-    const p = new FeasibilityCase(data)
-    super.add(p)
+    super.add({
+      target: data.dri.map(function (item) {
+        return { id: item.id, count: 0 }
+      }),
+      selectedCrop: new CropInfo(data.cropInfo),
+      note: data.note,
+      ansList: [-99, -99, -99, -99, -99, -99, -99, -99, -99, -99, -99, -99],
+      familyId: data.familyId,
+      month: data.month,
+      caseId: data.caseId || data.selectedCrop.Name + '_' + data.month,
+    })
   }
 }
 
 export class Recipe extends ResponsiveArray {
   add(data) {
-    const p = new RecipeItem(data)
-    super.add(p)
+    const recipeId = data.recipeId || data.cropInfo.Name + '_' + data.foodName
+
+    const dataSet = {
+      cropInfo: new CropInfo(data.cropInfo),
+      Wt: data.Wt,
+      foodName: data.foodName,
+      recipeId,
+    }
+
+    const index = this.findIndex((item) => {
+      return item.recipeId === recipeId
+    })
+
+    if (index) {
+      super.replace(index, dataSet)
+    } else {
+      super.add(dataSet)
+    }
   }
 }
 
 export class RecipeCases extends ResponsiveArray {
-  init(payload) {
-    for (let i = 0; i < payload.count; i++) {
-      const isTargetSingle = true
-      const note = ''
-      const recipe = []
-      const target = payload.data.map(function (dat) {
-        return { id: dat.id, count: 0 }
-      })
-      super.add({ target, recipe, note, isTargetSingle })
-    }
+  add(data) {
+    super.add({
+      recipe: new Recipe(data.recipe),
+      familyId: data.familyId,
+      date: data.date,
+      caseId: data.caseId,
+    })
   }
 }
 
 export class PriorityCommodities extends ResponsiveArray {
   init(size) {
     for (let i = 0; i < size - 1; i++) {
-      super.add({ month: -1, index: -1, selectedCrop: {} })
+      super.add({ month: '0', index: -1, selectedCrop: {} })
     }
+  }
+}
+
+export class CropCalendar extends ResponsiveArray {
+  init(data) {
+    data.forEach((item) => {
+      super.add({
+        1: '0',
+        2: '0',
+        3: '0',
+        4: '0',
+        5: '0',
+        6: '0',
+        7: '0',
+        8: '0',
+        9: '0',
+        10: '0',
+        11: '0',
+        12: '0',
+        FCT_id: data.FCT_id,
+        Group: data.Group,
+        Name: data.Name,
+        id: data.id,
+      })
+    })
   }
 }

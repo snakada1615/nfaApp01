@@ -151,7 +151,7 @@
 import { objectValidator } from 'vue-props-validation'
 
 /**
- * foodModal
+ * fctSetWeightModal
  *- fctTableから行の値を受け取ってmodalに表示する
  *- ユーザーが入力したweight値をOkクリック時にemit
  */

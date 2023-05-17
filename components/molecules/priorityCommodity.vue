@@ -42,9 +42,13 @@
       <template #header>
         <div>Selected Commodities</div>
       </template>
-      <div v-if="cropListByMonth">
-        please select candidate commodities first
-      </div>
+      {{ feasibilityCasesComputed }}
+      {{ cropListByMonth }}
+      {{ selectedMonth }}
+      {{ selectedMonthComputed }}
+      <b-button size="sm" variant="info" @click="showFctDialogue"
+        >add new candidate</b-button
+      >
 
       <b-list-group>
         <b-list-group-item
@@ -58,22 +62,21 @@
                 :disabled="!selectedNutrientComputed || !selectedMonthComputed"
                 size="sm"
                 variant="info"
-                @click="showFctDialogue(index)"
-                >select</b-button
-              >
+                @click="showFctDialogue"
+                >remove
+              </b-button>
             </span>
           </div>
         </b-list-group-item>
       </b-list-group>
     </b-card>
-    <fct-table-modal
+    <fct-box-modal
       my-name="modalTest"
       my-modal-header="Food Composition Table"
       :show-modal.sync="showFct"
       :items="fctFilterByMonth"
       @modalOk="
         onCropSelected($event, {
-          index: addCropId,
           month: selectedMonthComputed,
         })
       "
@@ -84,25 +87,26 @@
 <script>
 import { arrayValidator, objectValidator } from 'vue-props-validation'
 // import fctTableModal from '@/components/organisms/FctTableModal'
+import fctBoxModal from '@/components/molecules/FctBoxModal'
 
 /**
  * #月ごとの優先作物の選定
  * ３つのParamに対して、値を選択してemit
  * 1. selectedMonth
  * 1. selectedNutrient
- * 1. cropList
+ * 1. feasibilityCases
  */
 export default {
   name: 'PriorityCommodity',
   components: {
-    //    fctTableModal,
+    fctBoxModal,
   },
   props: {
     /**
      * 評価対象となる月
      */
     selectedMonth: {
-      type: Number,
+      type: String,
       required: true,
     },
     /**
@@ -164,21 +168,24 @@ export default {
       }),
     },
     /**
-     * 選択された優先品目のArray
+     * 優先作物一覧
      */
-    cropList: {
+    feasibilityCases: {
       type: Array,
       required: true,
       validator: arrayValidator({
         type: Object,
         validator: objectValidator({
-          month: {
-            type: Number,
-            default: 1,
-          },
-          index: {
-            type: Number,
-            default: -1,
+          target: {
+            type: Array,
+            required: true,
+            validator: arrayValidator({
+              type: Object,
+              validator: objectValidator({
+                id: String,
+                count: Number,
+              }),
+            }),
           },
           selectedCrop: {
             type: Object,
@@ -187,17 +194,57 @@ export default {
               En: Number,
               Fe: Number,
               Fat: Number,
-              Food_grp: String,
-              Name: String,
               Pr: Number,
               Va: Number,
+              Food_grp: String,
+              Name: String,
               Group: String,
               food_grp_id: String,
               id: String,
             }),
           },
+          note: {
+            type: String,
+            default: '',
+          },
+          ansList: {
+            type: Array,
+            default: () => [
+              -99, -99, -99, -99, -99, -99, -99, -99, -99, -99, -99, -99,
+            ],
+          },
+          familyId: {
+            type: String,
+          },
+          month: {
+            type: String,
+          },
+          caseId: {
+            type: String,
+          },
         }),
       }),
+    },
+    /**
+     * 対象家族の構成
+     */
+    familyMember: {
+      type: Array,
+      required: true,
+      validator: arrayValidator({
+        type: Object,
+        validator: objectValidator({
+          id: String,
+          count: Number,
+        }),
+      }),
+    },
+    /**
+     * 対象家族のID
+     */
+    familyId: {
+      type: String,
+      required: true,
     },
     /**
      * 月の表示オプション
@@ -206,18 +253,18 @@ export default {
       type: Array,
       default: () => {
         return [
-          { value: 1, text: 'Jan' },
-          { value: 2, text: 'Feb' },
-          { value: 3, text: 'Mar' },
-          { value: 4, text: 'Apr' },
-          { value: 5, text: 'May' },
-          { value: 6, text: 'Jun' },
-          { value: 7, text: 'Jul' },
-          { value: 8, text: 'Aug' },
-          { value: 9, text: 'Sep' },
-          { value: 10, text: 'Oct' },
-          { value: 11, text: 'Nov' },
-          { value: 12, text: 'Dec' },
+          { value: '1', text: 'Jan' },
+          { value: '2', text: 'Feb' },
+          { value: '3', text: 'Mar' },
+          { value: '4', text: 'Apr' },
+          { value: '5', text: 'May' },
+          { value: '6', text: 'Jun' },
+          { value: '7', text: 'Jul' },
+          { value: '8', text: 'Aug' },
+          { value: '9', text: 'Sep' },
+          { value: '10', text: 'Oct' },
+          { value: '11', text: 'Nov' },
+          { value: '12', text: 'Dec' },
         ]
       },
     },
@@ -252,16 +299,19 @@ export default {
     cropListByMonth: {
       get() {
         const vm = this
-        if (vm.selectedMonthComputed === -1) {
+        if (vm.feasibilityCasesComputed.length === -1) {
           return []
         }
-        return vm.cropList
-          .filter((item) => item.month === vm.selectedMonthComputed)
-          .map((item2) => {
-            return Object.keys(item2.selectedCrop).length
-              ? item2.selectedCrop.Name
-              : ''
+        const res = vm.feasibilityCasesComputed.filter((item) => {
+          return item.month === vm.selectedMonthComputed
+        })
+        if (!res) {
+          return []
+        } else {
+          return res.map((item2) => {
+            return item2.selectedCrop.Name
           })
+        }
       },
     },
     fctFilterByMonth() {
@@ -295,17 +345,24 @@ export default {
         this.$emit('update:selectedMonth', val)
       },
     },
+    feasibilityCasesComputed: {
+      get() {
+        return this.feasibilityCases
+      },
+      set(val) {
+        this.$emit('update:feasibilityCases', val)
+      },
+    },
   },
   methods: {
     /**
      * fctダイアログのトリガー
      */
-    showFctDialogue(index) {
+    showFctDialogue() {
       if (this.fctFilterByMonth.length === 0) {
         alert('there is no available crop for this month')
         return
       }
-      this.addCropId = index
       this.showFct = !this.showFct
     },
     /**
@@ -314,21 +371,22 @@ export default {
      * @param options
      */
     onCropSelected(val, options) {
+      const vm = this
       // 選択された作物の重量を100gにセット
       val.Wt = 100
-      // cropList全体を更新する場合
-      const returnValue = this.cropList.map((item) => {
-        if (item.month === options.month && item.index === options.index) {
-          return {
-            month: item.month,
-            index: item.index,
-            selectedCrop: JSON.parse(JSON.stringify(val)),
-          }
-        } else {
-          return item
-        }
+      // feasibilityCases全体を更新する場合
+      const returnValue = JSON.parse(
+        JSON.stringify(vm.feasibilityCasesComputed)
+      ).push({
+        target: JSON.parse(JSON.stringify(vm.familyMember)),
+        selectedCrop: val,
+        note: '',
+        ansList: [-99, -99, -99, -99, -99, -99, -99, -99, -99, -99, -99, -99],
+        familyId: vm.familyId,
+        month: vm.selectedMonth,
+        caseId: vm.familyId + '_' + vm.selectedMonth + '_' + val.id,
       })
-      this.$emit('update:cropList', returnValue)
+      this.$emit('update:feasibilityCases', returnValue)
       this.$emit('changeCrop', {
         month: options.month,
         index: options.index,

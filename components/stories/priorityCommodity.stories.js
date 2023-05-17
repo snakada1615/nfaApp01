@@ -1,7 +1,6 @@
 // import { action } from '@storybook/addon-actions'
 import priorityCommodity from '~/components/molecules/priorityCommodity'
 import * as fctBoxModalStories from '~/components/stories/fctBoxModal.stories'
-import { PriorityCommodities } from '~/plugins/construct'
 
 export default {
   title: 'NFA-app/molecules/priorityCommodity',
@@ -11,20 +10,20 @@ export default {
   argTypes: {},
 }
 
-const month = 3
-const keyNutrient = 'En'
+const month = '3'
+const keyNutrient = 'Pr'
 const calendar = [
   {
     1: '0',
-    2: '0',
+    2: '1',
     3: '0',
-    4: '0',
+    4: '2',
     5: '0',
-    6: '0',
+    6: '1',
     7: '0',
-    8: '0',
+    8: '1',
     9: '0',
-    10: '0',
+    10: '1',
     11: '0',
     12: '0',
     FCT_id: '110',
@@ -34,12 +33,12 @@ const calendar = [
   },
   {
     1: '0',
-    2: '0',
-    3: '0',
+    2: '1',
+    3: '1',
     4: '0',
     5: '0',
-    6: '0',
-    7: '0',
+    6: '2',
+    7: '1',
     8: '0',
     9: '0',
     10: '0',
@@ -51,17 +50,17 @@ const calendar = [
     id: '1',
   },
   {
-    1: '0',
-    2: '0',
-    3: '0',
+    1: '1',
+    2: '1',
+    3: '1',
     4: '0',
     5: '0',
     6: '0',
     7: '0',
-    8: '0',
-    9: '0',
+    8: '2',
+    9: '2',
     10: '0',
-    11: '0',
+    11: '1',
     12: '0',
     FCT_id: '273',
     Group: 'Legumes and nuts ',
@@ -69,13 +68,13 @@ const calendar = [
     id: '2',
   },
   {
-    1: '0',
+    1: '1',
     2: '0',
-    3: '0',
-    4: '0',
-    5: '0',
+    3: '1',
+    4: '2',
+    5: '1',
     6: '0',
-    7: '0',
+    7: '2',
     8: '0',
     9: '0',
     10: '0',
@@ -88,12 +87,12 @@ const calendar = [
   },
   {
     1: '0',
-    2: '0',
-    3: '0',
+    2: '1',
+    3: '1',
     4: '0',
-    5: '0',
-    6: '0',
-    7: '0',
+    5: '2',
+    6: '2',
+    7: '1',
     8: '0',
     9: '0',
     10: '0',
@@ -105,8 +104,26 @@ const calendar = [
     id: '4',
   },
 ]
-const cropList = new PriorityCommodities()
-cropList.init(4)
+const cropList = []
+const feasibilityCases = [
+  {
+    target: [{ id: 'sss', Number: 4 }],
+    selectedCrop: {
+      Carbohydrate: 67.9,
+      En: 315,
+      Fe: 1.9,
+      Fat: 0.4,
+      Food_grp: 'Starchy roots, tubers and their products',
+      Name: 'Yam tuber, flour',
+      Pr: 3.4,
+      Va: 0,
+      Group: 'Grains, roots and tubers',
+      food_grp_id: '2',
+      id: '110',
+    },
+    month: '3',
+  },
+]
 
 const Template = (args) => ({
   components: { priorityCommodity },
@@ -123,4 +140,5 @@ Default.args = {
   fct: fctBoxModalStories.Default.args.items,
   cropCalendar: calendar,
   cropList,
+  feasibilityCases,
 }
