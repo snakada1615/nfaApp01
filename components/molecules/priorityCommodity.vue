@@ -12,6 +12,8 @@
       </template>
       <b-row>
         <b-col>
+          <!-- 対象栄養素の選択 -->
+          <div>target nutrient</div>
           <b-form-group class="ml-2">
             <b-form-radio-group
               v-model="selectedNutrientComputed"
@@ -24,6 +26,7 @@
           </b-form-group>
         </b-col>
         <b-col>
+          <!-- 対象月の選択 -->
           <div>Month</div>
           <b-form-select
             v-model="selectedMonthComputed"
@@ -32,6 +35,8 @@
         </b-col>
       </b-row>
     </b-card>
+
+    <!-- 選択された優先作物の一覧 -->
     <b-card
       style="min-width: 530px"
       header-bg-variant="success"
@@ -42,59 +47,80 @@
       <template #header>
         <div>Selected Commodities</div>
       </template>
-      {{ feasibilityCasesComputed }}
-      {{ cropListByMonth }}
-      {{ selectedMonth }}
-      {{ selectedMonthComputed }}
-      <b-button size="sm" variant="info" @click="showFctDialogue"
-        >add new candidate</b-button
-      >
 
+      <!-- 追加ボタン -->
+      <b-button
+        size="sm"
+        variant="info"
+        block
+        class="my-2"
+        @click="showFctDialogue({ mode: 0, caseId: '' })"
+        >add new candidate commodity
+      </b-button>
+
+      <!-- 既存の優先品目一覧 -->
       <b-list-group>
         <b-list-group-item
           v-for="(crop, index) in cropListByMonth"
           :key="index"
         >
           <div class="d-flex justify-content-between">
-            <span>{{ crop }}</span>
+            <span>{{ crop.selectedCrop.Name }}</span>
             <span>
+              <!-- 優先品目の変更 -->
               <b-button
                 :disabled="!selectedNutrientComputed || !selectedMonthComputed"
                 size="sm"
                 variant="info"
-                @click="showFctDialogue"
-                >remove
+                @click="
+                  showFctDialogue({ mode: 1, caseId: crop.selectedCrop.id })
+                "
+                >change
+              </b-button>
+
+              <!-- 優先品目の削除 -->
+              <b-button
+                :disabled="!selectedNutrientComputed || !selectedMonthComputed"
+                size="sm"
+                variant="warning"
+                @click="
+                  showFctDialogue({ mode: 2, caseId: crop.selectedCrop.id })
+                "
+                >delete
               </b-button>
             </span>
           </div>
         </b-list-group-item>
       </b-list-group>
     </b-card>
+
+    <!-- 品目編集用のModal -->
     <fct-box-modal
       my-name="modalTest"
       my-modal-header="Food Composition Table"
       :show-modal.sync="showFct"
       :items="fctFilterByMonth"
-      @modalOk="
-        onCropSelected($event, {
-          month: selectedMonthComputed,
-        })
-      "
+      @modalOk="onCropSelected($event, dialogOption)"
     />
   </b-container>
 </template>
 
 <script>
 import { arrayValidator, objectValidator } from 'vue-props-validation'
-// import fctTableModal from '@/components/organisms/FctTableModal'
 import fctBoxModal from '@/components/molecules/FctBoxModal'
 
 /**
  * #月ごとの優先作物の選定
  * ３つのParamに対して、値を選択してemit
  * 1. selectedMonth
- * 1. selectedNutrient
- * 1. feasibilityCases
+ * 2. selectedNutrient
+ * 3. feasibilityCases
+ *
+ * 補足的に必要なParam
+ * * 対象家族の構成(document該当箇所と紐付けのため)
+ * * 対象家族のID(document該当箇所と紐付けのため)
+ * * FCT
+ * * 作物カレンダー
  */
 export default {
   name: 'PriorityCommodity',
@@ -176,7 +202,10 @@ export default {
       validator: arrayValidator({
         type: Object,
         validator: objectValidator({
-          target: {
+          /**
+           * 家族構成
+           */
+          familyMember: {
             type: Array,
             required: true,
             validator: arrayValidator({
@@ -187,6 +216,9 @@ export default {
               }),
             }),
           },
+          /**
+           * 選択した優先品目
+           */
           selectedCrop: {
             type: Object,
             validator: objectValidator({
@@ -203,10 +235,21 @@ export default {
               id: String,
             }),
           },
+          /**
+           * 優先品目の生産目標
+           */
+          prodTarget: {
+            Wt: Number,
+            Wt365: Number,
+            share: Number,
+          },
           note: {
             type: String,
             default: '',
           },
+          /**
+           * feasibility Questionへの回答
+           */
           ansList: {
             type: Array,
             default: () => [
@@ -290,30 +333,67 @@ export default {
        */
       showFct: false,
       /**
+       *
+       */
+      dialogOption: '',
+      /**
        * 現在入力中の作物リストのid
        */
       addCropId: -1,
     }
   },
   computed: {
+    /**
+     * property（selectedNutrient）をリアクティブにするため
+     */
+    selectedNutrientComputed: {
+      get() {
+        return this.selectedNutrient
+      },
+      set(val) {
+        this.$emit('update:selectedNutrient', val)
+      },
+    },
+    /**
+     * property（selectedMonth）をリアクティブにするため
+     */
+    selectedMonthComputed: {
+      get() {
+        return this.selectedMonth
+      },
+      set(val) {
+        this.$emit('update:selectedMonth', val)
+      },
+    },
+    /**
+     * property（feasibilityCases）をリアクティブにするため
+     */
+    feasibilityCasesComputed: {
+      get() {
+        return this.feasibilityCases
+      },
+      set(val) {
+        this.$emit('update:feasibilityCases', val)
+      },
+    },
+    /**
+     * feasibilityCaseを対象月で絞り込み
+     */
     cropListByMonth: {
       get() {
         const vm = this
         if (vm.feasibilityCasesComputed.length === -1) {
           return []
         }
-        const res = vm.feasibilityCasesComputed.filter((item) => {
+        return vm.feasibilityCasesComputed.filter((item) => {
           return item.month === vm.selectedMonthComputed
         })
-        if (!res) {
-          return []
-        } else {
-          return res.map((item2) => {
-            return item2.selectedCrop.Name
-          })
-        }
       },
     },
+    /**
+     * fctを対象月で絞り込み
+     * @returns {*[]|any}
+     */
     fctFilterByMonth() {
       if (this.selectedMonthComputed === -1) {
         return JSON.parse(JSON.stringify(this.fct))
@@ -329,69 +409,93 @@ export default {
         })
       return this.fct.filter((item) => filteredId.includes(item.id))
     },
-    selectedNutrientComputed: {
-      get() {
-        return this.selectedNutrient
-      },
-      set(val) {
-        this.$emit('update:selectedNutrient', val)
-      },
-    },
-    selectedMonthComputed: {
-      get() {
-        return this.selectedMonth
-      },
-      set(val) {
-        this.$emit('update:selectedMonth', val)
-      },
-    },
-    feasibilityCasesComputed: {
-      get() {
-        return this.feasibilityCases
-      },
-      set(val) {
-        this.$emit('update:feasibilityCases', val)
-      },
-    },
   },
   methods: {
     /**
      * fctダイアログのトリガー
      */
-    showFctDialogue() {
+    showFctDialogue(param = '') {
       if (this.fctFilterByMonth.length === 0) {
         alert('there is no available crop for this month')
+        return
+      }
+      this.dialogOption = param
+      /**
+       * 削除モードの場合はダイアログを開かず削除処理に移る
+       */
+      if (param.mode === 2) {
+        this.onCropSelected([], param)
         return
       }
       this.showFct = !this.showFct
     },
     /**
-     * cropの選択した値をもとにデータ更新
+     * cropの選択した値をもとにデータ更新(追加、変更、削除の３パターン)
      * @param val
-     * @param options
+     * @param dialogOption {mode: [0: 追加, 1: 修正, 2:削除]}
      */
-    onCropSelected(val, options) {
+    onCropSelected(val, dialogOption) {
       const vm = this
-      // 選択された作物の重量を100gにセット
-      val.Wt = 100
-      // feasibilityCases全体を更新する場合
-      const returnValue = JSON.parse(
-        JSON.stringify(vm.feasibilityCasesComputed)
-      ).push({
-        target: JSON.parse(JSON.stringify(vm.familyMember)),
+
+      // feasibilityCases更新用のoriginalコピーを作成
+      let returnValue = []
+      returnValue = JSON.parse(JSON.stringify(vm.feasibilityCases))
+
+      // feasibilityCases更新用のnewValueを作成
+      const newValue = {
+        familyMember: JSON.parse(JSON.stringify(vm.familyMember)),
         selectedCrop: val,
-        note: '',
+        prodTarget: {
+          Wt: 100,
+          Wt365: 36500,
+          share: 100,
+        },
         ansList: [-99, -99, -99, -99, -99, -99, -99, -99, -99, -99, -99, -99],
+        note: '',
         familyId: vm.familyId,
         month: vm.selectedMonth,
-        caseId: vm.familyId + '_' + vm.selectedMonth + '_' + val.id,
-      })
+        caseId: dialogOption.caseId
+          ? dialogOption.caseId
+          : vm.familyId + '_' + vm.selectedMonth + '_' + val.id,
+      }
+
+      switch (dialogOption.mode) {
+        case 0:
+          returnValue = returnValue.push(newValue)
+          break
+
+        case 1: {
+          const searchIndex = returnValue.findIndex((item) => {
+            return item.caseId === dialogOption.caseId
+          })
+
+          if (searchIndex) {
+            // マッチしている場合
+            returnValue.splice(searchIndex, 1, newValue)
+          } else {
+            // 見つからなかった場合は追加更新で
+            returnValue.push(newValue)
+          }
+          break
+        }
+
+        case 2: {
+          returnValue = returnValue.filter((item) => {
+            return item.caseId !== dialogOption.caseId
+          })
+          break
+        }
+      }
+
       this.$emit('update:feasibilityCases', returnValue)
-      this.$emit('changeCrop', {
-        month: options.month,
-        index: options.index,
-        selectedCrop: val,
-      })
+      if (dialogOption.mode !== 2) {
+        this.$emit('changeCrop', {
+          month: vm.selectedMonth,
+          familyId: vm.familyId,
+          caseId: dialogOption.caseId,
+          selectedCrop: val,
+        })
+      }
     },
   },
 }

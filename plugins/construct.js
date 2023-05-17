@@ -52,11 +52,16 @@ export class CropInfo {
 export class FeasibilityCases extends ResponsiveArray {
   add(data) {
     super.add({
-      target: data.dri.map(function (item) {
+      familyMember: data.dri.map(function (item) {
         return { id: item.id, count: 0 }
       }),
       selectedCrop: new CropInfo(data.cropInfo),
       note: data.note,
+      prodTarget: {
+        Wt: Number,
+        Wt365: Number,
+        share: Number,
+      },
       ansList: [-99, -99, -99, -99, -99, -99, -99, -99, -99, -99, -99, -99],
       familyId: data.familyId,
       month: data.month,
