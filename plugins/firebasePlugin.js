@@ -24,13 +24,13 @@ import { getStorage } from 'firebase/storage'
  *     string, appId: string, projectId: string, databaseURL: string, authDomain: string}}
  */
 const firebaseConfig = {
-  apiKey: 'AIzaSyBcX6DLb34dpg9MUBmmce-HJtEPHQSeAuY',
-  authDomain: 'ifnanfaapp2.firebaseapp.com',
-  projectId: 'ifnanfaapp2',
-  storageBucket: 'ifnanfaapp2.appspot.com',
-  messagingSenderId: '603579018350',
-  appId: '1:603579018350:web:843cb38707702de7740a7f',
-  measurementId: 'G-5VRCVZTEWK',
+  apiKey: 'AIzaSyBfEUXtBe-NewgcZBeRYfdqhpkMuRYpI-o',
+  authDomain: 'ifnanfaapp.firebaseapp.com',
+  projectId: 'ifnanfaapp',
+  storageBucket: 'ifnanfaapp.appspot.com',
+  messagingSenderId: '992030662373',
+  appId: '1:992030662373:web:f0f14f54251b82a93d7e0c',
+  measurementId: 'G-7Y5M000WTC',
 }
 
 /**

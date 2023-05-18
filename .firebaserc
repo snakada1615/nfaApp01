@@ -1,0 +1,17 @@
+{
+  "projects": {
+    "default": "ifnanfaapp"
+  },
+  "targets": {
+    "ifnanfaapp": {
+      "hosting": {
+        "main": [
+          "ifnanfapp"
+        ],
+        "storybook": [
+          "nfaapp-storybook"
+        ]
+      }
+    }
+  }
+}
