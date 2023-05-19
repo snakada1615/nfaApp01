@@ -71,10 +71,8 @@
 import { arrayValidator, objectValidator } from 'vue-props-validation'
 
 /**
- * @desc 3つのコンポーネントを組み合わせて特定の品目のfeasibility scoreを算出する
- * 2. driSelectSingle - 対象グループを選択した場合、これに応じた栄養素必要量を返す
- * 3. nutritionBar - 上記2つから、栄養素の銃速度をバーチャートで示す
- *
+ * 与えられた質問セットに応じて質問項目と回答候補一覧（ドロップダウン）を表示
+ * ユーザーが解答を選択するごとに変更内容をemit
  */
 export default {
   components: {},

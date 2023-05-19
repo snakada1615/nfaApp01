@@ -295,7 +295,7 @@ const TemplateWithScope = (args) => ({
     '@update:answerList="update" >' +
     '<template #extraContents>' +
     '<div>this is for testing slot</div>' +
-    '<div>but i do not believe</div><hr>' +
+    '<span class="text-info">i wonder how it works</span><hr>' +
     '</template>' +
     '</qa-tool>',
   methods: {
