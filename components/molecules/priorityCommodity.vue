@@ -123,8 +123,8 @@ import fctBoxModal from '@/components/molecules/FctBoxModal'
  * 補足的に必要なParam
  * * 対象家族の構成(document該当箇所と紐付けのため)
  * * 対象家族のID(document該当箇所と紐付けのため)
- * * FCT
- * * 作物カレンダー
+ * * FCT(表示用)
+ * * 作物カレンダー（FCTやfeasibilityCasesのフィルタリング用）
  */
 export default {
   name: 'PriorityCommodity',
@@ -277,6 +277,7 @@ export default {
     },
     /**
      * 対象家庭の情報
+     * 家族情報と優先品目を紐づけるためのproperty
      */
     familyInfo: {
       type: Object,
@@ -362,7 +363,6 @@ export default {
      * 対象家族のID
      */
     familyId() {
-      console.log(this.familyInfo)
       return this.familyInfo.familyId
     },
     /**

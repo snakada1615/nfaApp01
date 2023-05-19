@@ -6,7 +6,7 @@
     "ifnanfaapp": {
       "hosting": {
         "main": [
-          "ifnanfapp"
+          "ifnanfaapp"
         ],
         "storybook": [
           "nfaapp-storybook"

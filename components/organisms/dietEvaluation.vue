@@ -108,6 +108,9 @@ import {
   getNutritionSupply,
 } from '@/plugins/helper'
 
+/**
+ * 食事データを入力すると、栄養ギャップおよび食の多様性を評価した結果をemit
+ */
 export default {
   name: 'DietEvaluation',
   components: {
