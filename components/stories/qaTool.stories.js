@@ -283,3 +283,28 @@ Default.args = {
   qaList,
   answerList,
 }
+
+const TemplateWithScope = (args) => ({
+  components: { qaTool },
+  setup() {
+    return { args }
+  },
+  template:
+    '<qa-tool ' +
+    'v-bind="args" ' +
+    '@update:answerList="update" >' +
+    '<template #extraContents>' +
+    '<div>this is for testing slot</div>' +
+    '<div>but i do not believe</div><hr>' +
+    '</template>' +
+    '</qa-tool>',
+  methods: {
+    update: action('update:answerList'),
+  },
+})
+
+export const withSlot = TemplateWithScope.bind({})
+withSlot.args = {
+  qaList,
+  answerList,
+}

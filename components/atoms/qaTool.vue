@@ -26,7 +26,7 @@
           </template>
 
           <!--    追加項目の表示      -->
-          <slot></slot>
+          <slot v-if="index === 0" name="extraContents"></slot>
 
           <ul class="pl-2 my-0">
             <li
@@ -58,7 +58,7 @@
                   })
                 "
                 size="sm"
-                @change="onAnswerChanged()"
+                @change="onAnswerChanged($event)"
               />
             </li>
           </ul>
