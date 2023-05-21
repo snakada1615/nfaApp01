@@ -25,15 +25,18 @@
             <div>{{ qaGroup.category }}</div>
           </template>
 
-          <!--    追加項目の表示      -->
-          <slot v-if="index === 0" name="extraContents"></slot>
-
           <ul class="pl-2 my-0">
             <li
               v-for="(qa, index2) in qaGroup.questionList"
               :key="index2"
               :class="{ 'mt-3': index2 !== 0 }"
             >
+              <!--    追加項目の表示      -->
+              <slot
+                v-if="extraComponentFlag.includes(index2)"
+                name="extraContents"
+              ></slot>
+
               {{ qa.questionText }}
               <b-form-select
                 :value="
@@ -126,6 +129,13 @@ export default {
         optionId: String,
         score: Number,
       }),
+    },
+    /**
+     * 表示項目に応じて追加コンポーネントを表示するためのフラグ
+     */
+    extraComponentFlag: {
+      type: Array,
+      default: () => [],
     },
   },
   computed: {

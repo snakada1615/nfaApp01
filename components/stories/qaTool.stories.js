@@ -307,4 +307,5 @@ export const withSlot = TemplateWithScope.bind({})
 withSlot.args = {
   qaList,
   answerList,
+  extraComponentFlag: [1],
 }
