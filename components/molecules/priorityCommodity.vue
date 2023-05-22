@@ -10,6 +10,15 @@
       <template #header>
         <div>Select key nutrient for your target family/HH</div>
       </template>
+      <b-row class="mb-2 mt-0">
+        <b-col>
+          <div>
+            FamilyName:<span class="font-weight-bold text-danger">{{
+              familyInfo.familyName
+            }}</span>
+          </div>
+        </b-col>
+      </b-row>
       <b-row>
         <b-col>
           <!-- 対象栄養素の選択 -->
@@ -303,6 +312,12 @@ export default {
         familyId: {
           type: String,
         },
+        /**
+         * 対象家族名
+         */
+        familyName: {
+          type: String,
+        },
       }),
     },
     /**
@@ -414,7 +429,10 @@ export default {
           return []
         }
         return vm.feasibilityCasesComputed.filter((item) => {
-          return item.month === vm.selectedMonthComputed
+          return (
+            item.month === vm.selectedMonthComputed &&
+            item.familyId === vm.familyId
+          )
         })
       },
     },

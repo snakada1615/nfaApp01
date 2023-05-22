@@ -60,6 +60,42 @@ export default {
   },
   props: {
     /**
+     * 評価対象となる家族
+     * 家族情報と優先品目を紐づけるためのproperty
+     */
+    familyInfo: {
+      type: Object,
+      required: true,
+      validate: objectValidator({
+        /**
+         * 家族構成
+         */
+        familyMember: {
+          type: Array,
+          required: true,
+          validator: arrayValidator({
+            type: Object,
+            validator: objectValidator({
+              id: String,
+              count: Number,
+            }),
+          }),
+        },
+        /**
+         * 対象家族のID
+         */
+        familyId: {
+          type: String,
+        },
+        /**
+         * 対象家族名
+         */
+        familyName: {
+          type: String,
+        },
+      }),
+    },
+    /**
      * 評価対象となる月
      */
     selectedMonth: {

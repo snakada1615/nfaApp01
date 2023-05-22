@@ -171,6 +171,7 @@ Default.args = {
   familyInfo: {
     familyMember: feasibilityCases[0].familyMember,
     familyId: feasibilityCases[0].familyId,
+    familyName: 'nakada',
   },
 }
 
@@ -185,5 +186,6 @@ noSelection.args = {
   familyInfo: {
     familyMember: feasibilityCases[0].familyMember,
     familyId: feasibilityCases[0].familyId,
+    familyName: 'nakada',
   },
 }
