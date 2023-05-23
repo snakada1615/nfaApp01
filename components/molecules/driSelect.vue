@@ -176,18 +176,21 @@ export default {
     updateTarget(index, val) {
       // targetの変更内容を親コンポーネントにemit
       const vm = this
+      const newTarget = vm.targetComputed.map((item) => {
+        let countTemp = item.count
+        if (index === item.id) {
+          countTemp = val
+        }
+        return {
+          id: item.id,
+          count: countTemp,
+        }
+      })
+
+      this.$emit('update:target', newTarget)
       this.$emit(
-        'update:target',
-        vm.targetComputed.map((item) => {
-          let countTemp = item.count
-          if (index === item.id) {
-            countTemp = val
-          }
-          return {
-            id: item.id,
-            count: countTemp,
-          }
-        })
+        'update:nutritionDemand',
+        getNutritionDemand(newTarget, vm.driItems)
       )
     },
     /**

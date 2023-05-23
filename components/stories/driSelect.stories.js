@@ -48,10 +48,12 @@ const Template = (args) => ({
   template:
     '<driSelect ' +
     '@update:target="updateNewFamily" ' +
+    '@update:nutritionDemand="updateNutritionDemand" ' +
     'v-bind="args" ' +
     '/>',
   methods: {
     updateNewFamily: action('update family member'),
+    updateNutritionDemand: action('update nutrition demand'),
   },
 })
 

@@ -104,6 +104,20 @@ export function getNutritionSupply(datArray, stapleCheck = 0) {
 }
 
 /**
+ * 栄養需要と栄養供給から、栄養素ごとのギャップ判定
+ * @param supply
+ * @param demand
+ * @returns {{}}
+ */
+export function getNutritionGap(supply, demand) {
+  const gap = {}
+  Object.entries(demand).forEach(([key, value]) => {
+    gap[key] = value - supply[key]
+  })
+  return gap
+}
+
+/**
  * 数字の桁数を３桁に自動調整し、単位を追記して返す
  * unitkey [0..3]
  * @param val

@@ -3,7 +3,6 @@
     <b-row class="my-2">
       <!-- 作物追加用のボタン  -->
       <b-col cols="12" lg="6">
-        {{ nutritionGap }}
         <b-card
           header-bg-variant="success"
           border-variant="success"
@@ -106,6 +105,7 @@ import nutritionBar from '@/components/molecules/nutritionBar'
 import {
   getDiversityStatus,
   getNutritionDemand,
+  getNutritionGap,
   getNutritionSupply,
 } from '@/plugins/helper'
 
@@ -285,11 +285,7 @@ export default {
      * @returns {{}}
      */
     nutritionGap() {
-      const vm = this
-      const gap = {}
-      Object.entries(vm.nutritionDemand).forEach(([key, value]) => {
-        gap[key] = value - vm.nutritionSupply[key]
-      })
+      const gap = getNutritionGap(this.nutritionSupply, this.nutritionDemand)
       this.$emit('updateNutritionGap', gap)
       return gap
     },
