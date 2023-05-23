@@ -3,6 +3,7 @@
     <b-row class="my-2">
       <!-- 作物追加用のボタン  -->
       <b-col cols="12" lg="6">
+        {{ nutritionGap }}
         <b-card
           header-bg-variant="success"
           border-variant="success"
@@ -278,6 +279,19 @@ export default {
     nutritionSupply() {
       const vm = this
       return getNutritionSupply(vm.recipe, 1)
+    },
+    /**
+     * 栄養素の受給ギャップ
+     * @returns {{}}
+     */
+    nutritionGap() {
+      const vm = this
+      const gap = {}
+      Object.entries(vm.nutritionDemand).forEach(([key, value]) => {
+        gap[key] = value - vm.nutritionSupply[key]
+      })
+      this.$emit('updateNutritionGap', gap)
+      return gap
     },
     /**
      * nutritionBar用のレーティング

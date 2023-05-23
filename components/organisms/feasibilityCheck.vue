@@ -21,13 +21,12 @@
             Feasibility assessment result
             <b-form-select
               v-model="selectedFeasibilityCase"
-              :options="feasibilityCaseByMonth"
+              :options="cropList"
             />
             <div class="d-flex flex-row">
               <b-form-input
-                v-model="feasibilityPageMemo"
+                :value="feasibilityCaseByMonth.note"
                 placeholder="memo for this page"
-                :state="stateMemoInput"
                 class="my-1"
               />
             </div>
@@ -37,7 +36,7 @@
     </b-row>
 
     <display-result feasibility-result="" />
-    <qa-tool answer-list="" qa-list="">
+    <qa-tool answer-list="answerList" qa-list="qaList">
       <template #extraContents>
         <show-target-volume target-info="" />
       </template>
@@ -59,42 +58,6 @@ export default {
     showTargetVolume,
   },
   props: {
-    /**
-     * 評価対象となる家族
-     * 家族情報と優先品目を紐づけるためのproperty
-     */
-    familyInfo: {
-      type: Object,
-      required: true,
-      validate: objectValidator({
-        /**
-         * 家族構成
-         */
-        familyMember: {
-          type: Array,
-          required: true,
-          validator: arrayValidator({
-            type: Object,
-            validator: objectValidator({
-              id: String,
-              count: Number,
-            }),
-          }),
-        },
-        /**
-         * 対象家族のID
-         */
-        familyId: {
-          type: String,
-        },
-        /**
-         * 対象家族名
-         */
-        familyName: {
-          type: String,
-        },
-      }),
-    },
     /**
      * 評価対象となる月
      */
@@ -164,13 +127,17 @@ export default {
             default: '',
           },
           /**
-           * feasibility Questionへの回答
+           * feasibility Questionへの回答一覧
            */
-          ansList: {
+          answerList: {
             type: Array,
-            default: () => [
-              -99, -99, -99, -99, -99, -99, -99, -99, -99, -99, -99, -99,
-            ],
+            required: true,
+            validator: arrayValidator({
+              categoryId: String,
+              questionId: String,
+              optionId: String,
+              score: Number,
+            }),
           },
           /**
            * 対象家族のID
@@ -187,6 +154,47 @@ export default {
         }),
       }),
     },
+    /**
+     * 質問と回答optionの一覧
+     */
+    qaList: {
+      type: Object,
+      required: true,
+      validator: objectValidator({
+        qaTitle: String,
+        totalScore: Number,
+        categoryList: Array,
+        required: true,
+        validator: arrayValidator({
+          type: Object,
+          validator: objectValidator({
+            category: String,
+            categoryId: String,
+            categoryScore: Number,
+            questionList: Array,
+            validator: arrayValidator({
+              type: Object,
+              validator: objectValidator({
+                questionText: String,
+                questionId: String,
+                ansState: Boolean,
+                singleScore: Number,
+                answerOptions: Array,
+                validator: arrayValidator({
+                  optionText: String,
+                  optionScore: Number,
+                  optionId: String,
+                }),
+              }),
+            }),
+          }),
+        }),
+      }),
+    },
+    /**
+     * 栄養素ギャップ
+     */
+    nutrientGaps() {},
   },
   computed: {
     feasibilityCaseByMonth() {
@@ -194,6 +202,24 @@ export default {
       return vm.feasibilityCases.filter(
         (item) => item.month === vm.selectedMonth
       )
+    },
+    cropList() {
+      return this.feasibilityCaseByMonth.map((item) => {
+        return item.selectedCrop.Name
+      })
+    },
+    answerList() {
+      return this.feasibilityCaseByMonth.map((item) => {
+        return item.answerList
+      })
+    },
+    targetInfo() {
+      return {
+        targetCommodity: this.feasibilityCaseByMonth.targetCommodity.Name,
+        targetNutrition: this.selectedNutrient,
+
+        prodTarget: this.feasibilityCaseByMonth.targetInfo,
+      }
     },
   },
 }

@@ -261,13 +261,17 @@ export default {
             default: '',
           },
           /**
-           * feasibility Questionへの回答
+           * feasibility Questionへの回答一覧
            */
-          ansList: {
+          answerList: {
             type: Array,
-            default: () => [
-              -99, -99, -99, -99, -99, -99, -99, -99, -99, -99, -99, -99,
-            ],
+            required: true,
+            validator: arrayValidator({
+              categoryId: String,
+              questionId: String,
+              optionId: String,
+              score: Number,
+            }),
           },
           /**
            * 対象家族のID

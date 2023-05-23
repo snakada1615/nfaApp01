@@ -1,4 +1,5 @@
 import { action } from '@storybook/addon-actions'
+// import { arrayValidator } from 'vue-props-validation'
 import priorityCommodity from '~/components/molecules/priorityCommodity'
 import * as fctBoxModalStories from '~/components/stories/fctBoxModal.stories'
 
@@ -116,7 +117,14 @@ const feasibilityCases = [
     ],
     familyId: 'baka01',
     caseId: 'baka01_3_110',
-    ansList: [-99, -99, -99, -99, -99, -99, -99, -99, -99, -99, -99, -99],
+    /**
+     * 回答一覧
+     */
+    answerList: [
+      { categoryId: 1, questionId: 0, optionId: 2, score: 2 },
+      { categoryId: 1, questionId: 1, optionId: 0, score: 4 },
+      { categoryId: 1, questionId: 2, optionId: 1, score: 3 },
+    ],
     selectedCrop: {
       Carbohydrate: 67.9,
       En: 315,

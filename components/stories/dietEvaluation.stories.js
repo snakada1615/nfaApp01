@@ -17,9 +17,11 @@ const Template = (args) => ({
     return { args }
   },
   template:
-    '<diet-evaluation ' + 'v-bind="args" @update:recipe="updateRecipe"/>',
+    '<diet-evaluation ' +
+    'v-bind="args" @update:recipe="updateRecipe" @updateNutritionGap="updateNutritionGap"/>',
   methods: {
     updateRecipe: action('update'),
+    updateNutritionGap: action('updateNutritionGap'),
   },
 })
 
