@@ -1,176 +1,127 @@
 <template>
   <b-container>
-    <b-row class="my-2">
-      <!-- 作物追加用のボタン  -->
-      <b-col cols="12" lg="6">
-        <b-card
-          header-bg-variant="success"
-          border-variant="success"
-          bg-variant="light"
-          class="my-2"
-        >
-          <template #header>
-            <div class="font-weight-bold">Add diet information</div>
-          </template>
+    <!-- 家族名表示 -->
+    <div>
+      family name:<span class="text-danger font-weight-bold">{{
+        familyInfo.familyId
+      }}</span>
+    </div>
 
-          <b-button variant="info" @click="showFctBox = !showFctBox">
-            add crop
-          </b-button>
-        </b-card>
-      </b-col>
+    <!-- 日付選択 -->
+    <b-input-group prepend="select survey date" size="sm" class="my-1">
+      <b-form-select v-model="selectedDate" :options="dateList" />
+      <template #append>
+        <b-button v-b-modal.dateModal variant="info">new survey</b-button>
+      </template>
+    </b-input-group>
+    {{ selectedDate }}
 
-      <!-- 作物多様化状態の表示 -->
-      <b-col cols="12" lg="6">
-        <diversity-table :diversity-status="diversityStatus" />
-      </b-col>
-
-      <!-- Nutrition barの表示 -->
-      <b-col cols="12" lg="6">
-        <b-card
-          header-bg-variant="success"
-          border-variant="success"
-          bg-variant="light"
-          class="my-2"
-        >
-          <template #header>
-            <div class="font-weight-bold">Key Nutrients Sufficiency</div>
-          </template>
-          <b-row>
-            <b-col cols="2" class="d-flex justify-content-center">
-              Target
-            </b-col>
-            <b-col cols="2" class="d-flex justify-content-center">
-              Supply
-            </b-col>
-            <b-col class="d-flex justify-content-start pl-5">
-              sufficiency rate
-            </b-col>
-          </b-row>
-          <nutrition-bar
-            v-for="index in 4"
-            :key="index"
-            :col-width-first="3"
-            :colwidth-second="2"
-            :colwidth-third="5"
-            :colwidth-fourth="2"
-            :label="nutritionLabel[index - 1]"
-            :max-rating="maxRating"
-            :rating="nutritionRating[nutritionLabel[index - 1]]"
-            :max-rating-absolute="maxRating"
-          />
-          <b-row>
-            <b-col>
-              <div class="small">
-                * the amount of protein and fe from staple is excluded from
-                total
-              </div>
-            </b-col>
-          </b-row>
-        </b-card>
-      </b-col>
-
-      <!-- recipe-tableの表示 -->
-      <b-col cols="12" lg="6">
-        <b-card
-          header-bg-variant="success"
-          border-variant="success"
-          bg-variant="light"
-          class="my-2"
-        >
-          <template #header>
-            <div class="font-weight-bold">Record of Diet</div>
-          </template>
-          <recipe-table :recipe="recipe" />
-        </b-card>
-      </b-col>
-    </b-row>
-    <!-- 食事入力用のダイアログ -->
-    <recipe-modal
-      :show-modal.sync="showFctBox"
+    <diet-evaluation-unit
+      :recipe="recipeFiltered"
+      :recipe-date.sync="selectedDate"
+      :target-member="familyInfo.familyMember"
+      :my-fct="fct"
+      :my-dri="dri"
       :portion-units="portionUnits"
-      :recipe="recipe"
-      :fct-items="myFct"
-      my-name="fctBox01"
       @update:recipe="updateRecipe"
+      @update:recipeDate="updateRecipeDate"
     />
+
+    <!-- recipeデータの新規作成 -->
+    <b-modal
+      id="dateModal"
+      title="Select date for new 24hr recall"
+      @ok="createNewRecipe(newlyCreatedDate)"
+    >
+      <b-form-datepicker v-model="newlyCreatedDate" />
+    </b-modal>
   </b-container>
 </template>
 
 <script>
 import { arrayValidator, objectValidator } from 'vue-props-validation'
-import recipeTable from '@/components/molecules/recipeTable'
-import diversityTable from '@/components/atoms/diversityTable'
-import recipeModal from '@/components/molecules/recipeModal'
-import nutritionBar from '@/components/molecules/nutritionBar'
-import {
-  getDiversityStatus,
-  getNutritionDemand,
-  getNutritionGap,
-  getNutritionSupply,
-} from '@/plugins/helper'
+import dietEvaluationUnit from '@/components/organisms/dietEvaluationUnit'
 
 /**
- * 食事データを入力すると、栄養ギャップおよび食の多様性を評価した結果をemit
+ * dietEvaluationUnitの拡張版
+ * * 複数のrecipeを切り替えながら編集。
+ * * recipeは日付が"unique ID"になっており、日付で切り替える
+ * * 入力値はrecipeセット、家族情報、戻り値は更新したrecipeと日付
  */
 export default {
   name: 'DietEvaluation',
-  components: {
-    recipeTable,
-    diversityTable,
-    recipeModal,
-    nutritionBar,
+  components: { dietEvaluationUnit },
+  component: {
+    dietEvaluationUnit,
   },
   props: {
     /**
-     * 対象家庭で摂取した食品名及び栄養成分の一覧
+     * 対象家族の情報
      */
-    recipe: {
-      type: Array,
+    familyInfo: {
+      type: Object,
       required: true,
-      validator: arrayValidator({
-        type: Object,
-        validator: objectValidator({
-          date: String,
-          cropInfo: {
+      validator: objectValidator({
+        familyId: String,
+        nutritionDemand: Number,
+        familyMember: {
+          type: Array,
+          required: true,
+          validator: arrayValidator({
             type: Object,
             validator: objectValidator({
-              Carbohydrate: Number,
-              En: Number,
-              Fe: Number,
-              Fat: Number,
-              Food_grp: String,
-              Name: String,
-              Pr: Number,
-              Va: Number,
-              Group: String,
-              food_grp_id: String,
               id: String,
+              count: Number,
             }),
-          },
-          Wt: Number,
-          foodName: String,
-        }),
+          }),
+        },
       }),
     },
     /**
-     * ターゲットグループの構成：v-modelで使用
-     *   [{ id: 1, count: 1}, { id: 2, count: 5}, { id: 3, count: 0}]
+     * 対象家庭で摂取した食品名及び栄養成分の一覧
      */
-    targetMember: {
+    recipeCases: {
       type: Array,
       required: true,
       validator: arrayValidator({
         type: Object,
-        validator: objectValidator({
-          id: String,
-          count: Number,
+        variable: objectValidator({
+          date: Date,
+          familyId: String,
+          recipe: {
+            type: Array,
+            required: true,
+            validator: arrayValidator({
+              type: Object,
+              validator: objectValidator({
+                cropInfo: {
+                  type: Object,
+                  validator: objectValidator({
+                    Carbohydrate: Number,
+                    En: Number,
+                    Fe: Number,
+                    Fat: Number,
+                    Food_grp: String,
+                    Name: String,
+                    Pr: Number,
+                    Va: Number,
+                    Group: String,
+                    food_grp_id: String,
+                    id: String,
+                  }),
+                },
+                Wt: Number,
+                foodName: String,
+              }),
+            }),
+          },
         }),
       }),
     },
     /**
      * 食品成分表:食品名及び栄養成分の一覧を含む配列
      */
-    myFct: {
+    fct: {
       type: Array,
       required: true,
       validator: arrayValidator({
@@ -203,7 +154,7 @@ export default {
      *            id: 0
      *           }],
      */
-    myDri: {
+    dri: {
       type: Array,
       required: true,
       validator: arrayValidator({
@@ -237,91 +188,52 @@ export default {
   },
   data() {
     return {
-      /**
-       * fctTableModal表示用のフラグ
-       */
-      showFctBox: false,
-      /**
-       * nutritionBar用のproperty：栄養素表示用のlabel
-       */
-      nutritionLabel: ['En', 'Pr', 'Va', 'Fe'],
-      /**
-       * nutritionBar用のproperty：ratingの最大値
-       */
-      maxRating: 10,
+      selectedDate: '',
+      newlyCreatedDate: '',
     }
   },
   computed: {
-    /**
-     * FCTからfood Groupを抽出
-     * @returns {*}
-     */
-    foodGroup() {
-      return this.myFct.reduce((accumulator, dat) => {
-        if (!accumulator.includes(dat.Group)) {
-          accumulator.push(dat.Group)
-        }
-        return accumulator
-      }, [])
+    recipeFiltered: {
+      get() {
+        const res = this.recipeCases.find(
+          (item) =>
+            item.familyId === this.familyInfo.familyId &&
+            item.date === this.selectedDate
+        )
+        return res ? res.recipe : []
+      },
     },
-    /**
-     * recipeに含まれるfood Groupから、何種類の食品群が含まれるか判定
-     * @returns {*[]}
-     */
-    diversityStatus() {
-      const vm = this
-      return getDiversityStatus(vm.recipe, vm.foodGroup)
-    },
-    nutritionDemand() {
-      const vm = this
-      return getNutritionDemand(vm.targetMember, vm.myDri)
-    },
-    nutritionSupply() {
-      const vm = this
-      return getNutritionSupply(vm.recipe, 1)
-    },
-    /**
-     * 栄養素の受給ギャップ
-     * @returns {{}}
-     */
-    nutritionGap() {
-      const gap = getNutritionGap(this.nutritionSupply, this.nutritionDemand)
-      this.$emit('updateNutritionGap', gap)
-      return gap
-    },
-    /**
-     * nutritionBar用のレーティング
-     * @returns {*} 栄養素ごとの充足率
-     */
-    nutritionRating() {
-      const vm = this
-      return {
-        En: vm.nutritionDemand.En
-          ? Math.round((100 * vm.nutritionSupply.En) / vm.nutritionDemand.En) /
-            10
-          : 0,
-        Pr: vm.nutritionDemand.Pr
-          ? Math.round((100 * vm.nutritionSupply.Pr) / vm.nutritionDemand.Pr) /
-            10
-          : 0,
-        Va: vm.nutritionDemand.Va
-          ? Math.round((100 * vm.nutritionSupply.Va) / vm.nutritionDemand.Va) /
-            10
-          : 0,
-        Fe: vm.nutritionDemand.Fe
-          ? Math.round((100 * vm.nutritionSupply.Fe) / vm.nutritionDemand.Fe) /
-            10
-          : 0,
-      }
+    dateList: {
+      get() {
+        return this.recipeCases.map((item) => {
+          return item.date
+        })
+      },
     },
   },
   methods: {
-    /**
-     * recipeの更新を親に伝達
-     * @param val
-     */
     updateRecipe(val) {
       this.$emit('update:recipe', val)
+    },
+    updateRecipeDate(val) {
+      this.$emit('update:recipeDate', val)
+    },
+    createNewRecipe(val) {
+      const vm = this
+      if (val) {
+        if (
+          window.confirm('do you want to conduct 24hr recall for ' + val + '?')
+        ) {
+          this.selectedDate = val
+          const res = JSON.parse(JSON.stringify(vm.recipeCases))
+          res.push({
+            date: val,
+            familyId: vm.familyInfo.familyId,
+            recipe: [],
+          })
+          this.updateRecipe(res)
+        }
+      }
     },
   },
 }
