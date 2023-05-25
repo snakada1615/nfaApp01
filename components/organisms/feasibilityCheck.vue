@@ -82,20 +82,6 @@ export default {
         type: Object,
         validator: objectValidator({
           /**
-           * 家族構成
-           */
-          familyMember: {
-            type: Array,
-            required: true,
-            validator: arrayValidator({
-              type: Object,
-              validator: objectValidator({
-                id: String,
-                count: Number,
-              }),
-            }),
-          },
-          /**
            * 選択した優先品目
            */
           selectedCrop: {

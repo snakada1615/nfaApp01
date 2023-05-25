@@ -136,3 +136,15 @@ export class CropCalendar extends ResponsiveArray {
     })
   }
 }
+
+export function propValidator(obj) {
+  return obj
+  /*
+  return objectValidator({
+    id: Number,
+    firstName: String,
+    lastName: { type: String, required: false },
+    age: Number,
+  })
+*/
+}

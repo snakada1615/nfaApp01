@@ -216,20 +216,6 @@ export default {
         type: Object,
         validator: objectValidator({
           /**
-           * 家族構成
-           */
-          familyMember: {
-            type: Array,
-            required: true,
-            validator: arrayValidator({
-              type: Object,
-              validator: objectValidator({
-                id: String,
-                count: Number,
-              }),
-            }),
-          },
-          /**
            * 選択した優先品目
            */
           selectedCrop: {
@@ -385,12 +371,6 @@ export default {
       return this.familyInfo.familyId
     },
     /**
-     * 対象家族の構成
-     */
-    familyMember() {
-      return this.familyInfo.familyMember
-    },
-    /**
      * property（selectedNutrient）をリアクティブにするため
      */
     selectedNutrientComputed: {
@@ -493,7 +473,6 @@ export default {
 
       // feasibilityCases更新用のnewValueを作成
       const newValue = {
-        familyMember: JSON.parse(JSON.stringify(vm.familyMember)),
         selectedCrop: val,
         prodTarget: {
           Wt: 100,
