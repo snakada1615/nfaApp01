@@ -13,11 +13,11 @@ const result = {
   cropName: 'apple',
   totalScore: 35,
   maxScore: 60,
-  singleScoreList: [
-    { title: 'Protein', singleScore: 8 },
-    { title: 'Vit-A', singleScore: 4 },
-    { title: 'Energy', singleScore: 6 },
-    { title: 'Iron', singleScore: 2 },
+  categoryScore: [
+    { title: 'Protein', score: 8 },
+    { title: 'Vit-A', score: 4 },
+    { title: 'Energy', score: 6 },
+    { title: 'Iron', score: 2 },
   ],
 }
 

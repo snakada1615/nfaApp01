@@ -25,12 +25,9 @@
           {{ resultComputed.maxScore }}
         </b-col>
       </b-row>
-      <b-row
-        v-for="(qa, index1) in resultComputed.singleScoreList"
-        :key="index1"
-      >
+      <b-row v-for="(qa, index1) in resultComputed.categoryScore" :key="index1">
         <b-col>
-          <nutrition-bar :label="qa.title" :rating="qa.singleScore" />
+          <nutrition-bar :label="qa.title" :rating="qa.score" />
         </b-col>
       </b-row>
     </b-card>
@@ -57,14 +54,14 @@ export default {
         cropName: String,
         totalScore: Number,
         maxScore: Number,
-        singleScoreList: {
+        categoryScore: {
           type: Array,
           required: true,
           validator: arrayValidator({
             type: Object,
             validator: objectValidator({
               title: String,
-              singleScore: Number,
+              score: Number,
             }),
           }),
         },

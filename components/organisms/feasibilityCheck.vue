@@ -34,7 +34,7 @@
         </b-row>
       </b-card>
     </b-row>
-
+    {{ ansList }}
     <display-result feasibility-result="" />
     <qa-tool answer-list="answerList" qa-list="qaList">
       <template #extraContents>
