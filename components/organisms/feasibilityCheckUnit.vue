@@ -1,6 +1,6 @@
 <template>
   <b-container>
-    <display-result :feasibility-result="feasibilityResultComputed" />
+    <display-result :feasibility-result="feasibilityResult" />
     <qa-tool :answer-list.sync="answerListComputed" :qa-list="qaListComputed">
       <template #extraContents>
         <show-target-volume
@@ -26,29 +26,6 @@ export default {
     showTargetVolume,
   },
   props: {
-    /**
-     * feasibility questionの回答に応じて集計されたスコア
-     */
-    feasibilityResult: {
-      type: Object,
-      required: true,
-      validator: objectValidator({
-        cropName: String,
-        totalScore: Number,
-        maxScore: Number,
-        categoryScore: {
-          type: Array,
-          required: true,
-          validator: arrayValidator({
-            type: Object,
-            validator: objectValidator({
-              title: String,
-              score: Number,
-            }),
-          }),
-        },
-      }),
-    },
     /**
      * 質問と回答optionの一覧
      */
@@ -140,15 +117,37 @@ export default {
     },
   },
   computed: {
-    categoryScore() {
+    scoreList() {
       const vm = this
       return vm.answerListComputed.reduce((accumulator, currentItem) => {
-        accumulator[currentItem.title] += currentItem.score
+        accumulator[currentItem.categoryId] += currentItem.score
+        accumulator.totalScore += currentItem.score
         return accumulator
       }, {})
     },
-    feasibilityResultComputed() {
-      return this.feasibilityResult
+    categoryScore() {
+      return this.scoreList
+        .filter((key, value) => key !== 'totalScore')
+        .map((title, score) => {
+          return {
+            title,
+            score,
+          }
+        })
+    },
+    totalScore() {
+      return this.scoreList.filter((key, value) => key === 'totalScore').score
+    },
+    /**
+     * feasibility questionの回答に応じて集計されたスコア
+     */
+    feasibilityResult() {
+      return {
+        cropName: this.cropName,
+        totalScore: this.totalScore,
+        maxScore: 60,
+        categoryScore: this.categoryScore,
+      }
     },
     answerListComputed: {
       get() {
