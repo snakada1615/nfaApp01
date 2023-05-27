@@ -233,37 +233,37 @@ const answerList = [
     categoryId: 'a1',
     questionId: 'a1-01',
     optionId: '',
-    score: 0,
+    score: 1,
   },
   {
     categoryId: 'a1',
     questionId: 'a1-02',
     optionId: '',
-    score: 0,
+    score: 2,
   },
   {
     categoryId: 'a1',
     questionId: 'a1-03',
     optionId: '',
-    score: 0,
+    score: 3,
   },
   {
     categoryId: 'b1',
     questionId: 'b1-01',
     optionId: '',
-    score: 0,
+    score: 4,
   },
   {
     categoryId: 'b1',
     questionId: 'b1-02',
     optionId: '',
-    score: 0,
+    score: 3,
   },
   {
     categoryId: 'b1',
     questionId: 'b1-03',
     optionId: '',
-    score: 0,
+    score: 2,
   },
 ]
 
@@ -307,5 +307,5 @@ export const withSlot = TemplateWithScope.bind({})
 withSlot.args = {
   qaList,
   answerList,
-  extraComponentFlag: [1],
+  extraComponentFlag: ['a1_a1-02'],
 }

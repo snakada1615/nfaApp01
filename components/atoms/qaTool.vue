@@ -33,7 +33,11 @@
             >
               <!--    追加項目の表示      -->
               <slot
-                v-if="extraComponentFlag.includes(index2)"
+                v-if="
+                  extraComponentFlag.includes(
+                    qaGroup.categoryId + '_' + qa.questionId
+                  )
+                "
                 name="extraContents"
               ></slot>
 

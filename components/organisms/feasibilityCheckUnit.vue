@@ -1,10 +1,14 @@
 <template>
   <b-container>
     <display-result :feasibility-result="feasibilityResult" />
-    <qa-tool :answer-list.sync="answerListComputed" :qa-list="qaListComputed">
+    <qa-tool
+      :answer-list.sync="answerListComputed"
+      :qa-list="qaListComputed"
+      :extra-component-flag="slotComputed"
+    >
       <template #extraContents>
         <show-target-volume
-          :target-info="targetInfoComputed"
+          :target-info.sync="targetInfoComputed"
           :extra-component-flag="extraComponentFlag"
         />
       </template>
@@ -77,11 +81,18 @@ export default {
       }),
     },
     /**
-     * 表示項目に応じて追加コンポーネントを表示するためのフラグ
+     * 表示項目に応じてnamed slotを表示するためのフラグ
      */
     extraComponentFlag: {
       type: Array,
       default: () => [],
+    },
+    /**
+     * 対象作物名
+     */
+    cropName: {
+      type: String,
+      required: true,
     },
     /**
      * * targetCommodity: 対象品目
@@ -117,26 +128,47 @@ export default {
     },
   },
   computed: {
+    answerListComputed: {
+      get() {
+        return this.answerList
+      },
+      set(val) {
+        this.$emit('update:answerList', val)
+      },
+    },
+    slotComputed: {
+      get() {
+        return this.extraComponentFlag
+      },
+    },
     scoreList() {
       const vm = this
       return vm.answerListComputed.reduce((accumulator, currentItem) => {
-        accumulator[currentItem.categoryId] += currentItem.score
-        accumulator.totalScore += currentItem.score
+        if (accumulator[currentItem.categoryId]) {
+          accumulator[currentItem.categoryId] += currentItem.score
+        } else {
+          accumulator[currentItem.categoryId] = currentItem.score
+        }
+        if (accumulator.totalScore) {
+          accumulator.totalScore += currentItem.score
+        } else {
+          accumulator.totalScore = currentItem.score
+        }
         return accumulator
       }, {})
     },
     categoryScore() {
-      return this.scoreList
-        .filter((key, value) => key !== 'totalScore')
-        .map((title, score) => {
+      return Object.entries(this.scoreList)
+        .filter((item) => item[0] !== 'totalScore')
+        .map((item) => {
           return {
-            title,
-            score,
+            title: item[0],
+            score: item[1],
           }
         })
     },
     totalScore() {
-      return this.scoreList.filter((key, value) => key === 'totalScore').score
+      return this.scoreList.totalScore
     },
     /**
      * feasibility questionの回答に応じて集計されたスコア
@@ -149,19 +181,16 @@ export default {
         categoryScore: this.categoryScore,
       }
     },
-    answerListComputed: {
-      get() {
-        return this.answerList
-      },
-      set(val) {
-        this.$emit('update:answerList', val)
-      },
-    },
     qaListComputed() {
       return this.qaList
     },
-    targetInfoComputed() {
-      return this.targetInfo
+    targetInfoComputed: {
+      get() {
+        return this.targetInfo
+      },
+      set(val) {
+        this.$emit('update:targetInfo', val)
+      },
     },
   },
 }

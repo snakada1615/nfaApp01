@@ -5,7 +5,6 @@
       header-bg-variant="success"
       bg-variant="light"
       border-variant="success"
-      class="mx-1 px-0 my-2"
     >
       <template #header>
         <div class="font-weight-bolder text-white">
