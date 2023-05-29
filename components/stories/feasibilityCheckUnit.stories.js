@@ -31,6 +31,5 @@ Default.args = {
   targetInfo: showTargetVolumeStories.Default.args.targetInfo,
   qaList: qaToolStories.withSlot.args.qaList,
   answerList: qaToolStories.withSlot.args.answerList,
-  cropName: 'Baka',
   extraComponentFlag: ['a1_a1-02'],
 }

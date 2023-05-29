@@ -88,13 +88,6 @@ export default {
       default: () => [],
     },
     /**
-     * 対象作物名
-     */
-    cropName: {
-      type: String,
-      required: true,
-    },
-    /**
      * * targetCommodity: 対象品目
      * * targetNutrition: 対象栄養素
      * * nutritionGap: 現在の栄養素ギャップ
@@ -128,6 +121,12 @@ export default {
     },
   },
   computed: {
+    /**
+     * 対象作物名
+     */
+    cropName() {
+      return this.targetInfoComputed.targetCommodity
+    },
     answerListComputed: {
       get() {
         return this.answerList

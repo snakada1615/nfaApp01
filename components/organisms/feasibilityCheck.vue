@@ -19,10 +19,7 @@
             class="mx-0 mb-0 py-2 bg-dark rounded text-light font-weight-bold"
           >
             Feasibility assessment result
-            <b-form-select
-              v-model="selectedFeasibilityCase"
-              :options="cropList"
-            />
+            <b-form-select v-model="cropName" :options="cropList" />
             <div class="d-flex flex-row">
               <b-form-input
                 :value="feasibilityCaseByMonth.note"
@@ -33,29 +30,25 @@
           </b-col>
         </b-row>
       </b-card>
+      <feasibility-check-unit
+        :target-info="targetInfo"
+        :qa-list="qaList"
+        :answer-list="answerList"
+        :crop-name="cropName"
+        :extra-component-flag="['a1_a1-02']"
+      />
     </b-row>
-    {{ ansList }}
-    <display-result feasibility-result="" />
-    <qa-tool answer-list="answerList" qa-list="qaList">
-      <template #extraContents>
-        <show-target-volume target-info="" />
-      </template>
-    </qa-tool>
   </b-container>
 </template>
 
 <script>
 import { arrayValidator, objectValidator } from 'vue-props-validation'
-import displayResult from '@/components/molecules/displayResult'
-import qaTool from '@/components/atoms/qaTool'
-import showTargetVolume from '@/components/atoms/showTargetVolume'
+import FeasibilityCheckUnit from '@/components/organisms/feasibilityCheckUnit'
 
 export default {
   name: 'FeasibilityCheck',
   components: {
-    displayResult,
-    qaTool,
-    showTargetVolume,
+    FeasibilityCheckUnit,
   },
   props: {
     /**
@@ -180,7 +173,22 @@ export default {
     /**
      * 栄養素ギャップ
      */
-    nutrientGaps() {},
+    nutrientGaps: {
+      type: Array,
+      required: true,
+      validator: arrayValidator({
+        type: Object,
+        validator: objectValidator({
+          nutrient: String,
+          gap: Number,
+        }),
+      }),
+    },
+  },
+  data() {
+    return {
+      cropName: '',
+    }
   },
   computed: {
     feasibilityCaseByMonth() {
@@ -200,12 +208,20 @@ export default {
       })
     },
     targetInfo() {
+      const vm = this
+      const current = vm.feasibilityCaseByMonth.find(
+        (item) => item.selectedCrop.Name === vm.targetCommodity
+      )
       return {
-        targetCommodity: this.feasibilityCaseByMonth.targetCommodity.Name,
-        targetNutrition: this.selectedNutrient,
-
-        prodTarget: this.feasibilityCaseByMonth.targetInfo,
+        targetCommodity: current.targetCommodity,
+        targetNutrition: vm.selectedNutrient,
+        nutritionGap: 159,
+        prodTarget: current.prodTarget,
       }
+    },
+    nutrientGap() {
+      const vm = this
+      return this.nutrientGaps.find((item) => item.nutrient === vm.cropName).gap
     },
   },
 }
