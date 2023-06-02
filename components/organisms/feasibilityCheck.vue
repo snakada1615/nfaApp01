@@ -31,9 +31,9 @@
         </b-row>
       </b-card>
       <feasibility-check-unit
-        :target-info="targetInfo"
+        :target-info="feasibilityCaseSelected.targetInfo"
         :qa-list="qaList"
-        :answer-list="answerList"
+        :answer-list="feasibilityCaseSelected.answerList"
         :crop-name="cropName"
         :extra-component-flag="['a1_a1-02']"
       />
@@ -74,39 +74,17 @@ export default {
       validator: arrayValidator({
         type: Object,
         validator: objectValidator({
-          /**
-           * 選択した優先品目
-           */
-          selectedCrop: {
-            type: Object,
-            validator: objectValidator({
-              Carbohydrate: Number,
-              En: Number,
-              Fe: Number,
-              Fat: Number,
-              Pr: Number,
-              Va: Number,
-              Food_grp: String,
-              Name: String,
-              Group: String,
-              food_grp_id: String,
-              id: String,
-            }),
-          },
-          /**
-           * 優先品目の生産目標
-           */
-          prodTarget: {
-            Wt: Number,
-            Wt365: Number,
-            share: Number,
-          },
-          note: {
+          familyId: {
             type: String,
-            default: '',
+          },
+          month: {
+            type: String,
+          },
+          caseId: {
+            type: String,
           },
           /**
-           * feasibility Questionへの回答一覧
+           * 回答一覧
            */
           answerList: {
             type: Array,
@@ -119,16 +97,43 @@ export default {
             }),
           },
           /**
-           * 対象家族のID
+           * 表示項目に応じてnamed slotを表示するためのフラグ
            */
-          familyId: {
-            type: String,
+          extraComponentFlag: {
+            type: Array,
+            default: () => [],
           },
-          month: {
-            type: String,
-          },
-          caseId: {
-            type: String,
+          /**
+           * * targetCommodity: 対象品目
+           * * targetNutrition: 対象栄養素
+           * * nutritionGap: 現在の栄養素ギャップ
+           * * prodTarget: 摂取目標
+           *   - Wt 1日あたり目標
+           *   - Wt365 1年あたり目標
+           *   - share 対象品目での摂取目標（栄養ギャップにしめる比率）
+           */
+          targetInfo: {
+            type: Object,
+            required: true,
+            validator: objectValidator({
+              targetCommodity: {
+                type: String,
+                required: true,
+              },
+              targetNutrition: {
+                type: String,
+                required: true,
+              },
+              nutritionGap: {
+                type: Number,
+                required: true,
+              },
+              prodTarget: {
+                Wt: Number,
+                Wt365: Number,
+                share: Number,
+              },
+            }),
           },
         }),
       }),
@@ -170,20 +175,6 @@ export default {
         }),
       }),
     },
-    /**
-     * 栄養素ギャップ
-     */
-    nutrientGaps: {
-      type: Array,
-      required: true,
-      validator: arrayValidator({
-        type: Object,
-        validator: objectValidator({
-          nutrient: String,
-          gap: Number,
-        }),
-      }),
-    },
   },
   data() {
     return {
@@ -197,9 +188,14 @@ export default {
         (item) => item.month === vm.selectedMonth
       )
     },
+    feasibilityCaseSelected() {
+      return this.feasibilityCaseByMonth.find(
+        (item) => item.targetInfo.targetCommodity === this.cropName
+      )
+    },
     cropList() {
       return this.feasibilityCaseByMonth.map((item) => {
-        return item.selectedCrop.Name
+        return item.targetInfo.targetCommodity
       })
     },
     answerList() {
@@ -208,16 +204,7 @@ export default {
       })
     },
     targetInfo() {
-      const vm = this
-      const current = vm.feasibilityCaseByMonth.find(
-        (item) => item.selectedCrop.Name === vm.targetCommodity
-      )
-      return {
-        targetCommodity: current.targetCommodity,
-        targetNutrition: vm.selectedNutrient,
-        nutritionGap: 159,
-        prodTarget: current.prodTarget,
-      }
+      return this.feasibilityCaseByMonth()
     },
     nutrientGap() {
       const vm = this
